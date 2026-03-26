@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.board.mapper.BoardMapper">
+
+    <select id="getCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM board_t WHERE active = 0
+        <if test="_parameter != null"> AND category = #{_parameter} </if>
+    </select>
+
+    <select id="getSearchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM board_t WHERE active = 0
+        AND (title LIKE #{keyword} OR author LIKE #{keyword})
+        <if test="category != null"> AND category = #{category} </if>
+    </select>
+
+    <select id="getBoardList" parameterType="map" resultType="BoardVO">
+        SELECT * FROM board_t WHERE active = 0
+        <if test="category != null"> AND category = #{category} </if>
+        ORDER BY b_idx DESC
+        LIMIT #{numPerPage} OFFSET #{offset}
+    </select>
+
+    <select id="searchBoard" parameterType="map" resultType="BoardVO">
+        SELECT * FROM board_t WHERE active = 0
+        AND (title LIKE #{keyword} OR author LIKE #{keyword})
+        <if test="category != null"> AND category = #{category} </if>
+        ORDER BY b_idx DESC
+        LIMIT #{numPerPage} OFFSET #{offset}
+    </select>
+
+    <select id="getPopularList" parameterType="int" resultType="BoardVO">
+        SELECT * FROM board_t WHERE active = 0
+        ORDER BY (views + comments * 2) DESC
+        LIMIT #{_parameter}
+    </select>
+
+    <select id="getRecentList" parameterType="int" resultType="BoardVO">
+        SELECT * FROM board_t WHERE active = 0
+        ORDER BY b_idx DESC
+        LIMIT #{_parameter}
+    </select>
+
+    <select id="getDetail" parameterType="String" resultType="BoardVO">
+        SELECT * FROM board_t WHERE b_idx = #{b_idx}
+    </select>
+
+    <insert id="insertBoard" parameterType="BoardVO">
+        INSERT INTO board_t (title, category, content, author)
+        VALUES (#{title}, #{category}, #{content}, #{author})
+    </insert>
+
+    <update id="updateBoard" parameterType="BoardVO">
+        UPDATE board_t SET title=#{title}, category=#{category}, content=#{content}
+        WHERE b_idx = #{b_idx}
+    </update>
+
+    <update id="deleteBoard" parameterType="String">
+        UPDATE board_t SET active = 1 WHERE b_idx = #{b_idx}
+    </update>
+
+    <update id="addViews" parameterType="String">
+        UPDATE board_t SET views = views + 1 WHERE b_idx = #{b_idx}
+    </update>
+
+    <!-- 댓글 -->
+    <select id="getComments" parameterType="String" resultType="CommentVO">
+        SELECT * FROM comment_t WHERE b_idx = #{b_idx} ORDER BY c_idx DESC
+    </select>
+
+    <insert id="insertComment" parameterType="CommentVO">
+        INSERT INTO comment_t (b_idx, author, content) VALUES (#{b_idx}, #{author}, #{content})
+    </insert>
+
+    <delete id="deleteComment" parameterType="String">
+        DELETE FROM comment_t WHERE c_idx = #{c_idx}
+    </delete>
+
+    <update id="addCommentCount" parameterType="String">
+        UPDATE board_t SET comments = comments + 1 WHERE b_idx = #{b_idx}
+    </update>
+
+    <update id="subtractCommentCount" parameterType="String">
+        UPDATE board_t SET comments = GREATEST(0, comments - 1) WHERE b_idx = #{b_idx}
+    </update>
+
+</mapper>

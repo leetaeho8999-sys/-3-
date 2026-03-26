@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.member.mapper.MemberMapper">
+
+    <insert id="insertMember" parameterType="MemberVO">
+        INSERT INTO member_t (username, email, password, phone)
+        VALUES (#{username}, #{email}, #{password}, #{phone})
+    </insert>
+
+    <select id="findByEmail" parameterType="String" resultType="MemberVO">
+        SELECT * FROM member_t WHERE email = #{email} AND active = 0
+    </select>
+
+    <select id="findByIdx" parameterType="String" resultType="MemberVO">
+        SELECT * FROM member_t WHERE m_idx = #{m_idx}
+    </select>
+
+    <select id="checkEmail" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM member_t WHERE email = #{email}
+    </select>
+
+    <select id="checkUsername" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM member_t WHERE username = #{username}
+    </select>
+
+    <update id="updateMember" parameterType="MemberVO">
+        UPDATE member_t
+        SET username = #{username}, phone = #{phone}
+        WHERE m_idx = #{m_idx}
+    </update>
+
+    <update id="deleteMember" parameterType="String">
+        UPDATE member_t SET active = 1 WHERE m_idx = #{m_idx}
+    </update>
+
+</mapper>
