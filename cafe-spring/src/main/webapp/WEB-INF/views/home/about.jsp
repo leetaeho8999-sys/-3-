@@ -1,11 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="소개 — 정성을 다한 커피"/>
+<c:set var="pageTitle" value="소개 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <main class="page-main">
   <section class="about-section">
     <div class="container">
-      <div class="section-header"><h2>우리의 이야기</h2><p>정성을 다한 커피는 최상의 원두와 완벽한 추출로 여러분께 특별한 커피 경험을 선사합니다</p></div>
+      <div class="section-header"><h2>우리의 이야기</h2><p>로운은 최상의 원두와 완벽한 추출로 여러분께 특별한 커피 경험을 선사합니다</p></div>
       <div class="about-story">
         <div class="about-text">
           <h3>진심을 담은 한 잔</h3>

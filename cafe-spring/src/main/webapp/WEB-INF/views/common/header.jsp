@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${not empty pageTitle ? pageTitle : '정성을 다한 커피'}</title>
+  <title>${not empty pageTitle ? pageTitle : '로운'}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
@@ -13,7 +13,7 @@
 <body>
 <header class="site-header" id="site-header">
   <div class="header-inner">
-    <a href="${pageContext.request.contextPath}/" class="header-logo">정성을 다한 커피</a>
+    <a href="${pageContext.request.contextPath}/" class="header-logo">로운</a>
     <nav class="header-nav">
       <a href="${pageContext.request.contextPath}/" class="nav-link">홈</a>
       <a href="${pageContext.request.contextPath}/about" class="nav-link">소개</a>

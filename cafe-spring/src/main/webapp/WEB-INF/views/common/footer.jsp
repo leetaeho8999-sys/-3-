@@ -4,7 +4,7 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <h3>정성을 다한 커피</h3>
+        <h3>로운</h3>
         <p>한 잔의 커피에 담긴<br>진심과 정성</p>
       </div>
       <div class="footer-links">
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 정성을 다한 커피. All rights reserved.</p>
+      <p>&copy; 2026 로운. All rights reserved.</p>
       <p>사업자등록번호: 123-45-67890 | 대표: 홍길동</p>
       <div class="footer-legal">
         <a href="${pageContext.request.contextPath}/privacy-policy">개인정보 처리방침</a>

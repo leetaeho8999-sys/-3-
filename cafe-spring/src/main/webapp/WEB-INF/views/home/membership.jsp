@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="멤버십 — 정성을 다한 커피"/>
+<c:set var="pageTitle" value="멤버십 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <main class="page-main">
     <!-- 히어로 배너 -->

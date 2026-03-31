@@ -1,12 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="FAQ — 정성을 다한 커피"/>
+<c:set var="pageTitle" value="FAQ — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <main class="page-main">
   <div class="container container-narrow" style="padding-top:2rem;padding-bottom:3rem">
     <a href="${pageContext.request.contextPath}/" style="font-size:.875rem;color:#717182">← 홈으로 돌아가기</a>
     <h1 style="font-family:'Noto Serif KR',serif;font-size:2rem;font-weight:400;margin:1rem 0 .5rem">자주 묻는 질문</h1>
-    <p style="color:#717182;margin-bottom:2rem">정성을 다한 커피에 대해 자주 묻는 질문과 답변을 확인하세요.</p>
+    <p style="color:#717182;margin-bottom:2rem">로운에 대해 자주 묻는 질문과 답변을 확인하세요.</p>
     <div class="faq-cats">
       <button class="faq-cat-btn active" onclick="filterFAQ('전체',this)">전체</button>
       <button class="faq-cat-btn" onclick="filterFAQ('주문 및 결제',this)">주문 및 결제</button>

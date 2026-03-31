@@ -123,3 +123,41 @@ function escapeHtml(str) {
 document.addEventListener('keydown', function (e) {
     if (e.target && e.target.id === 'chat-input' && e.key === 'Enter') sendChat();
 });
+
+// ── 카드/블록 전체 클릭 활성화 ──
+// 텍스트가 아닌 블록 어디를 눌러도 링크로 이동
+(function () {
+    function makeBlockClickable(selector) {
+        document.querySelectorAll(selector).forEach(function (el) {
+            var link = el.querySelector('a[href]');
+            if (!link) return;
+            el.style.cursor = 'pointer';
+            el.addEventListener('click', function (e) {
+                // 내부 링크·버튼·입력 요소 직접 클릭 시엔 무시 (자연 동작 유지)
+                if (e.target.closest('a, button, input, select, textarea')) return;
+                window.location.href = link.href;
+            });
+        });
+    }
+
+    function init() {
+        // 게시판 테이블 행
+        makeBlockClickable('.board-table tbody tr');
+        // 홈 화면 게시글 카드
+        makeBlockClickable('.home-board-card');
+        // data-href 속성이 있는 모든 요소 (향후 확장용)
+        document.querySelectorAll('[data-href]').forEach(function (el) {
+            el.style.cursor = 'pointer';
+            el.addEventListener('click', function (e) {
+                if (e.target.closest('a, button, input, select, textarea')) return;
+                window.location.href = el.getAttribute('data-href');
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();

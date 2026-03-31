@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.chat.mapper.ChatMapper">
+
+    <resultMap id="chatMap" type="org.study.cafe.chat.vo.ChatVO">
+        <result column="log_idx"    property="logIdx"/>
+        <result column="session_id" property="sessionId"/>
+        <result column="m_idx"      property="mIdx"/>
+        <result column="reg_date"   property="regDate"/>
+    </resultMap>
+
+    <insert id="insertMessage" parameterType="org.study.cafe.chat.vo.ChatVO">
+        INSERT INTO chat_log_t (session_id, m_idx, sender, message)
+        VALUES (#{sessionId}, #{mIdx}, #{sender}, #{message})
+    </insert>
+
+    <select id="getHistory" parameterType="String" resultMap="chatMap">
+        SELECT * FROM chat_log_t
+        WHERE session_id = #{sessionId}
+        ORDER BY log_idx ASC
+        LIMIT 50
+    </select>
+
+</mapper>

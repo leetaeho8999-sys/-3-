@@ -7,6 +7,7 @@ public interface MemberService {
     int      checkEmail(String email);
     int      checkUsername(String username);
     MemberVO findByIdx(String m_idx);
+    MemberVO findMyPageInfo(String m_idx);
     int      updateMember(MemberVO vo);
     int      deleteMember(String m_idx);
 }

@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="AI 상담 — 정성을 다한 커피"/>
+<c:set var="pageTitle" value="AI 상담 — 로운"/>
 <c:set var="activePage" value="chat"/>
 <%@ include file="../common/header.jsp" %>
 
@@ -37,7 +37,7 @@
                 <div class="msg-bot">
                     <div class="msg-avatar bot-avatar">AI</div>
                     <div class="msg-bubble bot-bubble">
-                        안녕하세요! 정성을 다한 커피 AI 어시스턴트입니다. ☕<br>
+                        안녕하세요! 로운 AI 어시스턴트입니다. ☕<br>
                         무엇을 도와드릴까요?
                     </div>
                 </div>
@@ -113,7 +113,7 @@ function sendQuick(text) {
 
 function clearChat() {
     var m = document.getElementById('chat-messages');
-    m.innerHTML = '<div class="msg-bot"><div class="msg-avatar bot-avatar">AI</div><div class="msg-bubble bot-bubble">안녕하세요! 정성을 다한 커피 AI 어시스턴트입니다. ☕<br>무엇을 도와드릴까요?</div></div>';
+    m.innerHTML = '<div class="msg-bot"><div class="msg-avatar bot-avatar">AI</div><div class="msg-bubble bot-bubble">안녕하세요! 로운 AI 어시스턴트입니다. ☕<br>무엇을 도와드릴까요?</div></div>';
 }
 </script>
 

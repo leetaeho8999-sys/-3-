@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="정성을 다한 커피 — 홈"/>
+<c:set var="pageTitle" value="로운 — 홈"/>
 <%@ include file="../common/header.jsp" %>
 <main>
   <!-- Hero -->
@@ -8,7 +8,7 @@
     <div class="hero-overlay"></div>
     <img class="hero-bg" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1920&h=1080&fit=crop" alt="Coffee">
     <div class="hero-content">
-      <h1 class="hero-title">정성을 다한 커피</h1>
+      <h1 class="hero-title">로운</h1>
       <p class="hero-subtitle">한 잔의 커피에 담긴 진심과 정성</p>
       <a href="${pageContext.request.contextPath}/menu/list" class="btn-hero">메뉴 보기</a>
     </div>

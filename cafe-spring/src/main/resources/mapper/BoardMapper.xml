@@ -3,6 +3,16 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.study.cafe.board.mapper.BoardMapper">
 
+    <!-- board_t: reg_date → regDate 매핑 -->
+    <resultMap id="boardMap" type="BoardVO">
+        <result column="reg_date" property="regDate"/>
+    </resultMap>
+
+    <!-- comment_t: reg_date → regDate 매핑 -->
+    <resultMap id="commentMap" type="CommentVO">
+        <result column="reg_date" property="regDate"/>
+    </resultMap>
+
     <select id="getCount" parameterType="String" resultType="int">
         SELECT COUNT(*) FROM board_t WHERE active = 0
         <if test="_parameter != null"> AND category = #{_parameter} </if>
@@ -10,38 +20,38 @@
 
     <select id="getSearchCount" parameterType="map" resultType="int">
         SELECT COUNT(*) FROM board_t WHERE active = 0
-        AND (title LIKE #{keyword} OR author LIKE #{keyword})
+        AND (title LIKE #{keyword} OR author LIKE #{keyword} OR content LIKE #{keyword})
         <if test="category != null"> AND category = #{category} </if>
     </select>
 
-    <select id="getBoardList" parameterType="map" resultType="BoardVO">
+    <select id="getBoardList" parameterType="map" resultMap="boardMap">
         SELECT * FROM board_t WHERE active = 0
         <if test="category != null"> AND category = #{category} </if>
         ORDER BY b_idx DESC
         LIMIT #{numPerPage} OFFSET #{offset}
     </select>
 
-    <select id="searchBoard" parameterType="map" resultType="BoardVO">
+    <select id="searchBoard" parameterType="map" resultMap="boardMap">
         SELECT * FROM board_t WHERE active = 0
-        AND (title LIKE #{keyword} OR author LIKE #{keyword})
+        AND (title LIKE #{keyword} OR author LIKE #{keyword} OR content LIKE #{keyword})
         <if test="category != null"> AND category = #{category} </if>
         ORDER BY b_idx DESC
         LIMIT #{numPerPage} OFFSET #{offset}
     </select>
 
-    <select id="getPopularList" parameterType="int" resultType="BoardVO">
+    <select id="getPopularList" parameterType="int" resultMap="boardMap">
         SELECT * FROM board_t WHERE active = 0
         ORDER BY (views + comments * 2) DESC
         LIMIT #{_parameter}
     </select>
 
-    <select id="getRecentList" parameterType="int" resultType="BoardVO">
+    <select id="getRecentList" parameterType="int" resultMap="boardMap">
         SELECT * FROM board_t WHERE active = 0
         ORDER BY b_idx DESC
         LIMIT #{_parameter}
     </select>
 
-    <select id="getDetail" parameterType="String" resultType="BoardVO">
+    <select id="getDetail" parameterType="String" resultMap="boardMap">
         SELECT * FROM board_t WHERE b_idx = #{b_idx}
     </select>
 
@@ -63,13 +73,15 @@
         UPDATE board_t SET views = views + 1 WHERE b_idx = #{b_idx}
     </update>
 
-    <!-- 댓글 -->
-    <select id="getComments" parameterType="String" resultType="CommentVO">
-        SELECT * FROM comment_t WHERE b_idx = #{b_idx} ORDER BY c_idx DESC
+    <!-- 댓글: comment_t 실제 컬럼(author, reg_date) 사용 -->
+    <select id="getComments" parameterType="String" resultMap="commentMap">
+        SELECT c_idx, b_idx, author, content, reg_date
+        FROM comment_t WHERE b_idx = #{b_idx} ORDER BY c_idx ASC
     </select>
 
     <insert id="insertComment" parameterType="CommentVO">
-        INSERT INTO comment_t (b_idx, author, content) VALUES (#{b_idx}, #{author}, #{content})
+        INSERT INTO comment_t (b_idx, author, content)
+        VALUES (#{b_idx}, #{author}, #{content})
     </insert>
 
     <delete id="deleteComment" parameterType="String">

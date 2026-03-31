@@ -3,31 +3,81 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.study.cafe.member.mapper.MemberMapper">
 
-    <insert id="insertMember" parameterType="MemberVO">
-        INSERT INTO member_t (username, email, password, phone)
-        VALUES (#{username}, #{email}, #{password}, #{phone})
+    <!--
+        CRM 고객 먼저 생성 (useGeneratedKeys → vo.linkedCustomer에 c_idx 자동 주입)
+        username → customer_t.name, phone → customer_t.phone
+    -->
+    <insert id="insertCustomerForMember" parameterType="MemberVO"
+            useGeneratedKeys="true" keyProperty="linkedCustomer">
+        INSERT INTO customer_t (name, phone, grade, visit_count, memo, active)
+        VALUES (#{username}, #{phone}, '일반', 0, '', 0)
     </insert>
 
+    <!--
+        회원 등록 (member_t 실제 컬럼: name, email, password, linked_customer)
+        username 값 → name 컬럼에 저장
+    -->
+    <insert id="insertMember" parameterType="MemberVO">
+        INSERT INTO member_t (name, email, password, linked_customer)
+        VALUES (#{username}, #{email}, #{password}, #{linkedCustomer})
+    </insert>
+
+    <!-- name AS username: MemberVO.username 필드에 매핑 -->
     <select id="findByEmail" parameterType="String" resultType="MemberVO">
-        SELECT * FROM member_t WHERE email = #{email} AND active = 0
+        SELECT m_idx, name AS username, email, password, reg_date AS regDate, active,
+               linked_customer AS linkedCustomer
+        FROM member_t WHERE email = #{email} AND active = 0
     </select>
 
     <select id="findByIdx" parameterType="String" resultType="MemberVO">
-        SELECT * FROM member_t WHERE m_idx = #{m_idx}
+        SELECT m_idx, name AS username, email, password, reg_date AS regDate, active,
+               linked_customer AS linkedCustomer
+        FROM member_t WHERE m_idx = #{m_idx}
+    </select>
+
+    <!-- 마이페이지 조회: customer_t LEFT JOIN으로 grade, visitCount, phone 포함 -->
+    <select id="findMyPageInfo" parameterType="String" resultType="MemberVO">
+        SELECT
+            m.m_idx,
+            m.name             AS username,
+            m.email,
+            m.password,
+            m.reg_date         AS regDate,
+            m.active,
+            m.linked_customer  AS linkedCustomer,
+            COALESCE(c.phone,       ''    ) AS phone,
+            COALESCE(c.grade,       '일반') AS grade,
+            COALESCE(c.visit_count, 0     ) AS visitCount
+        FROM member_t m
+        LEFT JOIN customer_t c
+            ON m.linked_customer = c.c_idx
+           AND c.active = 0
+        WHERE m.m_idx = #{m_idx}
+          AND m.active = 0
     </select>
 
     <select id="checkEmail" parameterType="String" resultType="int">
         SELECT COUNT(*) FROM member_t WHERE email = #{email}
     </select>
 
+    <!-- name 컬럼으로 닉네임 중복 확인 -->
     <select id="checkUsername" parameterType="String" resultType="int">
-        SELECT COUNT(*) FROM member_t WHERE username = #{username}
+        SELECT COUNT(*) FROM member_t WHERE name = #{username}
     </select>
 
+    <!-- 회원 정보 수정: name 컬럼 업데이트 -->
     <update id="updateMember" parameterType="MemberVO">
         UPDATE member_t
-        SET username = #{username}, phone = #{phone}
+        SET name = #{username}
         WHERE m_idx = #{m_idx}
+    </update>
+
+    <!-- CRM 고객 정보 동기화 (이름, 전화번호) -->
+    <update id="updateLinkedCustomer" parameterType="MemberVO">
+        UPDATE customer_t
+        SET name  = #{username},
+            phone = #{phone}
+        WHERE c_idx = #{linkedCustomer}
     </update>
 
     <update id="deleteMember" parameterType="String">

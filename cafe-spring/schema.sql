@@ -1,74 +1,244 @@
--- =============================================
--- 정성을 다한 커피 — schema.sql
--- =============================================
+-- ================================================================
+-- 정성을 다한 커피 (cafe-spring) — schema.sql
+-- ----------------------------------------------------------------
+-- DB     : dbstudy  (brew-crm-v2 와 같은 DB 공유)
+-- PORT   : 8080  (brew-crm-v2 는 8081)
+--
+-- ※ 실제 DB 구조는 brew-crm-v2/schema.sql 기준으로 생성한다.
+--    이 파일은 cafe-spring 전용 테이블(board_t, comment_t, menu_t)과
+--    공유 테이블(customer_t, member_t, membership_t) 전체를 기술한다.
+-- ================================================================
+
 USE dbstudy;
 
--- 회원
-DROP TABLE IF EXISTS member_t;
-CREATE TABLE member_t (
-    m_idx    INT          NOT NULL AUTO_INCREMENT,
-    username VARCHAR(100) NOT NULL UNIQUE,
-    email    VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    phone    VARCHAR(20)  DEFAULT '',
-    reg_date TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-    active   TINYINT      DEFAULT 0,
-    PRIMARY KEY (m_idx)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 게시판
+-- ================================================================
+-- 공유 테이블 (brew-crm-v2 와 동일 DB 사용)
+-- ================================================================
+
+-- ── customer_t ───────────────────────────────────────────────
+--  brew-crm 관리자가 주로 관리하는 고객 테이블.
+--  cafe-spring 에서는 회원가입 시 row를 생성하고(insertCustomerForMember),
+--  member_t.linked_customer FK 로 참조하여 등급·방문 정보를 읽는다.
+CREATE TABLE IF NOT EXISTS customer_t (
+    c_idx       INT           NOT NULL AUTO_INCREMENT
+        COMMENT '고객 번호 (PK) — member_t.linked_customer FK 로 참조. cafe-spring 회원가입(insertCustomerForMember) 시 자동 생성',
+
+    name        VARCHAR(50)   NOT NULL
+        COMMENT '고객 이름 — cafe-spring 회원가입 시 username 값으로 채워짐. brew-crm 고객 목록 표시. 마이페이지 수정 시 updateLinkedCustomer 로 동기화',
+
+    phone       VARCHAR(20)   DEFAULT '-'
+        COMMENT '연락처 — cafe-spring 회원가입·정보 수정 시 동기화. brew-crm 고객 검색(이름/전화 LIKE) 에 사용',
+
+    grade       VARCHAR(10)   DEFAULT '일반'
+        COMMENT '등급 (일반/실버/골드/VIP) — brew-crm 방문 기록 시 자동 갱신. cafe-spring MemberMapper.findMyPageInfo() LEFT JOIN 으로 읽어 ${memberInfo.grade} 표시. membership_t.grade 와 항상 동기화',
+
+    visit_count INT           DEFAULT 0
+        COMMENT '방문 횟수 — brew-crm 관리자 [방문 기록] 클릭 시 +1. 등급 산정 기준, 포인트(×100) 계산 기준. cafe-spring 마이페이지 ${memberInfo.visitCount} 표시',
+
+    memo        TEXT
+        COMMENT '메모 — 알레르기·선호 음료 등. brew-crm 관리자 메모 화면에서 수정',
+
+    reg_date    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+        COMMENT '등록일 — brew-crm 대시보드 이번 달 신규 고객 수 집계에 사용',
+
+    active      TINYINT       DEFAULT 0
+        COMMENT '삭제 여부 (0=정상, 1=논리삭제) — 모든 SELECT에 AND c.active=0 조건 포함. 실제 row는 남김',
+
+    PRIMARY KEY (c_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='CRM 고객 테이블 — brew-crm에서 관리, cafe-spring 회원가입 시 row 자동 생성';
+
+
+-- ── member_t ─────────────────────────────────────────────────
+--  brew-crm·cafe-spring 공통 로그인 계정 테이블.
+--  cafe-spring 에서는 name 컬럼을 AS username 으로 alias 해서 읽는다.
+CREATE TABLE IF NOT EXISTS member_t (
+    m_idx           INT           NOT NULL AUTO_INCREMENT
+        COMMENT '회원 번호 (PK) — 세션 loginMember.m_idx. membership_t.user_id FK. findMyPageInfo·login·updateMember 등 모든 조회 기준 키',
+
+    email           VARCHAR(100)  NOT NULL UNIQUE
+        COMMENT '이메일 (로그인 ID) — cafe-spring·brew-crm 공통 로그인 식별자. findByEmail() WHERE 조건. UNIQUE 제약',
+
+    password        VARCHAR(255)  NOT NULL
+        COMMENT 'BCrypt 암호화 비밀번호 — BCryptPasswordEncoder.matches(입력값, DB값)으로 검증. 평문 저장 금지',
+
+    name            VARCHAR(50)   NOT NULL
+        COMMENT '이름/닉네임 — cafe-spring 회원가입 시 username 값을 저장(INSERT INTO member_t ... VALUES(#{username})). cafe-spring MemberMapper.xml 에서 name AS username 으로 읽음. brew-crm 마이페이지에서 name 필드로 직접 표시·수정',
+
+    linked_customer INT           DEFAULT NULL
+        COMMENT '연결된 고객 번호 (FK → customer_t.c_idx) — 회원가입 시 customer_t row 먼저 생성 후 여기에 저장. findMyPageInfo LEFT JOIN 기준. brew-crm이 방문 기록 시 역방향 조회(findMemberByCustomer)로 membership_t 동기화에 사용',
+
+    reg_date        TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+        COMMENT '가입일 — 현재 화면에 표시되지 않음',
+
+    active          TINYINT       DEFAULT 0
+        COMMENT '탈퇴 여부 (0=정상, 1=탈퇴) — 모든 SELECT에 AND m.active=0 조건 포함. 탈퇴 시 UPDATE active=1(논리삭제)',
+
+    PRIMARY KEY (m_idx),
+    CONSTRAINT fk_member_customer
+        FOREIGN KEY (linked_customer)
+        REFERENCES customer_t(c_idx)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='회원 테이블 — cafe-spring·brew-crm 공통 사용. name 컬럼을 cafe-spring은 username으로 alias해서 읽음';
+
+
+-- ── membership_t ─────────────────────────────────────────────
+--  cafe-spring 포인트·등급 테이블.
+--  brew-crm 방문 기록 시 CustomerServiceImpl.addVisitAndUpdateGrade() 가 자동 동기화.
+CREATE TABLE IF NOT EXISTS membership_t (
+    ms_idx   INT         NOT NULL AUTO_INCREMENT
+        COMMENT '멤버십 번호 (PK) — 내부 식별자',
+
+    user_id  INT         NOT NULL UNIQUE
+        COMMENT '회원 번호 (FK → member_t.m_idx) — getByUserId()·insertMembership()·updateMembership()의 WHERE 조건. UNIQUE: 회원 1명당 1행',
+
+    grade    VARCHAR(20) DEFAULT '일반'
+        COMMENT '등급 — brew-crm 방문 기록 시 customer_t.grade 와 동기화. cafe-spring MembershipController 에서 ${membership.grade}로 표시',
+
+    points   INT         DEFAULT 0
+        COMMENT '누적 포인트 — 방문 1회 = 100점(visit_count × 100). brew-crm 마이페이지 ${myInfo.points} 배지, cafe-spring 멤버십 페이지 ${membership.points} 에 표시',
+
+    reg_date TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+        COMMENT '최초 멤버십 생성일 — 현재 화면에 표시되지 않음',
+
+    PRIMARY KEY (ms_idx),
+    FOREIGN KEY (user_id) REFERENCES member_t(m_idx) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='멤버십 포인트·등급 테이블 — cafe-spring 포인트 화면의 데이터 소스. brew-crm 방문 기록 시 자동 동기화';
+
+
+-- ================================================================
+-- cafe-spring 전용 테이블
+-- ================================================================
+
+-- ── board_t ──────────────────────────────────────────────────
 DROP TABLE IF EXISTS comment_t;
 DROP TABLE IF EXISTS board_t;
 CREATE TABLE board_t (
-    b_idx    INT          NOT NULL AUTO_INCREMENT,
-    title    VARCHAR(255) NOT NULL,
-    category VARCHAR(50)  DEFAULT '자유',
-    content  TEXT,
-    author   VARCHAR(100) NOT NULL,
-    views    INT          DEFAULT 0,
-    comments INT          DEFAULT 0,
-    reg_date TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-    active   TINYINT      DEFAULT 0,
-    PRIMARY KEY (b_idx)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    b_idx    INT          NOT NULL AUTO_INCREMENT
+        COMMENT '게시글 번호 (PK) — BoardController·comment_t.b_idx FK',
 
--- 댓글
+    title    VARCHAR(255) NOT NULL
+        COMMENT '제목 — 게시판 목록·상세 표시',
+
+    category VARCHAR(50)  DEFAULT '자유'
+        COMMENT '카테고리 (공지/질문/후기/정보/자유) — 게시판 필터·표시에 사용',
+
+    content  TEXT
+        COMMENT '본문 내용 — 게시글 상세 화면 표시',
+
+    author   VARCHAR(100) NOT NULL
+        COMMENT '작성자 — 로그인 회원의 username(name) 값을 저장',
+
+    views    INT          DEFAULT 0
+        COMMENT '조회 수 — 게시글 상세 접근 시 +1',
+
+    comments INT          DEFAULT 0
+        COMMENT '댓글 수 — 댓글 등록·삭제 시 갱신. 목록 화면에 표시',
+
+    reg_date TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+        COMMENT '작성일 — 게시판 목록 표시',
+
+    active   TINYINT      DEFAULT 0
+        COMMENT '삭제 여부 (0=정상, 1=논리삭제)',
+
+    PRIMARY KEY (b_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='게시판 테이블 — cafe-spring 커뮤니티 게시판 전용';
+
+
+-- ── comment_t ─────────────────────────────────────────────────
 CREATE TABLE comment_t (
-    c_idx    INT          NOT NULL AUTO_INCREMENT,
-    b_idx    INT          NOT NULL,
-    author   VARCHAR(100) NOT NULL,
-    content  TEXT         NOT NULL,
-    reg_date TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    c_idx    INT          NOT NULL AUTO_INCREMENT
+        COMMENT '댓글 번호 (PK)',
+
+    b_idx    INT          NOT NULL
+        COMMENT '게시글 번호 (FK → board_t.b_idx) — ON DELETE CASCADE: 게시글 삭제 시 댓글도 자동 삭제',
+
+    author   VARCHAR(100) NOT NULL
+        COMMENT '작성자 — 로그인 회원의 username 값을 저장',
+
+    content  TEXT         NOT NULL
+        COMMENT '댓글 내용',
+
+    reg_date TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+        COMMENT '작성일',
+
     PRIMARY KEY (c_idx),
     FOREIGN KEY (b_idx) REFERENCES board_t(b_idx) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='댓글 테이블 — cafe-spring 게시판 댓글 전용. board_t 삭제 시 CASCADE 자동 삭제';
 
--- 메뉴
+
+-- ── menu_t ────────────────────────────────────────────────────
 DROP TABLE IF EXISTS menu_t;
 CREATE TABLE menu_t (
-    m_idx       INT            NOT NULL AUTO_INCREMENT,
-    name        VARCHAR(100)   NOT NULL,
-    description TEXT,
-    price       INT            DEFAULT 0,
-    category    VARCHAR(50),
-    image_url   VARCHAR(500),
-    story       TEXT,
-    origin      VARCHAR(100),
-    available   TINYINT        DEFAULT 1,
-    PRIMARY KEY (m_idx)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    m_idx       INT            NOT NULL AUTO_INCREMENT
+        COMMENT '메뉴 번호 (PK) — MenuController 상세·수정·삭제 식별자',
 
--- 멤버십
-DROP TABLE IF EXISTS membership_t;
-CREATE TABLE membership_t (
-    ms_idx   INT         NOT NULL AUTO_INCREMENT,
-    user_id  INT         NOT NULL UNIQUE,
-    grade    VARCHAR(20) DEFAULT '베이직',
-    points   INT         DEFAULT 0,
-    reg_date TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (ms_idx),
-    FOREIGN KEY (user_id) REFERENCES member_t(m_idx) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    name        VARCHAR(100)   NOT NULL
+        COMMENT '메뉴 이름 — 메뉴 목록·상세 화면 표시',
+
+    description TEXT
+        COMMENT '메뉴 설명 — 메뉴 목록 카드 설명 문구',
+
+    price       INT            DEFAULT 0
+        COMMENT '가격 (원) — 메뉴 목록·상세 화면 표시',
+
+    category    VARCHAR(50)
+        COMMENT '카테고리 (ESPRESSO/LATTE/SPECIAL 등) — 메뉴 탭 필터에 사용',
+
+    image_url   VARCHAR(500)
+        COMMENT '메뉴 이미지 URL — 메뉴 카드 img src에 사용. 외부 URL(Unsplash 등) 허용',
+
+    story       TEXT
+        COMMENT '메뉴 스토리 — 메뉴 상세 페이지 하단 소개 문구',
+
+    origin      VARCHAR(100)
+        COMMENT '원두 산지 — 메뉴 상세 페이지에 표시 (예: 에티오피아 예가체프)',
+
+    available   TINYINT        DEFAULT 1
+        COMMENT '판매 여부 (1=판매중, 0=품절) — 메뉴 목록에서 품절 표시 분기에 사용',
+
+    PRIMARY KEY (m_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='메뉴 테이블 — cafe-spring 메뉴 화면 전용. brew-crm 에서는 사용하지 않음';
+
+
+-- ── chat_log_t ───────────────────────────────────────────────
+--  cafe-spring 채팅 로그 테이블.
+--  ChatMapper.insertMessage / getHistory 에서 사용.
+CREATE TABLE IF NOT EXISTS chat_log_t (
+    log_idx    INT           NOT NULL AUTO_INCREMENT
+        COMMENT '로그 번호 (PK)',
+
+    session_id VARCHAR(100)  NOT NULL
+        COMMENT '채팅 세션 ID — getHistory WHERE 조건',
+
+    m_idx      INT           DEFAULT NULL
+        COMMENT '회원 번호 (NULL = 비로그인) — FK 없이 참조',
+
+    sender     VARCHAR(20)   NOT NULL
+        COMMENT '발신자 구분 (user / bot)',
+
+    message    TEXT          NOT NULL
+        COMMENT '채팅 메시지 내용',
+
+    reg_date   TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+        COMMENT '전송 시각',
+
+    PRIMARY KEY (log_idx),
+    INDEX idx_session (session_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='채팅 로그 테이블 — cafe-spring 챗봇 대화 내역 저장';
+
+
+-- ================================================================
+-- 샘플 데이터
+-- ================================================================
 
 -- 샘플 메뉴
 INSERT INTO menu_t (name, description, price, category, image_url, origin, story) VALUES

@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="회원가입 — 정성을 다한 커피"/>
+<c:set var="pageTitle" value="회원가입 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <main class="page-main bg-gray">
   <div class="auth-container">
-    <div class="auth-header"><div class="auth-icon">☕</div><h1>회원가입</h1><p>정성을 다한 커피의 회원이 되어보세요</p></div>
+    <div class="auth-header"><div class="auth-icon">☕</div><h1>회원가입</h1><p>로운의 회원이 되어보세요</p></div>
     <div class="auth-card">
       <h2>계정 만들기</h2><p class="auth-desc">아래 정보를 입력하여 회원가입을 완료하세요</p>
       <c:if test="${not empty error}"><div class="alert alert-error">${error}</div></c:if>

@@ -64,8 +64,12 @@ public class MemberController {
 
     // 마이페이지
     @GetMapping("/mypage")
-    public String mypage(HttpSession session) {
-        if (session.getAttribute("loginMember") == null) return "redirect:/member/login";
+    public String mypage(HttpSession session, Model model) {
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
+        if (loginMember == null) return "redirect:/member/login";
+        // customer_t JOIN으로 grade, visitCount 포함한 최신 정보 조회
+        MemberVO info = memberService.findMyPageInfo(loginMember.getM_idx());
+        if (info != null) model.addAttribute("memberInfo", info);
         return "member/mypage";
     }
 
@@ -74,7 +78,9 @@ public class MemberController {
     public String updateOk(MemberVO vo, HttpSession session, Model model) {
         int r = memberService.updateMember(vo);
         if (r > 0) {
-            session.setAttribute("loginMember", memberService.findByIdx(vo.getM_idx()));
+            MemberVO updated = memberService.findMyPageInfo(vo.getM_idx());
+            session.setAttribute("loginMember", updated);
+            model.addAttribute("memberInfo", updated);
             model.addAttribute("success", "정보가 업데이트되었습니다.");
         }
         return "member/mypage";

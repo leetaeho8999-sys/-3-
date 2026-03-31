@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="멤버십 — 정성을 다한 커피"/>
+<c:set var="pageTitle" value="멤버십 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <main class="page-main">
   <div class="membership-hero">
@@ -10,6 +10,39 @@
       <div style="font-size:.875rem;opacity:.7">함께하는 커피의 즐거움</div>
     </div>
   </div>
+  <c:if test="${not empty memberInfo}">
+  <section style="padding:2rem 0;background:#faf9f7">
+    <div class="container">
+      <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+          <div style="text-align:center;min-width:80px">
+            <c:choose>
+              <c:when test="${memberInfo.grade == 'VIP'}"><div style="font-size:2rem">👑</div></c:when>
+              <c:when test="${memberInfo.grade == '골드'}"><div style="font-size:2rem">⭐</div></c:when>
+              <c:when test="${memberInfo.grade == '실버'}"><div style="font-size:2rem">🥈</div></c:when>
+              <c:otherwise><div style="font-size:2rem">☕</div></c:otherwise>
+            </c:choose>
+            <div style="font-weight:600;font-size:1rem;margin-top:.3rem">${memberInfo.grade}</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:1.1rem;font-weight:500">${memberInfo.username} 님</div>
+            <div style="color:#717182;font-size:.875rem;margin-top:.25rem">총 방문 횟수: <strong>${memberInfo.visitCount}회</strong></div>
+            <div style="color:#c8832a;font-size:.875rem;margin-top:.25rem">누적 포인트: <strong>${membership.points}P</strong></div>
+          </div>
+          <div style="font-size:.8rem;color:#9ca3af;text-align:right">
+            <c:choose>
+              <c:when test="${memberInfo.grade == 'VIP'}">최상위 등급 🎉</c:when>
+              <c:when test="${memberInfo.grade == '골드'}">VIP까지 ${31 - memberInfo.visitCount}회</c:when>
+              <c:when test="${memberInfo.grade == '실버'}">골드까지 ${16 - memberInfo.visitCount}회</c:when>
+              <c:otherwise>실버까지 ${6 - memberInfo.visitCount}회</c:otherwise>
+            </c:choose>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </c:if>
+
   <section style="padding:3rem 0;background:white">
     <div class="container">
       <h2 style="font-family:'Noto Serif KR',serif;font-size:1.5rem;font-weight:400;margin-bottom:1.5rem">멤버십 혜택</h2>

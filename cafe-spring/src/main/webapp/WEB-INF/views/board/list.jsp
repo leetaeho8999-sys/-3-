@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="pageTitle" value="게시판 — 정성을 다한 커피"/>
+<c:set var="pageTitle" value="게시판 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <main class="page-main">
   <div class="container" style="padding-top:2rem">
