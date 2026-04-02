@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.brewcrm.customer.mapper.CustomerMapper">
+
+    <!-- 전체 고객 수 -->
+    <select id="getCount" resultType="int">
+        SELECT COUNT(*) FROM customer_t WHERE active = 0
+    </select>
+
+    <!-- 등급별 고객 수 -->
+    <select id="getCountByGrade" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM customer_t WHERE active = 0 AND grade = #{grade}
+    </select>
+
+    <!-- 이번 달 신규 -->
+    <select id="getCountThisMonth" resultType="int">
+        SELECT COUNT(*) FROM customer_t
+        WHERE active = 0
+          AND DATE_FORMAT(reg_date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+    </select>
+
+    <!--
+        고객 목록 (등급 필터 버그 수정)
+        grade = null 이면 전체, 값이 있으면 WHERE 에 추가
+    -->
+    <select id="getCustomerList" parameterType="map" resultType="CustomerVO">
+        SELECT * FROM customer_t
+        WHERE active = 0
+        <if test="grade != null and grade != ''">
+            AND grade = #{grade}
+        </if>
+        ORDER BY c_idx DESC
+        LIMIT #{numPerPage} OFFSET #{offset}
+    </select>
+
+    <!-- 고객 단건 조회 -->
+    <select id="getCustomerDetail" parameterType="String" resultType="CustomerVO">
+        SELECT * FROM customer_t WHERE c_idx = #{c_idx}
+    </select>
+
+    <!-- 고객 등록 (useGeneratedKeys: 생성된 c_idx를 CustomerVO에 자동 주입) -->
+    <insert id="insertCustomer" parameterType="CustomerVO" useGeneratedKeys="true" keyProperty="c_idx">
+        INSERT INTO customer_t (name, phone, grade, visit_count, memo, active)
+        VALUES (
+            #{name}, #{phone}, #{grade}, 0,
+            <choose>
+                <when test="memo != null and memo != ''">#{memo}</when>
+                <otherwise>''</otherwise>
+            </choose>,
+            0
+        )
+    </insert>
+
+    <!-- 고객 수정 -->
+    <update id="updateCustomer" parameterType="CustomerVO">
+        UPDATE customer_t
+        SET name  = #{name},
+            phone = #{phone},
+            grade = #{grade},
+            memo  = #{memo}
+        WHERE c_idx = #{c_idx}
+    </update>
+
+    <!-- 등급 단독 업데이트 (자동 등급 업데이트용) -->
+    <update id="updateGrade" parameterType="CustomerVO">
+        UPDATE customer_t SET grade = #{grade} WHERE c_idx = #{c_idx}
+    </update>
+
+    <!-- 논리 삭제 -->
+    <update id="deleteCustomer" parameterType="String">
+        UPDATE customer_t SET active = 1 WHERE c_idx = #{c_idx}
+    </update>
+
+    <!-- 방문 횟수 증가 -->
+    <update id="addVisit" parameterType="String">
+        UPDATE customer_t SET visit_count = visit_count + 1 WHERE c_idx = #{c_idx}
+    </update>
+
+    <!--
+        검색 (% 는 ServiceImpl 에서만 추가 — 중복 방지)
+        grade 필터 추가
+    -->
+    <select id="searchCustomer" parameterType="map" resultType="CustomerVO">
+        SELECT * FROM customer_t
+        WHERE active = 0
+          AND (name LIKE #{keyword} OR phone LIKE #{keyword})
+        <if test="grade != null and grade != ''">
+            AND grade = #{grade}
+        </if>
+        ORDER BY c_idx DESC
+        LIMIT #{numPerPage} OFFSET #{offset}
+    </select>
+
+    <!--
+        검색 결과 수 (Map 파라미터로 변경, grade 포함)
+        기존: parameterType="String" → 수정: parameterType="map"
+    -->
+    <select id="getSearchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM customer_t
+        WHERE active = 0
+          AND (name LIKE #{keyword} OR phone LIKE #{keyword})
+        <if test="grade != null and grade != ''">
+            AND grade = #{grade}
+        </if>
+    </select>
+
+</mapper>
