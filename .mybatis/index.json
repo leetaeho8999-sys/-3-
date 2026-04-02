@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "timestamp": 1775093889974,
+  "projectRoot": "d:\\dev\\중간프로젝트\\chat_bot",
+  "entries": [
+    {
+      "path": "target\\classes\\com\\chatbot\\ChatBotApplication.class",
+      "mtime": 1775093889156.5696,
+      "size": 1061,
+      "mapperScan": {
+        "basePackages": [
+          "com.chatbot.mapper"
+        ],
+        "sourceFile": "d:\\dev\\중간프로젝트\\chat_bot\\target\\classes\\com\\chatbot\\ChatBotApplication.class"
+      }
+    }
+  ]
+}

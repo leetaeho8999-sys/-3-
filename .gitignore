@@ -1,0 +1,6 @@
+target/
+*.class
+
+# 민감 정보 - 절대 git에 올리지 말 것
+src/main/resources/application.properties
+src/main/resources/application-local.properties

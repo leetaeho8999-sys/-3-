@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.chatbot.mapper.ChatMapper">
+
+    <select id="findByKeyword" parameterType="String" resultType="ChatVO">
+        SELECT id, keyword, response
+        FROM chat_keyword
+        WHERE #{keyword} LIKE CONCAT('%', keyword, '%')
+        ORDER BY LENGTH(keyword) DESC
+        LIMIT 1
+    </select>
+
+    <insert id="saveHistory" parameterType="ChatHistoryVO">
+        INSERT INTO chat_history (sender, message)
+        VALUES (#{sender}, #{message})
+    </insert>
+
+    <select id="getHistory" resultType="ChatHistoryVO">
+        SELECT id, sender, message, created_at
+        FROM (
+            SELECT id, sender, message, created_at
+            FROM chat_history
+            ORDER BY id DESC
+            LIMIT 200
+        ) recent
+        ORDER BY id ASC
+    </select>
+
+</mapper>
