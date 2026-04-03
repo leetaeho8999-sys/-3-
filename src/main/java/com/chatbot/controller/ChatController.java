@@ -20,8 +20,11 @@ public class ChatController {
     @PostMapping("/send")
     public Map<String, String> send(@RequestBody Map<String, String> body) {
         String userMessage = body.get("message");
-        String nickname = body.getOrDefault("nickname", "손님"); // 로그인 구현 시 세션에서 가져올 것
-        String response = chatService.getResponse(userMessage, nickname);
+        if (userMessage == null || userMessage.isBlank()) {
+            return Map.of("response", "메시지를 입력해주세요.");
+        }
+        String nickname = body.getOrDefault("nickname", "손님");
+        String response = chatService.getResponse(userMessage.trim(), nickname);
         return Map.of("response", response);
     }
 

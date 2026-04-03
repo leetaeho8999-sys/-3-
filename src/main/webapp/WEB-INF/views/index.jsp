@@ -242,11 +242,11 @@ function sendMessage() {
             })
             .then(res => { if (!res.ok) throw new Error('오류'); return res.json(); })
             .then(data => {
-                document.getElementById('waitingMsg').remove();
+                document.getElementById('waitingMsg')?.remove();
                 appendMessage('아메리', data.response);
             })
             .catch(() => {
-                document.getElementById('waitingMsg').remove();
+                document.getElementById('waitingMsg')?.remove();
                 appendMessage('아메리', '메시지 전송 중 오류가 발생했습니다.');
             });
         }
@@ -255,7 +255,8 @@ function sendMessage() {
             const box = document.getElementById('chatBox');
             const div = document.createElement('div');
             div.className = sender === '손님' ? 'msg-user' : 'msg-bot';
-            div.textContent = text;
+            const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            div.innerHTML = escaped.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }

@@ -17,14 +17,19 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatMapper chatMapper;
     private final GeminiService geminiService;
+    private final TranslationService translationService;
 
-    public ChatServiceImpl(ChatMapper chatMapper, GeminiService geminiService) {
+    public ChatServiceImpl(ChatMapper chatMapper, GeminiService geminiService, TranslationService translationService) {
         this.chatMapper = chatMapper;
         this.geminiService = geminiService;
+        this.translationService = translationService;
     }
 
     @Override
     public String getResponse(String userMessage, String nickname) {
+        // 0. 사용자 입력 언어 감지
+        String userLang = translationService.detectLanguage(userMessage);
+
         // 1. 사용자 메시지 저장 (실패해도 응답은 계속 진행)
         try {
             ChatHistoryVO userHistory = new ChatHistoryVO();
@@ -46,21 +51,41 @@ public class ChatServiceImpl implements ChatService {
         String response;
         if (result != null) {
             response = geminiService.askWithHint(userMessage, result.getResponse());
+            if (isErrorResponse(response)) {
+                response = result.getResponse();
+            }
         } else {
             response = geminiService.ask(userMessage);
         }
 
-        // 3. 아메리 응답 저장 (실패해도 응답은 반환)
-        try {
-            ChatHistoryVO botHistory = new ChatHistoryVO();
-            botHistory.setSender("아메리");
-            botHistory.setMessage(response);
-            chatMapper.saveHistory(botHistory);
-        } catch (Exception e) {
-            log.error("아메리 응답 저장 실패: {}", e.getMessage());
+        // 3. 아메리 응답 저장 (에러 메시지는 저장하지 않음)
+        boolean isErrorResponse = isErrorResponse(response);
+        if (!isErrorResponse) {
+            try {
+                ChatHistoryVO botHistory = new ChatHistoryVO();
+                botHistory.setSender("아메리");
+                botHistory.setMessage(response);
+                chatMapper.saveHistory(botHistory);
+            } catch (Exception e) {
+                log.error("아메리 응답 저장 실패: {}", e.getMessage());
+            }
+        }
+
+        // 4. 한국어가 아닌 경우 손님 언어로 번역
+        if (!isErrorResponse && !"ko".equals(userLang)) {
+            response = translationService.translate(response, "ko", userLang);
         }
 
         return response;
+    }
+
+    private boolean isErrorResponse(String response) {
+        return response.startsWith("AI 서버에 연결할 수 없습니다") ||
+               response.startsWith("AI 응답 중 오류") ||
+               response.startsWith("응답이 없습니다") ||
+               response.startsWith("응답을 생성하지 못했습니다") ||
+               response.startsWith("응답 내용이 없습니다") ||
+               response.startsWith("응답 텍스트가 없습니다");
     }
 
     @Override

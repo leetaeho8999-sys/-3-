@@ -1,6 +1,6 @@
 # 카페 챗봇 (Chat Bot)
 
-Spring Boot + MyBatis + MySQL + Gemini AI 기반 카페 안내 챗봇 프로젝트입니다.
+Spring Boot + MyBatis + MySQL + Groq AI 기반 카페 안내 챗봇 프로젝트입니다.
 
 ---
 
@@ -24,8 +24,8 @@ src/main/java/com/chatbot/
 │   └── GlobalExceptionHandler.java # 전역 예외 처리
 ├── service/
 │   ├── ChatService.java            # 서비스 인터페이스
-│   ├── ChatServiceImpl.java        # 키워드 조회 → Gemini 호출 로직
-│   └── GeminiService.java          # Gemini API 연동
+│   ├── ChatServiceImpl.java        # 키워드 조회 → Groq 호출 로직
+│   └── GeminiService.java          # Groq API 연동 (llama-3.3-70b-versatile)
 ├── mapper/
 │   └── ChatMapper.java             # MyBatis 매퍼 인터페이스
 └── vo/
@@ -159,7 +159,7 @@ INSERT INTO chat_keyword (keyword, response) VALUES
 ```
 
 > 키워드 매칭 방식: 사용자가 "영업시간은 어떻게 돼요?" 처럼 키워드를 포함한 문장을 입력해도
-> DB에서 가장 구체적인 키워드를 찾아 Gemini가 자연스럽게 답변합니다.
+> DB에서 가장 구체적인 키워드를 찾아 Groq AI가 자연스럽게 답변합니다.
 > 같은 의미의 질문을 여러 키워드로 등록해 두면 더 많은 질문에 대응할 수 있습니다.
 
 ---
@@ -187,8 +187,8 @@ mybatis.mapper-locations=classpath:mapper/*.xml
 mybatis.type-aliases-package=com.chatbot.vo
 mybatis.configuration.map-underscore-to-camel-case=true
 
-# Gemini API
-gemini.api.key=발급받은_Gemini_API_키
+# Groq API
+groq.api.key=발급받은_Groq_API_키
 
 # 로그 레벨
 logging.level.com.chatbot.mapper=DEBUG
@@ -210,16 +210,19 @@ spring.datasource.password=본인_MySQL_비밀번호
 - username: MySQL에 접속하는 본인 계정 아이디
 - password: MySQL 계정 비밀번호
 
-### ② Gemini API 키 (필수)
+### ② Groq API 키 (필수)
 
 ```properties
-gemini.api.key=발급받은_Gemini_API_키
+groq.api.key=발급받은_Groq_API_키
 ```
 
-Gemini API 키 발급 방법
-1. https://aistudio.google.com/app/apikey 접속
-2. 로그인 후 "Create API Key" 클릭
-3. 발급된 키를 위 항목에 붙여넣기
+Groq API 키 발급 방법
+1. https://console.groq.com 접속
+2. 로그인 후 "API Keys" 메뉴 클릭
+3. "Create API Key" 클릭
+4. 발급된 키를 위 항목에 붙여넣기
+
+사용 모델: llama-3.3-70b-versatile (무료)
 
 ### ③ 서버 포트 (선택)
 
