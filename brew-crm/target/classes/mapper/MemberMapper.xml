@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.brewcrm.member.mapper.MemberMapper">
+
+    <!-- 회원가입 (linked_customer: 동시 생성된 customer_t.c_idx 설정) -->
+    <insert id="insertMember" parameterType="MemberVO">
+        INSERT INTO member_t (email, password, name, linked_customer)
+        VALUES (#{email}, #{password}, #{name}, #{linkedCustomer})
+    </insert>
+
+    <!-- 이메일 중복 확인 -->
+    <select id="checkEmail" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM member_t WHERE email = #{email}
+    </select>
+
+    <!-- 이메일로 회원 조회 (로그인) -->
+    <select id="findByEmail" parameterType="String" resultType="MemberVO">
+        SELECT * FROM member_t
+        WHERE email = #{email} AND active = 0
+    </select>
+
+    <!--
+        마이페이지 조회 (customer_t LEFT JOIN)
+        linked_customer가 연결되어 있으면 등급, 방문횟수, 전화번호, 메모를 가져옴
+    -->
+    <select id="findMyPageInfo" parameterType="String" resultType="MemberVO">
+        SELECT
+            m.m_idx,
+            m.email,
+            m.password,
+            m.name,
+            m.linked_customer  AS linkedCustomer,
+            m.reg_date         AS regDate,
+            m.active,
+            COALESCE(c.grade,       '일반') AS grade,
+            COALESCE(c.visit_count, 0     ) AS visitCount,
+            COALESCE(c.phone,       ''    ) AS phone,
+            COALESCE(c.memo,        ''    ) AS memo
+        FROM member_t m
+        LEFT JOIN customer_t c
+            ON m.linked_customer = c.c_idx
+           AND c.active = 0
+        WHERE m.m_idx = #{m_idx}
+          AND m.active = 0
+    </select>
+
+    <!-- 회원 정보 수정 (name만) -->
+    <update id="updateMember" parameterType="MemberVO">
+        UPDATE member_t
+        SET name = #{name}
+        WHERE m_idx = #{m_idx}
+    </update>
+
+    <!--
+        연결된 CRM 고객 정보 동기화 (마이페이지 수정 시)
+        linked_customer(c_idx) 기준으로 customer_t.phone, memo 업데이트
+    -->
+    <update id="updateLinkedCustomer" parameterType="MemberVO">
+        UPDATE customer_t
+        SET phone = #{phone},
+            memo  = #{memo}
+        WHERE c_idx = #{linkedCustomer}
+    </update>
+
+</mapper>
