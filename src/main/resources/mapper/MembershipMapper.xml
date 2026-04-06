@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.membership.mapper.MembershipMapper">
+
+    <!-- membership_t: ms_idx, user_id, grade, points, reg_date -->
+    <resultMap id="membershipMap" type="MembershipVO">
+        <result column="ms_idx"   property="ms_idx"/>
+        <result column="user_id"  property="userId"/>
+        <result column="reg_date" property="regDate"/>
+    </resultMap>
+
+    <select id="getByUserId" parameterType="String" resultMap="membershipMap">
+        SELECT * FROM membership_t WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertMembership" parameterType="MembershipVO">
+        INSERT INTO membership_t (user_id, grade, points) VALUES (#{userId}, #{grade}, #{points})
+    </insert>
+
+    <update id="updateMembership" parameterType="MembershipVO">
+        UPDATE membership_t SET grade = #{grade}, points = #{points} WHERE user_id = #{userId}
+    </update>
+
+</mapper>
