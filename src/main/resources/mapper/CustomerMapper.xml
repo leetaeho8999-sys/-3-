@@ -4,9 +4,47 @@
 
 <mapper namespace="org.study.brewcrm.customer.mapper.CustomerMapper">
 
+    <!-- c_idx 컬럼은 map-underscore-to-camel-case 에 의해 cIdx 로 변환되어
+         CustomerVO.c_idx 필드에 매핑되지 않으므로 resultMap 으로 명시적으로 지정 -->
+    <resultMap id="customerResultMap" type="CustomerVO">
+        <id     column="c_idx"           property="c_idx"/>
+        <result column="name"            property="name"/>
+        <result column="phone"           property="phone"/>
+        <result column="grade"           property="grade"/>
+        <result column="visit_count"     property="visitCount"/>
+        <result column="monthly_visit"   property="monthlyVisit"/>
+        <result column="monthly_amount"  property="monthlyAmount"/>
+        <result column="memo"            property="memo"/>
+        <result column="birthday"        property="birthday"/>
+        <result column="last_visit_date" property="lastVisitDate"/>
+        <result column="reg_date"        property="regDate"/>
+        <result column="active"          property="active"/>
+        <result column="coupon_count"    property="couponCount"/>
+        <result column="total_amount"    property="totalAmount"/>
+    </resultMap>
+
+    <resultMap id="visitLogResultMap" type="VisitLogVO">
+        <id     column="log_idx"   property="logIdx"/>
+        <result column="c_idx"     property="c_idx"/>
+        <result column="amount"    property="amount"/>
+        <result column="menu_item" property="menuItem"/>
+        <result column="note"      property="note"/>
+        <result column="reg_date"  property="regDate"/>
+    </resultMap>
+
     <!-- 전체 고객 수 -->
     <select id="getCount" resultType="int">
         SELECT COUNT(*) FROM customer_t WHERE active = 0
+    </select>
+
+    <!-- 이번 달 총 결제액 -->
+    <select id="getTotalMonthlyAmount" resultType="long">
+        SELECT COALESCE(SUM(monthly_amount), 0) FROM customer_t WHERE active = 0
+    </select>
+
+    <!-- 이번 달 총 방문 수 -->
+    <select id="getTotalMonthlyVisit" resultType="int">
+        SELECT COALESCE(SUM(monthly_visit), 0) FROM customer_t WHERE active = 0
     </select>
 
     <!-- 등급별 고객 수 -->
@@ -25,7 +63,7 @@
         고객 목록 (등급 필터 버그 수정)
         grade = null 이면 전체, 값이 있으면 WHERE 에 추가
     -->
-    <select id="getCustomerList" parameterType="map" resultType="CustomerVO">
+    <select id="getCustomerList" parameterType="map" resultMap="customerResultMap">
         SELECT * FROM customer_t
         WHERE active = 0
         <if test="grade != null and grade != ''">
@@ -36,9 +74,70 @@
     </select>
 
     <!-- 고객 단건 조회 -->
-    <select id="getCustomerDetail" parameterType="String" resultType="CustomerVO">
+    <select id="getCustomerDetail" parameterType="String" resultMap="customerResultMap">
         SELECT * FROM customer_t WHERE c_idx = #{c_idx}
     </select>
+
+    <!-- ── 통계용 쿼리 ──────────────────────────────────────────── -->
+
+    <!-- 등급별 고객 분포 -->
+    <select id="getGradeDistribution" resultType="map">
+        SELECT grade, COUNT(*) AS cnt
+        FROM customer_t WHERE active = 0
+        GROUP BY grade
+        ORDER BY FIELD(grade, 'VIP', '골드', '실버', '일반')
+    </select>
+
+    <!-- 월별 신규 고객 수 (최근 6개월) -->
+    <select id="getMonthlyNewCustomers" resultType="map">
+        SELECT DATE_FORMAT(reg_date, '%Y-%m') AS month, COUNT(*) AS cnt
+        FROM customer_t
+        WHERE active = 0
+          AND reg_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+        GROUP BY month ORDER BY month
+    </select>
+
+    <!-- 방문 횟수 구간별 고객 수 -->
+    <select id="getVisitDistribution" resultType="map">
+        SELECT
+          CASE
+            WHEN visit_count = 0            THEN '0회'
+            WHEN visit_count BETWEEN 1 AND 5  THEN '1-5회'
+            WHEN visit_count BETWEEN 6 AND 15 THEN '6-15회'
+            WHEN visit_count BETWEEN 16 AND 30 THEN '16-30회'
+            ELSE '31회+'
+          END AS bucket,
+          COUNT(*) AS cnt
+        FROM customer_t WHERE active = 0
+        GROUP BY bucket
+        ORDER BY FIELD(bucket, '0회', '1-5회', '6-15회', '16-30회', '31회+')
+    </select>
+
+    <!-- 방문 횟수 Top N 고객 -->
+    <select id="getTopByVisit" parameterType="int" resultMap="customerResultMap">
+        SELECT * FROM customer_t WHERE active = 0
+        ORDER BY visit_count DESC LIMIT #{limit}
+    </select>
+
+    <!-- 평균 방문 횟수 -->
+    <select id="getAvgVisitCount" resultType="double">
+        SELECT COALESCE(AVG(visit_count), 0) FROM customer_t WHERE active = 0
+    </select>
+
+    <!-- 이번 달 등급 진행 현황 -->
+    <select id="getCustomerProgress" resultMap="customerResultMap">
+        SELECT c_idx, name, phone, grade, visit_count,
+               COALESCE(monthly_visit,  0) AS monthly_visit,
+               COALESCE(monthly_amount, 0) AS monthly_amount,
+               memo, reg_date, active
+        FROM customer_t
+        WHERE active = 0
+        ORDER BY
+            CASE grade WHEN 'VIP' THEN 1 WHEN '골드' THEN 2 WHEN '실버' THEN 3 ELSE 4 END,
+            visit_count DESC
+    </select>
+
+    <!-- ── 기존 CRUD 쿼리 ─────────────────────────────────────────── -->
 
     <!-- 고객 등록 (useGeneratedKeys: 생성된 c_idx를 CustomerVO에 자동 주입) -->
     <insert id="insertCustomer" parameterType="CustomerVO" useGeneratedKeys="true" keyProperty="c_idx">
@@ -73,16 +172,150 @@
         UPDATE customer_t SET active = 1 WHERE c_idx = #{c_idx}
     </update>
 
-    <!-- 방문 횟수 증가 -->
+    <!-- 방문 기록 + 결제액 반영 (누적 방문 + 이번달 방문 + 이번달 결제액) -->
+    <update id="addVisitWithAmount" parameterType="map">
+        UPDATE customer_t
+        SET visit_count    = visit_count + 1,
+            monthly_visit  = monthly_visit + 1,
+            monthly_amount = monthly_amount + #{amount}
+        WHERE c_idx = #{c_idx}
+    </update>
+
+    <!-- 이번 달 데이터 초기화 (매월 1일 실행) -->
+    <update id="resetMonthlyStats">
+        UPDATE customer_t SET monthly_visit = 0, monthly_amount = 0 WHERE active = 0
+    </update>
+
+    <!-- 방문 횟수 증가 (레거시 — 기존 컬럼만 사용, ALTER TABLE 전에도 안전) -->
     <update id="addVisit" parameterType="String">
         UPDATE customer_t SET visit_count = visit_count + 1 WHERE c_idx = #{c_idx}
     </update>
+
+    <!-- ── 방문 이력 (visit_log_t) ─────────────────────────────── -->
+
+    <!-- last_visit_date 업데이트 -->
+    <update id="updateLastVisitDate" parameterType="map">
+        UPDATE customer_t SET last_visit_date = NOW() WHERE c_idx = #{c_idx}
+    </update>
+
+    <!-- 방문 기록 INSERT -->
+    <insert id="insertVisitLog" parameterType="VisitLogVO">
+        INSERT INTO visit_log_t (c_idx, amount, menu_item, note)
+        VALUES (#{c_idx}, #{amount}, #{menuItem}, #{note})
+    </insert>
+
+    <!-- 고객별 최근 방문 이력 (최신순 20건) -->
+    <select id="getVisitLogs" parameterType="String" resultMap="visitLogResultMap">
+        SELECT log_idx, c_idx, amount, menu_item, note, reg_date
+        FROM visit_log_t
+        WHERE c_idx = #{c_idx}
+        ORDER BY reg_date DESC
+        LIMIT 20
+    </select>
+
+    <!-- ── 고객 태그 (customer_tag_t) ────────────────────────────── -->
+
+    <select id="getTags" parameterType="String" resultType="String">
+        SELECT tag FROM customer_tag_t WHERE c_idx = #{c_idx} ORDER BY tag_idx
+    </select>
+
+    <insert id="insertTag" parameterType="map">
+        INSERT INTO customer_tag_t (c_idx, tag) VALUES (#{c_idx}, #{tag})
+    </insert>
+
+    <delete id="deleteTag" parameterType="map">
+        DELETE FROM customer_tag_t
+        WHERE c_idx = #{c_idx} AND tag = #{tag}
+        LIMIT 1
+    </delete>
+
+    <!-- ── 마케팅용 ───────────────────────────────────────────────── -->
+
+    <!-- N일 이상 미방문 고객 (last_visit_date 기준) -->
+    <select id="getInactiveCustomers" parameterType="int" resultMap="customerResultMap">
+        SELECT c_idx, name, phone, grade, visit_count, memo, reg_date,
+               last_visit_date,
+               (SELECT COUNT(*) FROM customer_coupon_t cc
+                WHERE cc.c_idx = c.c_idx AND cc.used = 0 AND cc.expire_date >= CURDATE()) AS coupon_count
+        FROM customer_t c
+        WHERE active = 0
+          AND (
+               last_visit_date IS NULL AND reg_date &lt; DATE_SUB(NOW(), INTERVAL #{days} DAY)
+               OR
+               last_visit_date &lt; DATE_SUB(NOW(), INTERVAL #{days} DAY)
+          )
+        ORDER BY last_visit_date ASC, reg_date ASC
+        LIMIT 100
+    </select>
+
+    <!-- 이번 달 생일 고객 -->
+    <select id="getBirthdayCustomers" resultMap="customerResultMap">
+        SELECT c_idx, name, phone, grade, visit_count, memo, birthday,
+               (SELECT COUNT(*) FROM customer_coupon_t cc
+                WHERE cc.c_idx = c.c_idx AND cc.used = 0 AND cc.expire_date >= CURDATE()) AS coupon_count
+        FROM customer_t c
+        WHERE active = 0
+          AND birthday IS NOT NULL
+          AND MONTH(birthday) = MONTH(CURDATE())
+        ORDER BY DAY(birthday)
+    </select>
+
+    <!-- ── 시간대별·요일별·메뉴별 통계 (visit_log_t 기반) ──────────── -->
+
+    <!-- 시간대별 방문 건수 + 매출 (최근 3개월) -->
+    <select id="getHourlyStats" resultType="map">
+        SELECT
+            HOUR(reg_date)             AS hour_slot,
+            COUNT(*)                   AS visit_cnt,
+            COALESCE(SUM(amount), 0)   AS total_amount
+        FROM visit_log_t
+        WHERE reg_date >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+        GROUP BY hour_slot
+        ORDER BY hour_slot
+    </select>
+
+    <!-- 요일별 방문 건수 + 매출 (최근 3개월, 1=일 ~ 7=토) -->
+    <select id="getWeekdayStats" resultType="map">
+        SELECT
+            DAYOFWEEK(reg_date)        AS dow,
+            COUNT(*)                   AS visit_cnt,
+            COALESCE(SUM(amount), 0)   AS total_amount
+        FROM visit_log_t
+        WHERE reg_date >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+        GROUP BY dow
+        ORDER BY dow
+    </select>
+
+    <!-- 인기 메뉴 Top N (menu_item 필드 기준, 빈값 제외) -->
+    <select id="getTopMenuItems" parameterType="int" resultType="map">
+        SELECT
+            menu_item,
+            COUNT(*) AS order_cnt
+        FROM visit_log_t
+        WHERE menu_item IS NOT NULL AND menu_item != ''
+        GROUP BY menu_item
+        ORDER BY order_cnt DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 등급별 평균 결제액 (customer_t.monthly_amount 기준) -->
+    <select id="getGradeAvgSpend" resultType="map">
+        SELECT
+            grade,
+            ROUND(AVG(monthly_amount), 0)   AS avg_monthly,
+            ROUND(AVG(visit_count), 1)       AS avg_visit,
+            COUNT(*)                         AS cnt
+        FROM customer_t
+        WHERE active = 0
+        GROUP BY grade
+        ORDER BY FIELD(grade, 'VIP', '골드', '실버', '일반')
+    </select>
 
     <!--
         검색 (% 는 ServiceImpl 에서만 추가 — 중복 방지)
         grade 필터 추가
     -->
-    <select id="searchCustomer" parameterType="map" resultType="CustomerVO">
+    <select id="searchCustomer" parameterType="map" resultMap="customerResultMap">
         SELECT * FROM customer_t
         WHERE active = 0
           AND (name LIKE #{keyword} OR phone LIKE #{keyword})

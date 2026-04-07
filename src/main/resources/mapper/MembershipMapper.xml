@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.brewcrm.member.mapper.MembershipMapper">
+
+    <!-- 회원 번호로 membership_t 존재 여부 확인 -->
+    <select id="countByUserId" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM membership_t WHERE user_id = #{userId}
+    </select>
+
+    <!--
+        포인트 적립 + 등급 동기화 (UPSERT)
+        user_id 는 UNIQUE 제약이므로 ON DUPLICATE KEY UPDATE 로 처리
+        params: userId(int), grade(String), pointsToAdd(int)
+    -->
+    <insert id="upsertMembership" parameterType="map">
+        INSERT INTO membership_t (user_id, grade, points)
+        VALUES (#{userId}, #{grade}, #{pointsToAdd})
+        ON DUPLICATE KEY UPDATE
+            grade  = #{grade},
+            points = points + #{pointsToAdd}
+    </insert>
+
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.brewcrm.customer.mapper.SchedulerLogMapper">
+
+    <!-- 스케줄러 로그 삽입 -->
+    <insert id="insertLog" parameterType="map">
+        INSERT INTO scheduler_log_t (job_name, status, affected, message)
+        VALUES (#{jobName}, #{status}, #{affected}, #{message})
+    </insert>
+
+    <!-- 최근 로그 조회 -->
+    <select id="getRecentLogs" parameterType="int" resultType="map">
+        SELECT log_idx, job_name, status, affected, message, reg_date
+        FROM scheduler_log_t
+        ORDER BY reg_date DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

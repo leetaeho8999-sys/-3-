@@ -22,6 +22,7 @@ public class MemberController {
     @PostMapping("/loginOk")
     public String loginOk(@RequestParam String email,
                           @RequestParam String password,
+                          @RequestParam(defaultValue = "") String redirect,
                           HttpSession session, Model model) {
         MemberVO member = memberService.login(email, password);
         if (member == null) {
@@ -29,7 +30,16 @@ public class MemberController {
             return "member/login";
         }
         session.setAttribute("loginMember", member);
-        return "redirect:/member/mypage";
+        // 인터셉터가 보내준 원래 페이지로 복귀 (오픈 리다이렉트 방지: 내부 경로만 허용)
+        if (!redirect.isEmpty() && redirect.startsWith("/")) {
+            return "redirect:" + redirect;
+        }
+        // 역할별 기본 이동: 고객(MEMBER) → 마이페이지, 직원/관리자 → CRM 대시보드
+        String role = member.getRole();
+        if (role == null || "MEMBER".equals(role)) {
+            return "redirect:/member/mypage";
+        }
+        return "redirect:/customer/dashboard";
     }
 
     // ── 로그아웃 ───────────────────────────────────────────

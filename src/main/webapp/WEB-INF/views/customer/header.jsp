@@ -6,8 +6,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BREW CRM</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
@@ -40,14 +40,26 @@
          class="nav-item ${activeMenu == 'list' ? 'active' : ''}">
         <span class="nav-icon">≡</span> 고객 목록
       </a>
-      <!-- 회원 마이페이지 링크 추가 -->
+      <a href="${pageContext.request.contextPath}/customer/stats"
+         class="nav-item ${activeMenu == 'stats' ? 'active' : ''}">
+        <span class="nav-icon">◎</span> 통계
+      </a>
+      <a href="${pageContext.request.contextPath}/customer/marketing"
+         class="nav-item ${activeMenu == 'marketing' ? 'active' : ''}">
+        <span class="nav-icon">🎯</span> 마케팅
+      </a>
+      <a href="${pageContext.request.contextPath}/customer/admin"
+         class="nav-item ${activeMenu == 'admin' ? 'active' : ''}">
+        <span class="nav-icon">⚙</span> 시스템 관리
+      </a>
+      <!-- 회원 마이페이지 링크 -->
       <a href="${pageContext.request.contextPath}/member/mypage"
          class="nav-item" style="margin-top:12px;border-top:1px solid var(--border);padding-top:16px">
         <span class="nav-icon">👤</span> 마이페이지
       </a>
-      <a href="${pageContext.request.contextPath}/member/login"
+      <a href="${pageContext.request.contextPath}/member/logout"
          class="nav-item">
-        <span class="nav-icon">→</span> 회원 로그인
+        <span class="nav-icon">→</span> 로그아웃
       </a>
     </nav>
     <div id="sidebar-footer">

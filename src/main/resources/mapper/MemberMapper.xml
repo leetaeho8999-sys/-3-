@@ -15,9 +15,27 @@
         SELECT COUNT(*) FROM member_t WHERE email = #{email}
     </select>
 
-    <!-- 이메일로 회원 조회 (로그인) -->
-    <select id="findByEmail" parameterType="String" resultType="MemberVO">
-        SELECT * FROM member_t
+    <!-- m_idx 컬럼은 map-underscore-to-camel-case 에 의해 mIdx 로 변환되어
+         MemberVO.m_idx 필드에 매핑되지 않으므로 resultMap 으로 명시적으로 지정 -->
+    <resultMap id="memberResultMap" type="MemberVO">
+        <id     column="m_idx"           property="m_idx"/>
+        <result column="email"           property="email"/>
+        <result column="password"        property="password"/>
+        <result column="name"            property="name"/>
+        <result column="linked_customer" property="linkedCustomer"/>
+        <result column="reg_date"        property="regDate"/>
+        <result column="active"          property="active"/>
+        <result column="role"            property="role"/>
+        <result column="grade"           property="grade"/>
+        <result column="visitCount"      property="visitCount"/>
+        <result column="phone"           property="phone"/>
+        <result column="memo"            property="memo"/>
+    </resultMap>
+
+    <!-- 이메일로 회원 조회 (로그인) — role 포함 -->
+    <select id="findByEmail" parameterType="String" resultMap="memberResultMap">
+        SELECT m_idx, email, password, name, linked_customer, reg_date, active, role
+        FROM member_t
         WHERE email = #{email} AND active = 0
     </select>
 
@@ -25,15 +43,16 @@
         마이페이지 조회 (customer_t LEFT JOIN)
         linked_customer가 연결되어 있으면 등급, 방문횟수, 전화번호, 메모를 가져옴
     -->
-    <select id="findMyPageInfo" parameterType="String" resultType="MemberVO">
+    <select id="findMyPageInfo" parameterType="String" resultMap="memberResultMap">
         SELECT
             m.m_idx,
             m.email,
             m.password,
             m.name,
-            m.linked_customer  AS linkedCustomer,
-            m.reg_date         AS regDate,
+            m.linked_customer,
+            m.reg_date,
             m.active,
+            m.role,
             COALESCE(c.grade,       '일반') AS grade,
             COALESCE(c.visit_count, 0     ) AS visitCount,
             COALESCE(c.phone,       ''    ) AS phone,
@@ -46,12 +65,39 @@
           AND m.active = 0
     </select>
 
+    <!-- 고객 번호(linked_customer)로 연결된 회원 조회 (포인트 동기화·삭제 캐스케이드용) -->
+    <select id="findByLinkedCustomer" parameterType="String" resultMap="memberResultMap">
+        SELECT m_idx, linked_customer, role FROM member_t
+        WHERE linked_customer = #{c_idx} AND active = 0
+        LIMIT 1
+    </select>
+
     <!-- 회원 정보 수정 (name만) -->
     <update id="updateMember" parameterType="MemberVO">
         UPDATE member_t
         SET name = #{name}
         WHERE m_idx = #{m_idx}
     </update>
+
+    <!-- 회원 권한 변경 (관리자 전용) -->
+    <update id="updateMemberRole" parameterType="map">
+        UPDATE member_t SET role = #{role} WHERE m_idx = #{m_idx}
+    </update>
+
+    <!-- 회원 계정 비활성화 (고객 삭제 캐스케이드 · 관리자 직접 삭제) -->
+    <update id="deactivateMember" parameterType="String">
+        UPDATE member_t SET active = 1 WHERE m_idx = #{m_idx}
+    </update>
+
+    <!-- 직원 계정 목록 (관리자 화면용)
+         MEMBER 역할(고객 계정)은 여기서 관리하지 않으므로 제외 -->
+    <select id="getAllMembers" resultMap="memberResultMap">
+        SELECT m_idx, email, name, role, reg_date, active
+        FROM member_t
+        WHERE active = 0
+          AND COALESCE(role, 'STAFF') != 'MEMBER'
+        ORDER BY m_idx DESC
+    </select>
 
     <!--
         연결된 CRM 고객 정보 동기화 (마이페이지 수정 시)

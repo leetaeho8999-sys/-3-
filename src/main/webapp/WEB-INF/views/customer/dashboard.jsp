@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core"  prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"   prefix="fmt" %>
 <c:set var="pageTitle" value="대시보드"/>
 <c:set var="activeMenu" value="dashboard"/>
 <%@ include file="header.jsp" %>
@@ -24,6 +25,17 @@
   <div class="stat-card">
     <div class="stat-label">이번 달 신규</div>
     <div class="stat-value">${newCount}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">이번 달 방문</div>
+    <div class="stat-value">${totalMonthlyVisit}<span style="font-size:14px;color:var(--text-faint)">회</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">이번 달 매출</div>
+    <div class="stat-value" style="font-size:18px">
+      <fmt:formatNumber value="${totalMonthlyAmount}" pattern="#,###"/>
+      <span style="font-size:12px;color:var(--text-faint)">원</span>
+    </div>
   </div>
 </div>
 

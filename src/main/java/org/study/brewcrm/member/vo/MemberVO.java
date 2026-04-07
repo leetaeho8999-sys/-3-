@@ -20,4 +20,5 @@ public class MemberVO {
     private int    visitCount;      // 방문 횟수
     private String phone;           // 전화번호
     private String memo;            // 메모
+    private String role;            // 권한 (ADMIN/MANAGER/STAFF/MEMBER)
 }

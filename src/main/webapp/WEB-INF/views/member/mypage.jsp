@@ -6,8 +6,8 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>BREW CRM — 마이페이지</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
@@ -32,6 +32,13 @@
       <a href="${pageContext.request.contextPath}/member/mypage" class="nav-item active">
         <span class="nav-icon">👤</span> 내 정보
       </a>
+      <%-- STAFF / MANAGER / ADMIN 은 CRM 대시보드로 이동 가능 --%>
+      <c:if test="${sessionScope.loginMember.role != 'MEMBER' and not empty sessionScope.loginMember.role}">
+        <a href="${pageContext.request.contextPath}/customer/dashboard"
+           class="nav-item" style="margin-top:12px;border-top:1px solid rgba(255,255,255,.12);padding-top:16px">
+          <span class="nav-icon">◀</span> CRM 대시보드
+        </a>
+      </c:if>
       <a href="${pageContext.request.contextPath}/member/logout" class="nav-item">
         <span class="nav-icon">→</span> 로그아웃
       </a>
@@ -46,6 +53,10 @@
       <div id="topbar-title">마이페이지</div>
       <div style="display:flex;align-items:center;gap:12px">
         <span style="color:var(--white-dim);font-size:13px">${myInfo.name}님</span>
+        <c:if test="${sessionScope.loginMember.role != 'MEMBER' and not empty sessionScope.loginMember.role}">
+          <a href="${pageContext.request.contextPath}/customer/dashboard" class="btn-reset"
+             style="background:rgba(100,180,255,.18)">◀ CRM</a>
+        </c:if>
         <a href="${pageContext.request.contextPath}/member/logout" class="btn-reset">로그아웃</a>
       </div>
     </header>
@@ -214,5 +225,15 @@
   const d = new Date();
   const el = document.getElementById('sidebar-date');
   if(el) el.textContent = d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+
+  // 전화번호 자동 하이픈
+  document.querySelectorAll('input[name="phone"]').forEach(function(ph) {
+    ph.addEventListener('input', function() {
+      var v = this.value.replace(/\D/g, '');
+      if (v.length <= 3)      this.value = v;
+      else if (v.length <= 7) this.value = v.slice(0,3)+'-'+v.slice(3);
+      else                    this.value = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+    });
+  });
 </script>
 </body></html>

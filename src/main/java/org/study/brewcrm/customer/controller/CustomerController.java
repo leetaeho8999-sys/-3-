@@ -8,6 +8,9 @@ import org.study.brewcrm.common.Paging;
 import org.study.brewcrm.customer.service.CustomerService;
 import org.study.brewcrm.customer.vo.CustomerVO;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -19,11 +22,13 @@ public class CustomerController {
     // ── 대시보드 ────────────────────────────────────────────
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("totalCount", customerService.getCount());
-        model.addAttribute("vipCount",   customerService.getCountByGrade("VIP"));
-        model.addAttribute("goldCount",  customerService.getCountByGrade("골드"));
-        model.addAttribute("newCount",   customerService.getCountThisMonth());
-        model.addAttribute("silverCount",customerService.getCountByGrade("실버"));
+        model.addAttribute("totalCount",        customerService.getCount());
+        model.addAttribute("vipCount",          customerService.getCountByGrade("VIP"));
+        model.addAttribute("goldCount",         customerService.getCountByGrade("골드"));
+        model.addAttribute("silverCount",       customerService.getCountByGrade("실버"));
+        model.addAttribute("newCount",          customerService.getCountThisMonth());
+        model.addAttribute("totalMonthlyAmount",customerService.getTotalMonthlyAmount());
+        model.addAttribute("totalMonthlyVisit", customerService.getTotalMonthlyVisit());
         List<CustomerVO> recentList = customerService.getCustomerList(5, 0, "전체");
         model.addAttribute("recentList", recentList);
         return "customer/dashboard";
@@ -86,8 +91,24 @@ public class CustomerController {
     public String detail(@RequestParam String c_idx, Model model) {
         CustomerVO customer = customerService.getCustomerDetail(c_idx);
         if (customer == null) return "customer/error";
-        model.addAttribute("customer", customer);
+        model.addAttribute("customer",  customer);
+        model.addAttribute("visitLogs", customerService.getVisitLogs(c_idx));
+        model.addAttribute("tags",      customerService.getTags(c_idx));
         return "customer/detail";
+    }
+
+    // ── 태그 추가 ────────────────────────────────────────────
+    @PostMapping("/addTag")
+    public String addTag(@RequestParam String c_idx, @RequestParam String tag) {
+        customerService.addTag(c_idx, tag);
+        return "redirect:/customer/detail?c_idx=" + c_idx + "#tags";
+    }
+
+    // ── 태그 삭제 ────────────────────────────────────────────
+    @PostMapping("/deleteTag")
+    public String deleteTag(@RequestParam String c_idx, @RequestParam String tag) {
+        customerService.deleteTag(c_idx, tag);
+        return "redirect:/customer/detail?c_idx=" + c_idx + "#tags";
     }
 
     // ── 수정 폼 ─────────────────────────────────────────────
@@ -114,15 +135,56 @@ public class CustomerController {
         return "redirect:/customer/list";
     }
 
-    // ── 방문 횟수 추가 (POST로 변경, 자동 등급 업데이트) ────
+    // ── 통계 페이지 ─────────────────────────────────────────────
+    @GetMapping("/stats")
+    public String stats(Model model) {
+        model.addAttribute("totalCount",          customerService.getCount());
+        model.addAttribute("vipCount",            customerService.getCountByGrade("VIP"));
+        model.addAttribute("newCount",            customerService.getCountThisMonth());
+        model.addAttribute("avgVisit",            Math.round(customerService.getAvgVisitCount() * 10) / 10.0);
+        model.addAttribute("gradeDistribution",   customerService.getGradeDistribution());
+        model.addAttribute("monthlyNewCustomers", customerService.getMonthlyNewCustomers());
+        model.addAttribute("visitDistribution",   customerService.getVisitDistribution());
+        model.addAttribute("topCustomers",        customerService.getTopByVisit(10));
+
+        // monthly_visit·monthly_amount 컬럼 마이그레이션 전에도 페이지 로드 보장
+        try { model.addAttribute("customerProgress", customerService.getCustomerProgress()); }
+        catch (Exception e) { model.addAttribute("customerProgress", new ArrayList<>()); }
+
+        // visit_log_t 기반 통계 — 테이블 미존재 시 빈 목록으로 대체
+        try { model.addAttribute("hourlyStats",   customerService.getHourlyStats()); }
+        catch (Exception e) { model.addAttribute("hourlyStats", new ArrayList<>()); }
+
+        try { model.addAttribute("weekdayStats",  customerService.getWeekdayStats()); }
+        catch (Exception e) { model.addAttribute("weekdayStats", new ArrayList<>()); }
+
+        try { model.addAttribute("topMenuItems",  customerService.getTopMenuItems(10)); }
+        catch (Exception e) { model.addAttribute("topMenuItems", new ArrayList<>()); }
+
+        try { model.addAttribute("gradeAvgSpend", customerService.getGradeAvgSpend()); }
+        catch (Exception e) { model.addAttribute("gradeAvgSpend", new ArrayList<>()); }
+
+        return "customer/stats";
+    }
+
+    // ── 방문 기록 (결제액 + 메뉴 + 메모, 자동 등급 업데이트) ─
     @PostMapping("/addVisit")
     public String addVisit(@RequestParam String c_idx,
-                           @RequestParam(defaultValue="1")  int    nowPage,
-                           @RequestParam(defaultValue="")   String keyword,
-                           @RequestParam(defaultValue="전체") String grade) {
-        customerService.addVisitAndUpdateGrade(c_idx);
+                           @RequestParam(defaultValue="0")    int    amount,
+                           @RequestParam(defaultValue="")     String menuItem,
+                           @RequestParam(defaultValue="")     String note,
+                           @RequestParam(defaultValue="list") String redirect,
+                           @RequestParam(defaultValue="1")    int    nowPage,
+                           @RequestParam(defaultValue="")     String keyword,
+                           @RequestParam(defaultValue="전체")  String grade) {
+        customerService.addVisitAndUpdateGrade(c_idx, amount, menuItem, note);
+        if ("detail".equals(redirect)) {
+            return "redirect:/customer/detail?c_idx=" + c_idx;
+        }
+        String encKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8);
+        String encGrade   = URLEncoder.encode(grade,   StandardCharsets.UTF_8);
         return "redirect:/customer/list?nowPage=" + nowPage
-             + "&keyword=" + keyword
-             + "&grade="   + grade;
+             + "&keyword=" + encKeyword
+             + "&grade="   + encGrade;
     }
 }

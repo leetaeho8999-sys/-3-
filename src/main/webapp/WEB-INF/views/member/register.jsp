@@ -5,8 +5,8 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>BREW CRM — 회원가입</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
@@ -60,4 +60,18 @@
     </div>
   </div>
 </div>
+<script>
+    document.querySelectorAll('input[name="phone"]').forEach(function(el) {
+        el.addEventListener('input', function() {
+            var v = this.value.replace(/\D/g, '');
+            if (v.length <= 3) {
+                this.value = v;
+            } else if (v.length <= 7) {
+                this.value = v.slice(0,3) + '-' + v.slice(3);
+            } else {
+                this.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11);
+            }
+        });
+    });
+</script>
 </body></html>

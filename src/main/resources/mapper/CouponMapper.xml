@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.brewcrm.customer.mapper.CouponMapper">
+
+    <resultMap id="couponResultMap" type="CouponVO">
+        <id     column="coupon_idx"  property="couponIdx"/>
+        <result column="name"        property="name"/>
+        <result column="description" property="description"/>
+        <result column="type"        property="type"/>
+        <result column="value"       property="value"/>
+        <result column="expire_days" property="expireDays"/>
+        <result column="active"      property="active"/>
+        <result column="reg_date"    property="regDate"/>
+    </resultMap>
+
+    <!-- 활성 쿠폰 템플릿 목록 -->
+    <select id="getActiveCoupons" resultMap="couponResultMap">
+        SELECT * FROM coupon_t WHERE active = 1 ORDER BY coupon_idx
+    </select>
+
+    <!-- 고객에게 쿠폰 발급 -->
+    <insert id="issueCoupon" parameterType="map">
+        INSERT INTO customer_coupon_t (c_idx, coupon_idx, expire_date)
+        VALUES (#{c_idx}, #{couponIdx},
+                DATE_ADD(CURDATE(), INTERVAL #{expireDays} DAY))
+    </insert>
+
+    <!-- 고객별 보유 미사용 쿠폰 -->
+    <select id="getCustomerCoupons" parameterType="String" resultType="map">
+        SELECT
+            cc.cc_idx,
+            cc.c_idx,
+            cc.coupon_idx,
+            ct.name         AS coupon_name,
+            ct.type         AS coupon_type,
+            ct.value        AS coupon_value,
+            ct.description,
+            cc.issued_date,
+            cc.expire_date,
+            cc.used
+        FROM customer_coupon_t cc
+        JOIN coupon_t ct ON cc.coupon_idx = ct.coupon_idx
+        WHERE cc.c_idx = #{c_idx}
+        ORDER BY cc.used ASC, cc.expire_date ASC
+    </select>
+
+    <!-- 쿠폰 사용 처리 -->
+    <update id="useCoupon" parameterType="int">
+        UPDATE customer_coupon_t
+        SET used = 1, used_date = NOW()
+        WHERE cc_idx = #{cc_idx} AND used = 0
+    </update>
+
+    <!-- 쿠폰 회수 -->
+    <delete id="revokeCoupon" parameterType="int">
+        DELETE FROM customer_coupon_t
+        WHERE cc_idx = #{cc_idx} AND used = 0
+    </delete>
+
+    <!-- 포인트 조정 (양수 = 적립, 음수 = 차감) -->
+    <update id="adjustPoints" parameterType="map">
+        UPDATE membership_t
+        SET points = GREATEST(0, points + #{delta})
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 최근 발급 내역 -->
+    <select id="getRecentIssuedCoupons" parameterType="int" resultType="map">
+        SELECT
+            cc.cc_idx,
+            c.name          AS customer_name,
+            c.grade,
+            ct.name         AS coupon_name,
+            ct.type         AS coupon_type,
+            cc.issued_date,
+            cc.expire_date,
+            cc.used
+        FROM customer_coupon_t cc
+        JOIN customer_t c  ON cc.c_idx      = c.c_idx
+        JOIN coupon_t   ct ON cc.coupon_idx = ct.coupon_idx
+        WHERE c.active = 0
+        ORDER BY cc.issued_date DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

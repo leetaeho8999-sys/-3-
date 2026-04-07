@@ -5,8 +5,8 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>BREW CRM — 로그인</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
@@ -34,7 +34,12 @@
       <div class="auth-msg auth-msg-error">⚠ ${error}</div>
     </c:if>
 
+    <c:if test="${not empty param.redirect}">
+      <div class="auth-msg auth-msg-info">🔒 로그인 후 이용할 수 있습니다.</div>
+    </c:if>
+
     <form action="${pageContext.request.contextPath}/member/loginOk" method="post">
+      <input type="hidden" name="redirect" value="${param.redirect}">
       <div class="form-group">
         <label for="email">이메일</label>
         <input type="email" id="email" name="email" placeholder="example@email.com" required>
