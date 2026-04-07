@@ -205,10 +205,6 @@
       <span class="tier-row-key">승급 조건</span>
       <span class="tier-row-val" style="font-size:11px">가입 즉시 부여</span>
     </div>
-    <div class="tier-row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:8px">
-      <span class="tier-row-key">포인트 적립</span>
-      <span class="tier-row-val">결제액 2%</span>
-    </div>
     <div class="tier-row">
       <span class="tier-row-key">쿠폰 혜택</span>
       <span class="tier-row-val" style="font-size:11px">웰컴 쿠폰 1장</span>
@@ -221,15 +217,7 @@
     <div class="tier-name">실버</div>
     <div class="tier-row">
       <span class="tier-row-key">월 방문</span>
-      <span class="tier-row-val">3회 이상</span>
-    </div>
-    <div class="tier-row">
-      <span class="tier-row-key" style="font-size:10px;letter-spacing:0">또는 월 결제</span>
-      <span class="tier-row-val">30,000원+</span>
-    </div>
-    <div class="tier-row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:8px">
-      <span class="tier-row-key">포인트 적립</span>
-      <span class="tier-row-val">결제액 5%</span>
+      <span class="tier-row-val">5회 이상</span>
     </div>
     <div class="tier-row">
       <span class="tier-row-key">쿠폰 혜택</span>
@@ -243,15 +231,7 @@
     <div class="tier-name">골드</div>
     <div class="tier-row">
       <span class="tier-row-key">월 방문</span>
-      <span class="tier-row-val">10회 이상</span>
-    </div>
-    <div class="tier-row">
-      <span class="tier-row-key" style="font-size:10px;letter-spacing:0">또는 월 결제</span>
-      <span class="tier-row-val">70,000원+</span>
-    </div>
-    <div class="tier-row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:8px">
-      <span class="tier-row-key">포인트 적립</span>
-      <span class="tier-row-val">결제액 7%</span>
+      <span class="tier-row-val">15회 이상</span>
     </div>
     <div class="tier-row">
       <span class="tier-row-key">쿠폰 혜택</span>
@@ -264,16 +244,8 @@
   <div class="tier-card tier-VIP">
     <div class="tier-name">VIP ✦</div>
     <div class="tier-row">
-      <span class="tier-row-key">월 결제</span>
-      <span class="tier-row-val">150,000원+</span>
-    </div>
-    <div class="tier-row" style="opacity:0.3">
-      <span class="tier-row-key" style="font-size:10px">방문 횟수 무관</span>
-      <span class="tier-row-val">—</span>
-    </div>
-    <div class="tier-row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:8px">
-      <span class="tier-row-key">포인트 적립</span>
-      <span class="tier-row-val" style="color:#cc88ee">결제액 10%</span>
+      <span class="tier-row-key">월 방문</span>
+      <span class="tier-row-val">30회 이상</span>
     </div>
     <div class="tier-row">
       <span class="tier-row-key">쿠폰 혜택</span>
@@ -438,7 +410,7 @@
     <tbody>
       <c:forEach var="row" items="${gradeDistribution}">
         <c:set var="pct"      value="${totalCount > 0 ? row.cnt * 100 / totalCount : 0}"/>
-        <c:set var="criteria" value="${'VIP' == row.grade ? '월 결제 15만원+' : '골드' == row.grade ? '월 10회+ 또는 7만원+' : '실버' == row.grade ? '월 3회+ 또는 3만원+' : '가입 즉시 부여'}"/>
+        <c:set var="criteria" value="${'VIP' == row.grade ? '월 방문 30회+' : '골드' == row.grade ? '월 방문 15회+' : '실버' == row.grade ? '월 방문 5회+' : '가입 즉시 부여'}"/>
         <c:set var="barColor" value="${'VIP' == row.grade ? 'rgba(180,100,220,0.75)' : '골드' == row.grade ? 'rgba(200,131,42,0.8)' : '실버' == row.grade ? 'rgba(192,192,192,0.6)' : 'rgba(255,255,255,0.25)'}"/>
         <tr>
           <td><span class="grade-badge grade-${row.grade}">${row.grade}</span></td>

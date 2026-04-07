@@ -16,6 +16,7 @@ public interface CustomerMapper {
     int  getTotalMonthlyVisit();
     List<CustomerVO> getCustomerList(Map<String, Object> map);
     CustomerVO getCustomerDetail(String c_idx);
+    CustomerVO findCustomerByName(String name);
     int insertCustomer(CustomerVO customerVO);
     int updateCustomer(CustomerVO customerVO);
     int updateGrade(CustomerVO customerVO);

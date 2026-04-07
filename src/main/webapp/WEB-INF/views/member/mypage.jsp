@@ -138,7 +138,7 @@
             <c:choose>
               <c:when test="${myInfo.grade == 'VIP'}">
                 <div class="grade-benefit-item">👑 전 메뉴 20% 상시 할인</div>
-                <div class="grade-benefit-item">☕ 매달 무료 음료 3잔 제공</div>
+                <div class="grade-benefit-item">☕ 매달 무료 음료 2잔 제공</div>
                 <div class="grade-benefit-item">🎂 생일 케이크 무료 제공</div>
                 <div class="grade-benefit-item">🔔 신메뉴 출시 전 사전 알림</div>
               </c:when>

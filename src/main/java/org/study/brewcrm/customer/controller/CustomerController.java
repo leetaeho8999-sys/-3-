@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.study.brewcrm.common.Paging;
+import org.study.brewcrm.customer.mapper.CouponMapper;
 import org.study.brewcrm.customer.service.CustomerService;
 import org.study.brewcrm.customer.vo.CustomerVO;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class CustomerController {
 
     @Autowired private CustomerService customerService;
+    @Autowired private CouponMapper    couponMapper;
 
     // ── 대시보드 ────────────────────────────────────────────
     @GetMapping("/dashboard")
@@ -94,6 +96,9 @@ public class CustomerController {
         model.addAttribute("customer",  customer);
         model.addAttribute("visitLogs", customerService.getVisitLogs(c_idx));
         model.addAttribute("tags",      customerService.getTags(c_idx));
+        // 보유 쿠폰 목록 (coupon_t, customer_coupon_t 미존재 시 빈 목록)
+        try { model.addAttribute("customerCoupons", couponMapper.getCustomerCoupons(c_idx)); }
+        catch (Exception e) { model.addAttribute("customerCoupons", new java.util.ArrayList<>()); }
         return "customer/detail";
     }
 

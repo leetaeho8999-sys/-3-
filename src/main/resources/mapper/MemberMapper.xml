@@ -74,6 +74,11 @@
         LIMIT 1
     </select>
 
+    <!-- linked_customer 연결 (admin 계정 등 NULL 상태 자동 연결용) -->
+    <update id="setLinkedCustomer" parameterType="map">
+        UPDATE member_t SET linked_customer = #{c_idx} WHERE m_idx = #{m_idx}
+    </update>
+
     <!-- 회원 정보 수정 (name만) -->
     <update id="updateMember" parameterType="MemberVO">
         UPDATE member_t

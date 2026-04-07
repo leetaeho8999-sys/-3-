@@ -17,9 +17,10 @@ public class MemberServiceImpl implements MemberService {
     @Autowired private BCryptPasswordEncoder enc;
 
     /**
-     * [1] 회원가입 + CRM 고객 동시 생성
-     * ① customer_t INSERT → useGeneratedKeys로 c_idx 획득
-     * ② 획득한 c_idx를 linked_customer로 설정 후 member_t INSERT
+     * [1] 회원가입
+     * ① 이름(+전화번호)으로 기존 CRM 고객 검색 → 있으면 연결 (등급·방문이력 유지)
+     * ② 없으면 신규 customer_t 생성 후 연결
+     * ③ 생성/조회한 c_idx를 linked_customer로 설정 후 member_t INSERT
      */
     @Override
     @Transactional
@@ -28,17 +29,34 @@ public class MemberServiceImpl implements MemberService {
         if (memberVO.getPassword().length() < 6)              return -2; // 비밀번호 짧음
         if (memberMapper.checkEmail(memberVO.getEmail()) > 0) return -3; // 이메일 중복
 
-        // ① customer_t 먼저 INSERT (c_idx 자동 생성)
-        CustomerVO customer = new CustomerVO();
-        customer.setName(memberVO.getName());
-        customer.setPhone(memberVO.getPhone() != null && !memberVO.getPhone().isEmpty()
-                ? memberVO.getPhone() : "-");
-        customer.setGrade("일반");
-        customer.setMemo("");
-        customerMapper.insertCustomer(customer); // useGeneratedKeys → customer.getC_idx() 에 PK 주입
+        // ① 기존 CRM 고객 찾기 (이름 일치 + 전화번호 교차 검증)
+        String linkedCIdx = null;
+        try {
+            CustomerVO existing = customerMapper.findCustomerByName(memberVO.getName());
+            if (existing != null) {
+                String regPhone = memberVO.getPhone() != null ? memberVO.getPhone().replaceAll("[^0-9]", "") : "";
+                String crmPhone = existing.getPhone() != null ? existing.getPhone().replaceAll("[^0-9]", "") : "";
+                // 전화번호가 한쪽이라도 없으면 이름만으로 연결, 둘 다 있으면 일치해야 연결
+                if (regPhone.isEmpty() || crmPhone.isEmpty() || regPhone.equals(crmPhone)) {
+                    linkedCIdx = existing.getC_idx();
+                }
+            }
+        } catch (Exception ignored) {}
 
-        // ② 생성된 c_idx를 linked_customer 로 설정 후 member_t INSERT
-        memberVO.setLinkedCustomer(customer.getC_idx());
+        if (linkedCIdx == null) {
+            // ② 기존 고객 없음 → 신규 customer_t 생성
+            CustomerVO customer = new CustomerVO();
+            customer.setName(memberVO.getName());
+            customer.setPhone(memberVO.getPhone() != null && !memberVO.getPhone().isEmpty()
+                    ? memberVO.getPhone() : "-");
+            customer.setGrade("일반");
+            customer.setMemo("");
+            customerMapper.insertCustomer(customer); // useGeneratedKeys → customer.getC_idx() 에 PK 주입
+            linkedCIdx = customer.getC_idx();
+        }
+
+        // ③ linked_customer 설정 후 member_t INSERT
+        memberVO.setLinkedCustomer(linkedCIdx);
         memberVO.setPassword(enc.encode(memberVO.getPassword()));
         return memberMapper.insertMember(memberVO);
     }
@@ -53,34 +71,27 @@ public class MemberServiceImpl implements MemberService {
     @Override public int checkEmail(String email) { return memberMapper.checkEmail(email); }
 
     /**
-     * 마이페이지 조회 — 연결된 customer_t 의 monthly_visit/monthly_amount 기준으로
-     * 등급을 실시간 재계산하여 반환한다.
-     * ① monthly_visit 컬럼이 없거나 0이면 visit_count(누적)로 대체 추정한다.
-     * ② 계산된 등급이 customer_t 와 다르면 customer_t 도 동기화한다.
+     * linked_customer 가 NULL 인 계정(관리자 등 직접 INSERT된 계정)은
+     * 이름으로 customer_t 를 찾아 자동 연결 후 등급/방문수를 반환한다.
      */
     @Override
     public MemberVO findMyPageInfo(String m_idx) {
         MemberVO info = memberMapper.findMyPageInfo(m_idx);
         if (info == null) return null;
-        if (info.getLinkedCustomer() == null || info.getLinkedCustomer().isEmpty()) return info;
+        if (info.getLinkedCustomer() != null && !info.getLinkedCustomer().isEmpty()) return info;
+        // linked_customer 가 없는 경우 — 이름으로 customer_t 조회 후 자동 연결
         try {
-            org.study.brewcrm.customer.vo.CustomerVO customer =
-                    customerMapper.getCustomerDetail(info.getLinkedCustomer());
-            if (customer == null) return info;
-            int mv = customer.getMonthlyVisit();
-            int ma = customer.getMonthlyAmount();
-            // monthly_visit 컬럼 미존재 또는 이번 달 방문 없음 → visit_count 기반 대체 추정
-            if (mv == 0 && ma == 0) mv = customer.getVisitCount();
-            String grade;
-            if      (mv >= 30)                   grade = "VIP";
-            else if (mv >= 15 || ma >= 70_000)   grade = "골드";
-            else if (mv >= 5  || ma >= 30_000)   grade = "실버";
-            else                                 grade = "일반";
-            info.setGrade(grade);
-            // customer_t 도 최신 등급으로 동기화
-            if (!grade.equals(customer.getGrade())) {
-                customer.setGrade(grade);
-                customerMapper.updateGrade(customer);
+            CustomerVO customer = customerMapper.findCustomerByName(info.getName());
+            if (customer != null) {
+                info.setGrade(customer.getGrade());
+                info.setVisitCount(customer.getVisitCount());
+                info.setMonthlyVisit(customer.getMonthlyVisit());
+                info.setLinkedCustomer(customer.getC_idx());
+                // member_t.linked_customer 영구 연결
+                java.util.Map<String, Object> params = new java.util.HashMap<>();
+                params.put("m_idx", info.getM_idx());
+                params.put("c_idx", customer.getC_idx());
+                memberMapper.setLinkedCustomer(params);
             }
         } catch (Exception ignored) {}
         return info;

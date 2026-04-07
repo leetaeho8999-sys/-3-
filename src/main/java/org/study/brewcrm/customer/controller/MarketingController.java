@@ -53,6 +53,14 @@ public class MarketingController {
         return "redirect:/customer/marketing?issued=true";
     }
 
+    // ── 쿠폰 사용 처리 (고객 상세 페이지에서 호출) ──────────
+    @PostMapping("/useCoupon")
+    public String useCoupon(@RequestParam int    cc_idx,
+                            @RequestParam String c_idx) {
+        couponMapper.useCoupon(cc_idx);
+        return "redirect:/customer/detail?c_idx=" + c_idx + "#coupons";
+    }
+
     // ── 쿠폰 회수 ────────────────────────────────────────────
     @PostMapping("/revokeCoupon")
     public String revokeCoupon(@RequestParam int cc_idx) {

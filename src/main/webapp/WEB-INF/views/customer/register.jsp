@@ -27,6 +27,10 @@
                     <option value="VIP">VIP</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="birthday">생일</label>
+                <input type="date" id="birthday" name="birthday">
+            </div>
             <div class="form-group form-group-full">
                 <label for="memo">메모</label>
                 <textarea id="memo" name="memo" placeholder="알레르기, 선호 음료, 특이사항 등"></textarea>

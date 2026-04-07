@@ -78,6 +78,11 @@
         SELECT * FROM customer_t WHERE c_idx = #{c_idx}
     </select>
 
+    <select id="findCustomerByName" parameterType="String" resultMap="customerResultMap">
+        SELECT * FROM customer_t WHERE name = #{name} AND active = 0
+        ORDER BY c_idx DESC LIMIT 1
+    </select>
+
     <!-- ── 통계용 쿼리 ──────────────────────────────────────────── -->
 
     <!-- 등급별 고객 분포 -->
@@ -141,12 +146,16 @@
 
     <!-- 고객 등록 (useGeneratedKeys: 생성된 c_idx를 CustomerVO에 자동 주입) -->
     <insert id="insertCustomer" parameterType="CustomerVO" useGeneratedKeys="true" keyProperty="c_idx">
-        INSERT INTO customer_t (name, phone, grade, visit_count, memo, active)
+        INSERT INTO customer_t (name, phone, grade, visit_count, memo, birthday, active)
         VALUES (
             #{name}, #{phone}, #{grade}, 0,
             <choose>
                 <when test="memo != null and memo != ''">#{memo}</when>
                 <otherwise>''</otherwise>
+            </choose>,
+            <choose>
+                <when test="birthday != null and birthday != ''">#{birthday}</when>
+                <otherwise>NULL</otherwise>
             </choose>,
             0
         )
@@ -155,10 +164,14 @@
     <!-- 고객 수정 -->
     <update id="updateCustomer" parameterType="CustomerVO">
         UPDATE customer_t
-        SET name  = #{name},
-            phone = #{phone},
-            grade = #{grade},
-            memo  = #{memo}
+        SET name     = #{name},
+            phone    = #{phone},
+            grade    = #{grade},
+            memo     = #{memo},
+            birthday = <choose>
+                           <when test="birthday != null and birthday != ''">#{birthday}</when>
+                           <otherwise>NULL</otherwise>
+                       </choose>
         WHERE c_idx = #{c_idx}
     </update>
 

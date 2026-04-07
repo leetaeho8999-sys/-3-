@@ -110,6 +110,15 @@
             <div class="detail-value">${customer.memo}</div>
         </div>
         <div class="detail-item">
+            <div class="detail-label">생일</div>
+            <div class="detail-value">
+                <c:choose>
+                    <c:when test="${not empty customer.birthday}">${customer.birthday}</c:when>
+                    <c:otherwise class="td-faint" style="color:var(--text-faint)">-</c:otherwise>
+                </c:choose>
+            </div>
+        </div>
+        <div class="detail-item">
             <div class="detail-label">등록일</div>
             <div class="detail-value td-faint">${customer.regDate}</div>
         </div>
@@ -173,8 +182,7 @@
       </div>
       <div class="tier-max-badge">👑 모든 혜택을 누리고 있습니다</div>
       <div class="benefit-list">
-        <div class="benefit-row"><span class="b-icon">💳</span> 결제액의 <strong style="color:#cc88ee">10%</strong> 포인트 적립</div>
-        <div class="benefit-row"><span class="b-icon">🎟</span> 모든 음료 프리패스 쿠폰 월 2장 발급</div>
+        <div class="benefit-row"><span class="b-icon">🎟</span> 모든 음료 쿠폰 월 2장 발급</div>
       </div>
     </c:when>
 
@@ -213,7 +221,6 @@
 
       <div class="benefit-list">
         <div style="font-size:11px;color:var(--text-faint);margin-bottom:4px">현재 골드 혜택</div>
-        <div class="benefit-row"><span class="b-icon">💳</span> 결제액의 <strong style="color:var(--brown-hi)">7%</strong> 포인트 적립</div>
         <div class="benefit-row"><span class="b-icon">☕</span> 무료 아메리카노 쿠폰 월 1장 발급</div>
       </div>
     </c:when>
@@ -281,7 +288,6 @@
 
       <div class="benefit-list">
         <div style="font-size:11px;color:var(--text-faint);margin-bottom:4px">현재 실버 혜택</div>
-        <div class="benefit-row"><span class="b-icon">💳</span> 결제액의 <strong style="color:#ccc">5%</strong> 포인트 적립</div>
         <div class="benefit-row"><span class="b-icon">🎟</span> 사이즈업 쿠폰 월 1장 발급</div>
       </div>
     </c:when>
@@ -349,12 +355,74 @@
 
       <div class="benefit-list">
         <div style="font-size:11px;color:var(--text-faint);margin-bottom:4px">현재 일반 혜택</div>
-        <div class="benefit-row"><span class="b-icon">💳</span> 결제액의 <strong style="color:var(--text-dim)">2%</strong> 포인트 적립</div>
-        <div class="benefit-row"><span class="b-icon">🎁</span> 가입 축하 웰컴 쿠폰 1장 발급</div>
+        <div class="benefit-row"><span class="b-icon">🎁</span> 가입 축하 아메리카노 쿠폰 1장 발급</div>
       </div>
     </c:otherwise>
   </c:choose>
 
+</div>
+
+<%-- ══════════════════════════════════════════════════════
+     보유 쿠폰
+     ══════════════════════════════════════════════════════ --%>
+<div class="glass-card" id="coupons" style="margin-top:18px">
+  <div class="card-header"><h3>보유 쿠폰</h3></div>
+  <c:choose>
+    <c:when test="${empty customerCoupons}">
+      <div class="empty-msg" style="padding:20px 0">발급된 쿠폰이 없습니다.</div>
+    </c:when>
+    <c:otherwise>
+      <table class="crm-table">
+        <thead>
+          <tr>
+            <th>쿠폰명</th>
+            <th style="width:90px">종류</th>
+            <th style="width:110px">만료일</th>
+            <th style="width:80px">상태</th>
+            <th style="width:90px">처리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach var="cp" items="${customerCoupons}">
+            <tr style="${cp.used == 1 ? 'opacity:0.45' : ''}">
+              <td>${cp.coupon_name}</td>
+              <td>
+                <c:choose>
+                  <c:when test="${cp.coupon_type == 'FREE'}">무료음료</c:when>
+                  <c:when test="${cp.coupon_type == 'DISCOUNT'}">할인</c:when>
+                  <c:when test="${cp.coupon_type == 'UPGRADE'}">업그레이드</c:when>
+                  <c:otherwise>${cp.coupon_type}</c:otherwise>
+                </c:choose>
+              </td>
+              <td class="td-faint">${cp.expire_date}</td>
+              <td>
+                <c:choose>
+                  <c:when test="${cp.used == 1}">
+                    <span style="color:var(--text-faint)">사용완료</span>
+                  </c:when>
+                  <c:otherwise>
+                    <span style="color:var(--brown-hi);font-weight:600">미사용</span>
+                  </c:otherwise>
+                </c:choose>
+              </td>
+              <td>
+                <c:if test="${cp.used == 0}">
+                  <form action="${pageContext.request.contextPath}/customer/marketing/useCoupon"
+                        method="post" style="margin:0">
+                    <input type="hidden" name="cc_idx" value="${cp.cc_idx}">
+                    <input type="hidden" name="c_idx"  value="${customer.c_idx}">
+                    <button type="submit" class="btn-ghost"
+                            style="font-size:11px;padding:4px 10px"
+                            onclick="return confirm('쿠폰을 사용 처리하시겠습니까?')">사용처리</button>
+                  </form>
+                </c:if>
+              </td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </c:otherwise>
+  </c:choose>
 </div>
 
 <%-- ══════════════════════════════════════════════════════

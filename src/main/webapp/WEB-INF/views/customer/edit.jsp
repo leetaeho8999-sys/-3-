@@ -28,6 +28,10 @@
                     <option value="VIP"  ${customer.grade == 'VIP'  ? 'selected' : ''}>VIP</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="birthday">생일</label>
+                <input type="date" id="birthday" name="birthday" value="${customer.birthday}">
+            </div>
             <div class="form-group form-group-full">
                 <label for="memo">메모</label>
                 <textarea id="memo" name="memo">${customer.memo}</textarea>

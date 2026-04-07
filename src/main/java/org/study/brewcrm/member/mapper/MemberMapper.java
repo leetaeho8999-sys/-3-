@@ -13,6 +13,7 @@ public interface MemberMapper {
     MemberVO findByEmail(String email);
     MemberVO findMyPageInfo(String m_idx);            // customer_t JOIN 포함
     int      updateMember(MemberVO memberVO);
+    int      setLinkedCustomer(Map<String, Object> params); // linked_customer 연결
     int      updateLinkedCustomer(MemberVO memberVO); // 연결된 customer_t.phone, memo 동기화
     MemberVO findByLinkedCustomer(String c_idx);      // 고객 번호로 연결된 회원 조회 (포인트 동기화용)
     int      updateMemberRole(Map<String, Object> params); // 권한 변경 (관리자 전용)
