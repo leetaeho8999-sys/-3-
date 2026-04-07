@@ -28,6 +28,7 @@
         <result column="role"            property="role"/>
         <result column="grade"           property="grade"/>
         <result column="visitCount"      property="visitCount"/>
+        <result column="monthlyVisit"    property="monthlyVisit"/>
         <result column="phone"           property="phone"/>
         <result column="memo"            property="memo"/>
     </resultMap>
@@ -53,10 +54,11 @@
             m.reg_date,
             m.active,
             m.role,
-            COALESCE(c.grade,       '일반') AS grade,
-            COALESCE(c.visit_count, 0     ) AS visitCount,
-            COALESCE(c.phone,       ''    ) AS phone,
-            COALESCE(c.memo,        ''    ) AS memo
+            COALESCE(c.grade,         '일반') AS grade,
+            COALESCE(c.visit_count,   0   ) AS visitCount,
+            COALESCE(c.monthly_visit, 0   ) AS monthlyVisit,
+            COALESCE(c.phone,         ''  ) AS phone,
+            COALESCE(c.memo,          ''  ) AS memo
         FROM member_t m
         LEFT JOIN customer_t c
             ON m.linked_customer = c.c_idx
@@ -96,7 +98,7 @@
         FROM member_t
         WHERE active = 0
           AND COALESCE(role, 'STAFF') != 'MEMBER'
-        ORDER BY m_idx DESC
+        ORDER BY CASE WHEN role = 'ADMIN' THEN 0 ELSE 1 END, m_idx ASC
     </select>
 
     <!--

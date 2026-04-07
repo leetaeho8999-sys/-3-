@@ -101,16 +101,16 @@
     <select id="getVisitDistribution" resultType="map">
         SELECT
           CASE
-            WHEN visit_count = 0            THEN '0회'
-            WHEN visit_count BETWEEN 1 AND 5  THEN '1-5회'
-            WHEN visit_count BETWEEN 6 AND 15 THEN '6-15회'
-            WHEN visit_count BETWEEN 16 AND 30 THEN '16-30회'
-            ELSE '31회+'
+            WHEN visit_count = 0             THEN '0회'
+            WHEN visit_count BETWEEN 1 AND 4  THEN '1-4회'
+            WHEN visit_count BETWEEN 5 AND 14 THEN '5-14회'
+            WHEN visit_count BETWEEN 15 AND 29 THEN '15-29회'
+            ELSE '30회+'
           END AS bucket,
           COUNT(*) AS cnt
         FROM customer_t WHERE active = 0
         GROUP BY bucket
-        ORDER BY FIELD(bucket, '0회', '1-5회', '6-15회', '16-30회', '31회+')
+        ORDER BY FIELD(bucket, '0회', '1-4회', '5-14회', '15-29회', '30회+')
     </select>
 
     <!-- 방문 횟수 Top N 고객 -->

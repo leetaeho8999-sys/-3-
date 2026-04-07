@@ -50,8 +50,41 @@ public class MemberServiceImpl implements MemberService {
         return enc.matches(password, m.getPassword()) ? m : null;
     }
 
-    @Override public int      checkEmail(String email)     { return memberMapper.checkEmail(email); }
-    @Override public MemberVO findMyPageInfo(String m_idx) { return memberMapper.findMyPageInfo(m_idx); }
+    @Override public int checkEmail(String email) { return memberMapper.checkEmail(email); }
+
+    /**
+     * 마이페이지 조회 — 연결된 customer_t 의 monthly_visit/monthly_amount 기준으로
+     * 등급을 실시간 재계산하여 반환한다.
+     * ① monthly_visit 컬럼이 없거나 0이면 visit_count(누적)로 대체 추정한다.
+     * ② 계산된 등급이 customer_t 와 다르면 customer_t 도 동기화한다.
+     */
+    @Override
+    public MemberVO findMyPageInfo(String m_idx) {
+        MemberVO info = memberMapper.findMyPageInfo(m_idx);
+        if (info == null) return null;
+        if (info.getLinkedCustomer() == null || info.getLinkedCustomer().isEmpty()) return info;
+        try {
+            org.study.brewcrm.customer.vo.CustomerVO customer =
+                    customerMapper.getCustomerDetail(info.getLinkedCustomer());
+            if (customer == null) return info;
+            int mv = customer.getMonthlyVisit();
+            int ma = customer.getMonthlyAmount();
+            // monthly_visit 컬럼 미존재 또는 이번 달 방문 없음 → visit_count 기반 대체 추정
+            if (mv == 0 && ma == 0) mv = customer.getVisitCount();
+            String grade;
+            if      (mv >= 30)                   grade = "VIP";
+            else if (mv >= 15 || ma >= 70_000)   grade = "골드";
+            else if (mv >= 5  || ma >= 30_000)   grade = "실버";
+            else                                 grade = "일반";
+            info.setGrade(grade);
+            // customer_t 도 최신 등급으로 동기화
+            if (!grade.equals(customer.getGrade())) {
+                customer.setGrade(grade);
+                customerMapper.updateGrade(customer);
+            }
+        } catch (Exception ignored) {}
+        return info;
+    }
 
     /**
      * [2] 마이페이지 수정 시 member_t + customer_t 동시 업데이트

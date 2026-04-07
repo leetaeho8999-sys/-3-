@@ -30,7 +30,7 @@
     </div>
     <nav id="sidebar-nav">
       <a href="${pageContext.request.contextPath}/member/mypage" class="nav-item active">
-        <span class="nav-icon">👤</span> 내 정보
+        <span class="nav-icon">◎</span> 내 정보
       </a>
       <%-- STAFF / MANAGER / ADMIN 은 CRM 대시보드로 이동 가능 --%>
       <c:if test="${sessionScope.loginMember.role != 'MEMBER' and not empty sessionScope.loginMember.role}">
@@ -107,25 +107,25 @@
                 <div class="grade-progress-bar"><div class="grade-progress-fill" style="width:100%;background:linear-gradient(90deg,#b464dc,#cc88ff)"></div></div>
               </c:when>
               <c:when test="${myInfo.grade == '골드'}">
-                <div class="grade-progress-label">VIP까지 <strong>${31 - myInfo.visitCount}회</strong> 남음</div>
+                <div class="grade-progress-label">VIP까지 이번 달 <strong>${30 - myInfo.monthlyVisit}회</strong> 남음</div>
                 <div class="grade-progress-bar">
-                  <div class="grade-progress-fill grade-fill-gold" style="width:${((myInfo.visitCount - 16) * 100) / 15}%"></div>
+                  <div class="grade-progress-fill grade-fill-gold" style="width:${((myInfo.monthlyVisit - 15) * 100) / 15}%"></div>
                 </div>
-                <div class="grade-progress-range"><span>골드 16회</span><span>VIP 31회</span></div>
+                <div class="grade-progress-range"><span>골드 15회</span><span>VIP 30회</span></div>
               </c:when>
               <c:when test="${myInfo.grade == '실버'}">
-                <div class="grade-progress-label">골드까지 <strong>${16 - myInfo.visitCount}회</strong> 남음</div>
+                <div class="grade-progress-label">골드까지 이번 달 <strong>${15 - myInfo.monthlyVisit}회</strong> 남음</div>
                 <div class="grade-progress-bar">
-                  <div class="grade-progress-fill grade-fill-silver" style="width:${((myInfo.visitCount - 6) * 100) / 10}%"></div>
+                  <div class="grade-progress-fill grade-fill-silver" style="width:${((myInfo.monthlyVisit - 5) * 100) / 10}%"></div>
                 </div>
-                <div class="grade-progress-range"><span>실버 6회</span><span>골드 16회</span></div>
+                <div class="grade-progress-range"><span>실버 5회</span><span>골드 15회</span></div>
               </c:when>
               <c:otherwise>
-                <div class="grade-progress-label">실버까지 <strong>${6 - myInfo.visitCount}회</strong> 남음</div>
+                <div class="grade-progress-label">실버까지 이번 달 <strong>${5 - myInfo.monthlyVisit}회</strong> 남음</div>
                 <div class="grade-progress-bar">
-                  <div class="grade-progress-fill grade-fill-normal" style="width:${(myInfo.visitCount * 100) / 6}%"></div>
+                  <div class="grade-progress-fill grade-fill-normal" style="width:${(myInfo.monthlyVisit * 100) / 5}%"></div>
                 </div>
-                <div class="grade-progress-range"><span>일반 0회</span><span>실버 6회</span></div>
+                <div class="grade-progress-range"><span>일반 0회</span><span>실버 5회</span></div>
               </c:otherwise>
             </c:choose>
           </div>
@@ -166,22 +166,22 @@
         <div class="grade-step-grid">
           <div class="grade-step ${myInfo.grade == '일반' ? 'grade-step-active' : ''}">
             <span class="grade-badge grade-일반">일반</span>
-            <div class="grade-step-desc">0 ~ 5회</div>
+            <div class="grade-step-desc">0 ~ 4회</div>
           </div>
           <div class="grade-step-arrow">→</div>
           <div class="grade-step ${myInfo.grade == '실버' ? 'grade-step-active' : ''}">
             <span class="grade-badge grade-실버">실버</span>
-            <div class="grade-step-desc">6 ~ 15회</div>
+            <div class="grade-step-desc">5 ~ 14회</div>
           </div>
           <div class="grade-step-arrow">→</div>
           <div class="grade-step ${myInfo.grade == '골드' ? 'grade-step-active' : ''}">
             <span class="grade-badge grade-골드">골드</span>
-            <div class="grade-step-desc">16 ~ 30회</div>
+            <div class="grade-step-desc">15 ~ 29회</div>
           </div>
           <div class="grade-step-arrow">→</div>
           <div class="grade-step ${myInfo.grade == 'VIP' ? 'grade-step-active' : ''}">
             <span class="grade-badge grade-VIP">VIP</span>
-            <div class="grade-step-desc">31회 이상</div>
+            <div class="grade-step-desc">30회 이상</div>
           </div>
         </div>
       </div>

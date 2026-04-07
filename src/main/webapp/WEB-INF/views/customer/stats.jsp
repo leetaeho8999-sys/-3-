@@ -496,22 +496,22 @@
               </c:when>
               <c:when test="${cp.grade == '골드'}">
                 <c:set var="nextGrade"    value="VIP"/>
-                <c:set var="visitTarget"  value="0"/>
-                <c:set var="amtTarget"    value="150000"/>
+                <c:set var="visitTarget"  value="30"/>
+                <c:set var="amtTarget"    value="0"/>
               </c:when>
               <c:when test="${cp.grade == '실버'}">
                 <c:set var="nextGrade"    value="골드"/>
-                <c:set var="visitTarget"  value="10"/>
+                <c:set var="visitTarget"  value="15"/>
                 <c:set var="amtTarget"    value="70000"/>
               </c:when>
               <c:otherwise>
                 <c:set var="nextGrade"    value="실버"/>
-                <c:set var="visitTarget"  value="3"/>
+                <c:set var="visitTarget"  value="5"/>
                 <c:set var="amtTarget"    value="30000"/>
               </c:otherwise>
             </c:choose>
 
-            <%-- 방문 달성률 (VIP/골드→VIP는 방문 기준 없음) --%>
+            <%-- 방문 달성률 --%>
             <c:set var="visitPct" value="0"/>
             <c:if test="${visitTarget > 0}">
               <c:set var="visitPct" value="${cp.monthlyVisit * 100 / visitTarget}"/>
@@ -528,7 +528,7 @@
             <%-- 종합 달성률 (방문 OR 결제 중 높은 것) --%>
             <c:set var="overallPct" value="${visitPct > amtPct ? visitPct : amtPct}"/>
             <c:if test="${cp.grade == 'VIP'}"><c:set var="overallPct" value="100"/></c:if>
-            <c:if test="${nextGrade == 'VIP'}"><c:set var="overallPct" value="${amtPct}"/></c:if>
+            <c:if test="${nextGrade == 'VIP'}"><c:set var="overallPct" value="${visitPct}"/></c:if>
 
             <c:set var="barColor" value="${nextGrade == 'VIP' ? 'rgba(160,80,200,0.7)' : nextGrade == '골드' ? 'rgba(200,131,42,0.75)' : nextGrade == '실버' ? 'rgba(192,192,192,0.6)' : 'rgba(240,224,200,0.25)'}"/>
 
@@ -778,10 +778,10 @@
     const labels = [], counts = [];
     const tierColors = {
       '0회':    'rgba(240,224,200,0.22)',
-      '1-5회':  'rgba(240,224,200,0.38)',
-      '6-15회': 'rgba(192,192,192,0.60)',
-      '16-30회':'rgba(200,131,42,0.75)',
-      '31회+':  'rgba(180,100,220,0.78)'
+      '1-4회':  'rgba(240,224,200,0.38)',
+      '5-14회': 'rgba(192,192,192,0.60)',
+      '15-29회':'rgba(200,131,42,0.75)',
+      '30회+':  'rgba(180,100,220,0.78)'
     };
 
     <c:forEach var="row" items="${visitDistribution}">

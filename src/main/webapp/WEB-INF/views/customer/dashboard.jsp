@@ -8,33 +8,51 @@
 <div class="stat-grid">
   <div class="stat-card">
     <div class="stat-label">전체 고객</div>
-    <div class="stat-value">${totalCount}</div>
+    <div class="stat-value">
+      ${totalCount}
+      <span style="font-size:14px;color:var(--text-faint)">명</span>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-label">👑 VIP</div>
-    <div class="stat-value" style="color:#cc88ff">${vipCount}</div>
+    <div class="stat-value" style="color:#cc88ff">
+      ${vipCount}
+      <span style="font-size:14px;color:var(--text-faint)">명</span>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-label">⭐ 골드</div>
-    <div class="stat-value">${goldCount}</div>
+    <div class="stat-value">
+      ${goldCount}
+      <span style="font-size:14px;color:var(--text-faint)">명</span>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-label">🥈 실버</div>
-    <div class="stat-value" style="color:#d8d8d8">${silverCount}</div>
+    <div class="stat-value" style="color:#d8d8d8">
+      ${silverCount}
+      <span style="font-size:14px;color:var(--text-faint)">명</span>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-label">이번 달 신규</div>
-    <div class="stat-value">${newCount}</div>
+    <div class="stat-value">
+      ${newCount}
+      <span style="font-size:14px;color:var(--text-faint)">명</span>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-label">이번 달 방문</div>
-    <div class="stat-value">${totalMonthlyVisit}<span style="font-size:14px;color:var(--text-faint)">회</span></div>
+    <div class="stat-value">
+      ${totalMonthlyVisit}
+      <span style="font-size:14px;color:var(--text-faint)">회</span>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-label">이번 달 매출</div>
-    <div class="stat-value" style="font-size:18px">
+    <div class="stat-value">
       <fmt:formatNumber value="${totalMonthlyAmount}" pattern="#,###"/>
-      <span style="font-size:12px;color:var(--text-faint)">원</span>
+      <span style="font-size:14px;color:var(--text-faint)">원</span>
     </div>
   </div>
 </div>

@@ -46,7 +46,7 @@
       </a>
       <a href="${pageContext.request.contextPath}/customer/marketing"
          class="nav-item ${activeMenu == 'marketing' ? 'active' : ''}">
-        <span class="nav-icon">🎯</span> 마케팅
+        <span class="nav-icon">◈</span> 마케팅
       </a>
       <a href="${pageContext.request.contextPath}/customer/admin"
          class="nav-item ${activeMenu == 'admin' ? 'active' : ''}">
@@ -55,7 +55,7 @@
       <!-- 회원 마이페이지 링크 -->
       <a href="${pageContext.request.contextPath}/member/mypage"
          class="nav-item" style="margin-top:12px;border-top:1px solid var(--border);padding-top:16px">
-        <span class="nav-icon">👤</span> 마이페이지
+        <span class="nav-icon">◉</span> 마이페이지
       </a>
       <a href="${pageContext.request.contextPath}/member/logout"
          class="nav-item">

@@ -17,7 +17,8 @@ public class MemberVO {
     private String active;          // 0=정상, 1=탈퇴
     // ── 마이페이지용 (customer_t JOIN) ──
     private String grade;           // 등급 (일반/실버/골드/VIP)
-    private int    visitCount;      // 방문 횟수
+    private int    visitCount;      // 누적 방문 횟수
+    private int    monthlyVisit;    // 이번 달 방문 횟수 (등급 기준)
     private String phone;           // 전화번호
     private String memo;            // 메모
     private String role;            // 권한 (ADMIN/MANAGER/STAFF/MEMBER)

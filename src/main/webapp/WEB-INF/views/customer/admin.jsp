@@ -50,9 +50,9 @@
           <tr><td colspan="7" class="empty-msg">등록된 직원 계정이 없습니다.</td></tr>
         </c:when>
         <c:otherwise>
-          <c:forEach var="m" items="${members}">
+          <c:forEach var="m" items="${members}" varStatus="vs">
             <tr>
-              <td class="td-faint">#${m.m_idx}</td>
+              <td class="td-faint">${vs.count}</td>
               <td>${m.email}</td>
               <td>${m.name}</td>
               <td style="text-align:center">

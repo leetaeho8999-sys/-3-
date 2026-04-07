@@ -186,32 +186,27 @@
         <span class="grade-badge grade-VIP">VIP</span>
         <span class="arrow-label">다음 등급까지</span>
       </div>
-      <c:set var="amtTarget" value="150000"/>
-      <c:set var="amtCurrent" value="${customer.monthlyAmount}"/>
-      <c:set var="amtPct" value="${amtCurrent * 100 / amtTarget}"/>
-      <c:if test="${amtPct > 100}"><c:set var="amtPct" value="100"/></c:if>
-      <c:set var="amtRemain" value="${amtTarget - amtCurrent}"/>
+      <c:set var="visitTarget"  value="30"/>
+      <c:set var="visitCurrent" value="${customer.monthlyVisit}"/>
+      <c:set var="visitPct"     value="${visitCurrent * 100 / visitTarget}"/>
+      <c:if test="${visitPct > 100}"><c:set var="visitPct" value="100"/></c:if>
+      <c:set var="visitRemain"  value="${visitTarget - visitCurrent}"/>
 
       <div class="progress-metric">
         <div class="progress-meta">
-          <span class="progress-meta-key">💳 이번 달 결제액</span>
-          <span class="progress-meta-val">
-            <fmt:formatNumber value="${amtCurrent}" pattern="#,###"/>원
-            / <fmt:formatNumber value="${amtTarget}" pattern="#,###"/>원
-          </span>
+          <span class="progress-meta-key">📅 이번 달 방문 횟수</span>
+          <span class="progress-meta-val">${visitCurrent}회 / ${visitTarget}회</span>
         </div>
         <div class="prog-bar-bg">
           <div class="prog-bar-fill"
-               style="width:<fmt:formatNumber value="${amtPct}" maxFractionDigits="1"/>%;
+               style="width:<fmt:formatNumber value="${visitPct}" maxFractionDigits="1"/>%;
                       background:linear-gradient(90deg,rgba(160,80,200,0.6),rgba(160,80,200,0.9))">
           </div>
         </div>
         <div class="progress-hint">
           <c:choose>
-            <c:when test="${amtRemain <= 0}">조건 충족 완료 ✓</c:when>
-            <c:otherwise>
-              <fmt:formatNumber value="${amtRemain}" pattern="#,###"/>원 더 결제하면 VIP 달성
-            </c:otherwise>
+            <c:when test="${visitRemain <= 0}">조건 충족 완료 ✓</c:when>
+            <c:otherwise>${visitRemain}회 더 방문하면 VIP 달성</c:otherwise>
           </c:choose>
         </div>
       </div>
@@ -231,7 +226,7 @@
         <span class="grade-badge grade-골드">골드</span>
         <span class="arrow-label">다음 등급까지</span>
       </div>
-      <c:set var="visitTarget"  value="10"/>
+      <c:set var="visitTarget"  value="15"/>
       <c:set var="amtTarget"    value="70000"/>
       <c:set var="visitCurrent" value="${customer.monthlyVisit}"/>
       <c:set var="amtCurrent"   value="${customer.monthlyAmount}"/>
@@ -299,7 +294,7 @@
         <span class="grade-badge grade-실버">실버</span>
         <span class="arrow-label">다음 등급까지</span>
       </div>
-      <c:set var="visitTarget"  value="3"/>
+      <c:set var="visitTarget"  value="5"/>
       <c:set var="amtTarget"    value="30000"/>
       <c:set var="visitCurrent" value="${customer.monthlyVisit}"/>
       <c:set var="amtCurrent"   value="${customer.monthlyAmount}"/>

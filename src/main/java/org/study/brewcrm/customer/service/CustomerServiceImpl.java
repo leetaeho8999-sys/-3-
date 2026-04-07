@@ -79,9 +79,9 @@ public class CustomerServiceImpl implements CustomerService {
 
             // ── 등급 산정 ──────────────────────────────────────────
             String newGrade;
-            if      (ma >= 150_000)              newGrade = "VIP";
-            else if (mv >= 10 || ma >= 70_000)   newGrade = "골드";
-            else if (mv >= 3  || ma >= 30_000)   newGrade = "실버";
+            if      (mv >= 30)                   newGrade = "VIP";
+            else if (mv >= 15 || ma >= 70_000)   newGrade = "골드";
+            else if (mv >= 5  || ma >= 30_000)   newGrade = "실버";
             else                                 newGrade = "일반";
 
             if (!newGrade.equals(customer.getGrade())) {
