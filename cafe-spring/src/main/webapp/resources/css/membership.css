@@ -1,0 +1,284 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   멤버십 페이지 — membership.css
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ── 히어로 ── */
+.ms-hero {
+  position: relative; padding: 120px 1.5rem 80px;
+  background: var(--rown-dark); text-align: center; overflow: hidden;
+}
+.ms-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: url('../images/로스팅-배너.jpg');
+  background-size: cover; background-position: center; opacity: .12;
+}
+.ms-hero::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--rown-cream));
+}
+.ms-hero__inner { position: relative; z-index: 2; }
+.ms-hero__eyebrow {
+  font-size: .65rem; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--rown-gold); margin-bottom: 1.2rem;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.ms-hero__eyebrow::before, .ms-hero__eyebrow::after {
+  content: ''; display: inline-block; width: 28px; height: 1px; background: var(--rown-gold); opacity: .5;
+}
+.ms-hero__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 300; letter-spacing: .04em; color: var(--rown-cream); margin-bottom: .75rem;
+}
+.ms-hero__sub { font-size: .95rem; color: rgba(250,247,242,.6); letter-spacing: .06em; }
+
+/* ── 공통 섹션 ── */
+.ms-section { padding: 5rem 1.5rem; }
+.ms-section--dark  { background: var(--rown-dark); }
+.ms-section--cream { background: var(--rown-cream); }
+.ms-section--beige { background: var(--rown-beige); }
+.ms-inner { max-width: 1100px; margin: 0 auto; }
+.ms-head { text-align: center; margin-bottom: 3.5rem; }
+.ms-head__eyebrow {
+  font-size: .65rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--rown-gold); margin-bottom: .75rem;
+}
+.ms-head__title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 300; letter-spacing: .03em;
+}
+.ms-head__title--light { color: var(--rown-cream); }
+.ms-head__title--dark  { color: var(--rown-dark); }
+.ms-head__line { width: 40px; height: 1px; background: var(--rown-gold); margin: 1rem auto 0; }
+
+/* ── 혜택 그리드 ── */
+.ms-benefit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+@media (max-width: 900px) { .ms-benefit-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .ms-benefit-grid { grid-template-columns: 1fr; } }
+
+.ms-benefit-card {
+  background: #fff; border: 1px solid var(--rown-border);
+  border-radius: 4px; padding: 2rem 1.5rem; text-align: center;
+  transition: box-shadow .3s, transform .3s;
+}
+.ms-benefit-card:hover { box-shadow: 0 8px 32px rgba(42,26,14,.1); transform: translateY(-3px); }
+.ms-benefit-icon {
+  font-size: 1.75rem; width: 56px; height: 56px; border-radius: 50%;
+  background: var(--rown-beige); border: 1px solid var(--rown-border);
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;
+}
+.ms-benefit-card h4 {
+  font-family: var(--font-serif); font-size: .95rem; font-weight: 400;
+  color: var(--rown-dark); margin-bottom: .5rem;
+}
+.ms-benefit-card p { font-size: .825rem; color: var(--rown-muted); line-height: 1.6; }
+
+/* ── 내 멤버십 현황 카드 ── */
+.ms-my-card {
+  background: #fff; border: 1px solid var(--rown-border);
+  border-radius: 8px; padding: 1.5rem 2rem;
+  display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+  box-shadow: 0 2px 16px rgba(42,26,14,.06);
+}
+.ms-my-grade {
+  display: flex; flex-direction: column; align-items: center;
+  gap: .35rem; min-width: 64px; font-size: 2rem; text-align: center;
+}
+.ms-my-grade-text {
+  font-size: .85rem; font-weight: 700; color: var(--rown-dark); letter-spacing: .04em;
+}
+.ms-my-info { flex: 1; }
+.ms-my-name { font-size: 1.05rem; font-weight: 600; color: var(--rown-dark); margin-bottom: .3rem; }
+.ms-my-meta { font-size: .845rem; color: var(--rown-muted); }
+.ms-my-meta strong { color: var(--rown-gold2); font-weight: 700; }
+.ms-my-next {
+  font-size: .82rem; color: var(--rown-muted); text-align: right;
+  white-space: nowrap;
+}
+.ms-my-next b { color: var(--rown-dark); font-weight: 700; }
+
+/* 현재 등급 강조 */
+.ms-grade-card--active {
+  border-color: var(--rown-gold) !important;
+  background: rgba(200,169,126,.10) !important;
+}
+
+/* ── 등급 기준 카드 ── */
+.ms-grade-subtitle {
+  text-align: center; font-size: .75rem; color: rgba(200,169,126,.5);
+  letter-spacing: .5px; margin-bottom: 3rem;
+}
+.ms-grade-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: center; gap: 0;
+}
+@media (max-width: 960px) {
+  .ms-grade-row { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+  .ms-grade-arrow { display: none; }
+}
+@media (max-width: 560px) { .ms-grade-row { grid-template-columns: 1fr; } }
+
+.ms-grade-arrow {
+  color: rgba(200,169,126,.4); font-size: 1.4rem;
+  text-align: center; padding: 0 .5rem; user-select: none;
+}
+.ms-grade-card {
+  background: rgba(250,247,242,.03);
+  border: 1px solid rgba(200,169,126,.18);
+  border-radius: 6px; padding: 1.75rem 1.5rem;
+  transition: border-color .3s, background .3s;
+}
+.ms-grade-card:hover { background: rgba(200,169,126,.06); border-color: rgba(200,169,126,.35); }
+.ms-grade-card--vip { border-color: var(--rown-gold); background: rgba(200,169,126,.07); }
+
+.ms-grade-label {
+  font-size: .6rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--rown-gold); margin-bottom: .5rem;
+}
+.ms-grade-name {
+  font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700;
+  color: var(--rown-cream); margin-bottom: 1.25rem; line-height: 1;
+}
+.ms-grade-name--vip { color: var(--rown-gold); }
+
+.ms-grade-row-item {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: .45rem 0; border-bottom: 1px solid rgba(200,169,126,.1); gap: .5rem;
+}
+.ms-grade-row-item:last-child { border-bottom: none; }
+.ms-grade-row-label { font-size: .72rem; color: rgba(250,247,242,.4); white-space: nowrap; flex-shrink: 0; }
+.ms-grade-row-value {
+  font-size: .8rem; font-weight: 600; color: rgba(250,247,242,.8);
+  text-align: right; line-height: 1.4;
+}
+.ms-grade-row-value b { color: var(--rown-gold); font-weight: 700; }
+.ms-grade-row-value--gold { color: var(--rown-gold); }
+
+/* ── 다크 통합 히어로 + 카드 ── */
+.ms-top {
+  position: relative;
+  background: var(--rown-dark);
+  padding: 100px 1.5rem 80px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+}
+
+/* 배경 커피 이미지 */
+.ms-top__bg {
+  position: absolute; inset: 0;
+  background-image: url('../images/카페-내부.jpg');
+  background-size: cover; background-position: center;
+  opacity: .07;
+  pointer-events: none;
+}
+
+/* 하단 페이드 */
+.ms-top::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
+  background: linear-gradient(to bottom, transparent, var(--rown-dark));
+  pointer-events: none;
+}
+
+/* 히어로 텍스트 */
+.ms-top__hero {
+  position: relative; z-index: 2;
+  text-align: center;
+}
+.ms-top__eyebrow {
+  font-size: .6rem; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--rown-gold); margin-bottom: 1.25rem;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.ms-top__eyebrow::before,
+.ms-top__eyebrow::after {
+  content: ''; display: inline-block; width: 32px; height: 1px;
+  background: var(--rown-gold); opacity: .45;
+}
+.ms-top__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 300; letter-spacing: .05em;
+  color: var(--rown-cream); margin-bottom: .6rem;
+}
+.ms-top__sub {
+  font-size: .9rem; color: rgba(250,247,242,.45); letter-spacing: .08em;
+}
+
+/* 카드 래퍼 */
+.ms-top__card-wrap {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 640px;
+}
+
+/* 멤버십 카드 */
+.ms-top__card {
+  background: rgba(250,247,242,.04);
+  border: 1px solid rgba(200,169,126,.3);
+  border-radius: 10px;
+  padding: 1.75rem 2rem;
+  display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 8px 40px rgba(0,0,0,.35);
+  transition: border-color .3s;
+}
+.ms-top__card:hover { border-color: rgba(200,169,126,.55); }
+
+/* 등급 */
+.ms-top__grade {
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  min-width: 56px; flex-shrink: 0;
+}
+.ms-top__grade-icon { font-size: 1.9rem; line-height: 1; }
+.ms-top__grade-name {
+  font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+  font-weight: 700; color: var(--rown-gold);
+}
+.ms-top__grade-name.grade-VIP   { color: #f0d080; }
+.ms-top__grade-name.grade-골드  { color: var(--rown-gold); }
+.ms-top__grade-name.grade-실버  { color: #b0c4d4; }
+
+/* 구분선 */
+.ms-top__divider {
+  width: 1px; height: 56px; background: rgba(200,169,126,.2); flex-shrink: 0;
+  align-self: center;
+}
+
+/* 사용자 정보 */
+.ms-top__info { flex: 1; min-width: 160px; }
+.ms-top__username {
+  font-family: var(--font-serif);
+  font-size: 1.15rem; font-weight: 400; color: var(--rown-cream);
+  margin-bottom: .45rem; letter-spacing: .03em;
+}
+.ms-top__stats {
+  font-size: .8rem; color: rgba(250,247,242,.5);
+  display: flex; align-items: center; gap: .4rem; flex-wrap: wrap;
+}
+.ms-top__stats b { color: var(--rown-gold); font-weight: 700; }
+.ms-top__dot { color: rgba(200,169,126,.3); }
+
+/* 다음 등급 */
+.ms-top__next {
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: .2rem; flex-shrink: 0; text-align: right;
+}
+.ms-top__next-label {
+  font-size: .7rem; color: rgba(250,247,242,.4); letter-spacing: .04em;
+}
+.ms-top__next-count {
+  font-family: var(--font-serif);
+  font-size: 1.5rem; font-weight: 700; color: var(--rown-gold); line-height: 1;
+}
+
+@media (max-width: 540px) {
+  .ms-top { padding: 80px 1.25rem 60px; }
+  .ms-top__card { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .ms-top__divider { display: none; }
+  .ms-top__next { align-items: flex-start; text-align: left; }
+}
