@@ -73,9 +73,9 @@
         LIMIT #{numPerPage} OFFSET #{offset}
     </select>
 
-    <!-- 고객 단건 조회 -->
+    <!-- 고객 단건 조회 (삭제된 고객 제외) -->
     <select id="getCustomerDetail" parameterType="String" resultMap="customerResultMap">
-        SELECT * FROM customer_t WHERE c_idx = #{c_idx}
+        SELECT * FROM customer_t WHERE c_idx = #{c_idx} AND active = 0
     </select>
 
     <select id="findCustomerByName" parameterType="String" resultMap="customerResultMap">

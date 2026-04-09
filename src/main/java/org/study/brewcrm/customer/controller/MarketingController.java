@@ -73,11 +73,13 @@ public class MarketingController {
     public String adjustPoints(@RequestParam String c_idx,
                                @RequestParam int    delta) {
         MemberVO linked = memberMapper.findByLinkedCustomer(c_idx);
-        if (linked != null) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("userId", Integer.parseInt(linked.getM_idx()));
-            params.put("delta",  delta);
-            couponMapper.adjustPoints(params);
+        if (linked != null && linked.getM_idx() != null) {
+            try {
+                Map<String, Object> params = new HashMap<>();
+                params.put("userId", Integer.parseInt(linked.getM_idx()));
+                params.put("delta",  delta);
+                couponMapper.adjustPoints(params);
+            } catch (NumberFormatException ignored) {}
         }
         return "redirect:/customer/detail?c_idx=" + c_idx + "&pointsAdjusted=true";
     }

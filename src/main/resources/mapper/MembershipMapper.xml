@@ -4,11 +4,6 @@
 
 <mapper namespace="org.study.brewcrm.member.mapper.MembershipMapper">
 
-    <!-- 회원 번호로 membership_t 존재 여부 확인 -->
-    <select id="countByUserId" parameterType="int" resultType="int">
-        SELECT COUNT(*) FROM membership_t WHERE user_id = #{userId}
-    </select>
-
     <!--
         포인트 적립 + 등급 동기화 (UPSERT)
         user_id 는 UNIQUE 제약이므로 ON DUPLICATE KEY UPDATE 로 처리

@@ -114,7 +114,7 @@
             <div class="detail-value">
                 <c:choose>
                     <c:when test="${not empty customer.birthday}">${customer.birthday}</c:when>
-                    <c:otherwise class="td-faint" style="color:var(--text-faint)">-</c:otherwise>
+                    <c:otherwise><span class="td-faint" style="color:var(--text-faint)">-</span></c:otherwise>
                 </c:choose>
             </div>
         </div>
@@ -494,7 +494,7 @@
                   <c:when test="${v.amount > 0}">
                     <fmt:formatNumber value="${v.amount}" pattern="#,###"/>원
                   </c:when>
-                  <c:otherwise class="td-faint">-</c:otherwise>
+                  <c:otherwise><span class="td-faint">-</span></c:otherwise>
                 </c:choose>
               </td>
               <td class="td-faint">${empty v.note ? '' : v.note}</td>

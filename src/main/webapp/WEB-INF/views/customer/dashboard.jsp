@@ -74,9 +74,7 @@
         <c:otherwise>
           <c:forEach var="c" items="${recentList}">
             <tr>
-              <td class="td-name">
-                <a href="${pageContext.request.contextPath}/customer/detail?c_idx=${c.c_idx}">${c.name}</a>
-              </td>
+              <td class="td-name">${c.name}</td>
               <td class="td-muted">${c.phone}</td>
               <td><span class="grade-badge grade-${c.grade}">${c.grade}</span></td>
               <td class="td-muted">${c.visitCount}회</td>

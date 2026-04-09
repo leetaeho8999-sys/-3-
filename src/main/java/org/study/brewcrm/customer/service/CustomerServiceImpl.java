@@ -2,6 +2,7 @@ package org.study.brewcrm.customer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.brewcrm.customer.mapper.CustomerMapper;
 import org.study.brewcrm.customer.vo.CustomerVO;
 import org.study.brewcrm.customer.vo.VisitLogVO;
@@ -61,6 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
      *   일반  : 위 조건 미충족             →  결제액의  2% 적립
      */
     @Override
+    @Transactional
     public int addVisitAndUpdateGrade(String c_idx, int amount, String menuItem, String note) {
         // monthly_visit / monthly_amount 컬럼이 없으면 visit_count 만 증가하는 레거시 방식으로 폴백
         Map<String, Object> params = new HashMap<>();
@@ -74,6 +76,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         if (result > 0) {
             CustomerVO customer = customerMapper.getCustomerDetail(c_idx);
+            if (customer == null) return result;  // 삭제된 고객 또는 잘못된 c_idx 방어
             int mv = customer.getMonthlyVisit();  // 컬럼 없으면 0 (resultMap 기본값)
             int ma = customer.getMonthlyAmount(); // 컬럼 없으면 0 (resultMap 기본값)
 
