@@ -1,0 +1,93 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   로그인 전용 — login.css
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.login-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--rown-cream);
+  padding: 80px 1.5rem 3rem;
+}
+.login-wrap { width: 100%; max-width: 480px; }
+
+/* 헤더 영역 */
+.login-brand { text-align: center; margin-bottom: 2.5rem; }
+.login-brand__logo {
+  font-family: var(--font-serif);
+  font-size: 2rem; letter-spacing: .08em;
+  color: var(--rown-dark); margin-bottom: .4rem;
+}
+.login-brand__logo span { color: var(--rown-gold2); }
+.login-brand__sub {
+  font-size: .8rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--rown-muted);
+}
+
+/* 데코 라인 */
+.login-deco {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-bottom: 2rem;
+}
+.login-deco__line { width: 32px; height: 1px; background: var(--rown-border); }
+.login-deco__dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--rown-gold); }
+
+/* 카드 */
+.login-card {
+  background: #fff;
+  border: 1px solid var(--rown-border);
+  border-radius: 6px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 32px rgba(42,26,14,.08);
+}
+.login-card__title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem; font-weight: 400;
+  color: var(--rown-dark); margin-bottom: .3rem;
+}
+.login-card__desc { font-size: .825rem; color: var(--rown-muted); margin-bottom: 1.75rem; }
+
+/* 폼 */
+.login-form-group { margin-bottom: 1.1rem; }
+.login-label {
+  display: block; font-size: .8rem; font-weight: 500;
+  color: var(--rown-text); margin-bottom: .4rem; letter-spacing: .02em;
+}
+.login-input {
+  width: 100%; padding: .65rem .875rem;
+  border: 1px solid var(--rown-border); border-radius: 4px;
+  font-size: .875rem; font-family: inherit;
+  outline: none; background: var(--rown-cream); color: var(--rown-dark);
+  transition: border-color .2s, background .2s;
+}
+.login-input:focus {
+  border-color: var(--rown-gold2); background: #fff;
+  box-shadow: 0 0 0 3px rgba(200,169,126,.12);
+}
+
+/* 버튼 */
+.login-submit {
+  width: 100%; padding: .75rem;
+  background: var(--rown-dark); color: var(--rown-gold);
+  border: none; border-radius: 4px;
+  font-size: .875rem; font-weight: 500; font-family: inherit;
+  letter-spacing: .04em; cursor: pointer;
+  margin-top: 1.5rem;
+  transition: background .2s, transform .15s;
+}
+.login-submit:hover { background: var(--rown-mid); transform: translateY(-1px); }
+
+/* 알림 */
+.login-alert {
+  padding: .65rem .875rem; border-radius: 4px;
+  font-size: .825rem; margin-bottom: 1rem;
+}
+.login-alert--error   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.login-alert--success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+/* 하단 링크 */
+.login-foot {
+  text-align: center; margin-top: 1.5rem;
+  font-size: .825rem; color: var(--rown-muted);
+}
+.login-foot a { color: var(--rown-gold2); font-weight: 500; transition: color .2s; }
+.login-foot a:hover { color: var(--rown-dark); }
