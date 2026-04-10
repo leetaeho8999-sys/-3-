@@ -258,7 +258,7 @@
      차트 행 1: 등급 도넛 + 방문 구간 막대
      ══════════════════════════════════════════════════════ --%>
 <div class="section-label">고객 분포</div>
-<div style="display:grid;grid-template-columns:300px 1fr;gap:16px;margin-bottom:16px;align-items:start">
+<div style="display:grid;grid-template-columns:300px 1fr;gap:16px;margin-bottom:28px;align-items:stretch">
 
   <%-- 등급 도넛 --%>
   <div class="chart-panel">
@@ -272,12 +272,12 @@
   </div>
 
   <%-- 방문 구간 막대 --%>
-  <div class="chart-panel">
+  <div class="chart-panel" style="display:flex;flex-direction:column">
     <div class="chart-title">
       방문 횟수 구간별 고객 수
       <span class="chart-title-sub">등급 기준 구간과 동일</span>
     </div>
-    <div style="position:relative;height:220px">
+    <div style="position:relative;flex:1;min-height:180px">
       <canvas id="visitDistChart"></canvas>
     </div>
   </div>
@@ -351,14 +351,7 @@
             <c:set var="barPct"    value="${maxVisit > 0 ? t.visitCount * 100 / maxVisit : 0}"/>
             <c:set var="barColor"  value="${'VIP' == t.grade ? 'rgba(180,100,220,0.75)' : '골드' == t.grade ? 'rgba(200,131,42,0.8)' : '실버' == t.grade ? 'rgba(192,192,192,0.6)' : 'rgba(255,255,255,0.25)'}"/>
             <tr>
-              <td class="rank-no ${rankClass}">
-                <c:choose>
-                  <c:when test="${displayRank == 1}">🥇</c:when>
-                  <c:when test="${displayRank == 2}">🥈</c:when>
-                  <c:when test="${displayRank == 3}">🥉</c:when>
-                  <c:otherwise>#${displayRank}</c:otherwise>
-                </c:choose>
-              </td>
+              <td class="rank-no ${rankClass}">#${displayRank}</td>
               <td class="td-name">
                 <a href="${pageContext.request.contextPath}/customer/detail?c_idx=${t.c_idx}">${t.name}</a>
               </td>
@@ -779,6 +772,7 @@
         borderWidth: 1.5, borderRadius: 7, borderSkipped: false }] },
       options: {
         responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 4, right: 4, bottom: 0, left: 0 } },
         plugins: {
           legend: { display: false },
           tooltip: { ...TOOLTIP, callbacks: { label: ctx => ' ' + ctx.raw + '명' } }
