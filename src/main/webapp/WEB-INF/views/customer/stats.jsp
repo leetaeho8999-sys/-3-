@@ -755,19 +755,27 @@
       '15-29회':'rgba(200,131,42,0.75)',
       '30회+':  'rgba(180,100,220,0.78)'
     };
+    const tierBorders = {
+      '0회':    'rgba(240,224,200,0.70)',
+      '1-4회':  'rgba(240,224,200,0.85)',
+      '5-14회': 'rgba(192,192,192,0.90)',
+      '15-29회':'rgba(220,160,55,1.0)',
+      '30회+':  'rgba(210,140,255,1.0)'
+    };
 
     <c:forEach var="row" items="${visitDistribution}">
     labels.push('${row.bucket}');
     counts.push(${row.cnt});
     </c:forEach>
 
-    const bgColors = labels.map(l => tierColors[l] || 'rgba(240,224,200,0.3)');
+    const bgColors     = labels.map(l => tierColors[l]  || 'rgba(240,224,200,0.3)');
+    const borderColors = labels.map(l => tierBorders[l] || 'rgba(240,224,200,0.7)');
 
     new Chart(document.getElementById('visitDistChart'), {
       type: 'bar',
       data: { labels, datasets: [{ label: '고객 수', data: counts,
         backgroundColor: bgColors,
-        borderColor: bgColors.map(c => c.replace(/[\d.]+\)$/, '0.95)')),
+        borderColor: borderColors,
         borderWidth: 1.5, borderRadius: 7, borderSkipped: false }] },
       options: {
         responsive: true, maintainAspectRatio: false,
