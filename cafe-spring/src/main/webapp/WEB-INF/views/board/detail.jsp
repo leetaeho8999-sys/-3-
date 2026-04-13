@@ -16,7 +16,7 @@
       <div class="board-detail-content">${board.content}</div>
       <div class="board-detail-actions">
         <a href="${pageContext.request.contextPath}/board/list" class="btn-ghost">목록</a>
-        <c:if test="${not empty sessionScope.loginMember and sessionScope.loginMember.username == board.author}">
+        <c:if test="${not empty sessionScope.m_id and sessionScope.m_name == board.author}">
           <a href="${pageContext.request.contextPath}/board/edit?b_idx=${board.b_idx}" class="btn-primary-sm">수정</a>
           <a href="${pageContext.request.contextPath}/board/delete?b_idx=${board.b_idx}" class="btn-danger"
              onclick="return confirm('삭제하시겠습니까?')">삭제</a>
@@ -35,7 +35,7 @@
               <div class="comment-body">
                 <span class="comment-author">${c.author}</span>
                 <span class="comment-date">${c.regDate}</span>
-                <c:if test="${not empty sessionScope.loginMember and sessionScope.loginMember.username == c.author}">
+                <c:if test="${not empty sessionScope.m_id and sessionScope.m_name == c.author}">
                   <a href="${pageContext.request.contextPath}/board/commentDelete?c_idx=${c.c_idx}&b_idx=${board.b_idx}"
                      class="comment-delete" onclick="return confirm('삭제하시겠습니까?')">삭제</a>
                 </c:if>
@@ -48,7 +48,7 @@
           </c:if>
         </div>
         <c:choose>
-          <c:when test="${not empty sessionScope.loginMember}">
+          <c:when test="${not empty sessionScope.m_id}">
             <form action="${pageContext.request.contextPath}/board/commentOk" method="post" style="display:flex;gap:.75rem">
               <input type="hidden" name="b_idx" value="${board.b_idx}">
               <input type="text" name="content" placeholder="댓글을 입력하세요..." class="comment-input" required>

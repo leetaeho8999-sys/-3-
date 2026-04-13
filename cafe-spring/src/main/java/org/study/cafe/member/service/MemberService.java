@@ -1,70 +1,24 @@
 package org.study.cafe.member.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.study.cafe.member.mapper.MemberMapper;
 import org.study.cafe.member.vo.MemberVO;
-import org.study.cafe.membership.mapper.MembershipMapper;
-import org.study.cafe.membership.vo.MembershipVO;
 
-/**
- * 회원 서비스 — mypractice01 방식으로 재구성
- * 인터페이스+구현체 구조를 단일 클래스로 통합
- */
-@Service
-public class MemberService {
+public interface MemberService {
 
-    @Autowired private MemberMapper     memberMapper;
-    @Autowired private MembershipMapper membershipMapper;
+    // 1. 회원가입 업무
+    void join(MemberVO vo);
 
-    /**
-     * 회원가입 — mypractice01의 join() 방식
-     * 평문 비밀번호 저장, customer_t·membership_t 동시 생성 (멤버십 시스템 연동)
-     */
-    @Transactional
-    public void register(MemberVO vo) {
-        // ① customer_t INSERT (멤버십 등급 연동용, linkedCustomer에 c_idx 주입)
-        memberMapper.insertCustomerForMember(vo);
-        // ② member_t INSERT (평문 비밀번호 그대로 저장)
-        memberMapper.insertMember(vo);
-        // ③ membership_t INSERT (가입 즉시 일반 등급 생성)
-        MemberVO newMember = memberMapper.findByEmail(vo.getEmail());
-        if (newMember != null) {
-            MembershipVO ms = new MembershipVO();
-            ms.setUserId(newMember.getM_idx());
-            ms.setGrade("일반");
-            ms.setPoints(0);
-            membershipMapper.insertMembership(ms);
-        }
-    }
+    // 2. 로그인 업무
+    MemberVO login(MemberVO vo);
 
-    /**
-     * 로그인 — mypractice01의 login() 방식
-     * DB에서 이메일로 회원 조회 후 평문 비밀번호 비교
-     */
-    public MemberVO login(String email, String password) {
-        MemberVO dbMember = memberMapper.findByEmail(email);
-        if (dbMember != null && dbMember.getPassword().equals(password)) {
-            return dbMember;
-        }
-        return null;
-    }
+    // 3. 아이디 찾기 업무
+    String findMemberId(String m_name, String m_phone);
 
-    public int      checkEmail(String email)         { return memberMapper.checkEmail(email); }
-    public int      checkUsername(String username)   { return memberMapper.checkUsername(username); }
-    public MemberVO findByIdx(String m_idx)          { return memberMapper.findByIdx(m_idx); }
-    public MemberVO findMyPageInfo(String m_idx)     { return memberMapper.findMyPageInfo(m_idx); }
+    // 4. 비밀번호 찾기: 아이디와 전화번호를 받아서 기존 비밀번호를 찾아주는 업무
+    String findMemberPw(String m_id, String m_phone);
 
-    /** 회원 정보 수정 + CRM 고객 동기화 */
-    @Transactional
-    public int updateMember(MemberVO vo) {
-        int result = memberMapper.updateMember(vo);
-        if (vo.getLinkedCustomer() != null && !vo.getLinkedCustomer().isEmpty()) {
-            memberMapper.updateLinkedCustomer(vo);
-        }
-        return result;
-    }
+    // 5. 비밀번호 재설정: 아이디와 새 비밀번호를 받아서 비밀번호를 교체하는 업무
+    void updatePw(String m_id, String m_pw);
 
-    public int deleteMember(String m_idx) { return memberMapper.deleteMember(m_idx); }
+    // 6. 아이디 중복 확인: 똑같은 아이디가 있는지 확인
+    int idCheck(String m_id);
 }

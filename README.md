@@ -19,10 +19,10 @@ ROWNCafe는 카페 브랜드 **로운(ROWN)**의 공식 홈페이지입니다.
 | View | JSP + JSTL |
 | ORM | MyBatis 3.0.3 |
 | Database | MySQL 8.x |
-| 인증/보안 | 세션 기반 인증 (평문 비밀번호 비교, mypractice01 패턴) |
+| 인증/보안 | 세션 기반 인증 — abcd 브랜치 방식 (m_id/m_pw, 평문 저장, 세션키: m_id·m_name) |
 | AI | Groq API — LLaMA 3.3 70B |
 | Build | Maven (WAR) |
-| Java | JDK 17 |
+| Java | JDK 21 |
 | 폰트 | Playfair Display, Noto Sans KR (Google Fonts) |
 | 이미지 | 로컬 한국어 파일명 (resources/images/) |
 
@@ -31,9 +31,11 @@ ROWNCafe는 카페 브랜드 **로운(ROWN)**의 공식 홈페이지입니다.
 ## 주요 기능
 
 ### 회원 (Member)
-- 회원가입 / 로그인 / 로그아웃 — mypractice01 방식으로 재구성 (RedirectAttributes 플래시 메시지, MemberVO 통합 파라미터)
-- 마이페이지 (닉네임·전화번호 수정, 회원 탈퇴)
-- 이메일 중복 확인 (회원가입 시 서버 체크)
+- 회원가입 / 로그인 / 로그아웃 — abcd 브랜치 방식 (m_id/m_pw 아이디 기반)
+- 아이디 중복 확인 (회원가입 시 AJAX 실시간 체크)
+- 비밀번호 일치확인 + 전화번호 인증 (모의 SMS, 회원가입)
+- 아이디 찾기 / 비밀번호 찾기 / 비밀번호 재설정 (로그인 페이지)
+- 세션키: `m_id`(아이디), `m_name`(이름)
 
 ### 게시판 (Board)
 - 카테고리별 게시물 목록 (공지 / 자유 / 이벤트)
@@ -137,7 +139,8 @@ cafe-spring/
 
 ```sql
 -- DB: project  /  접속: dbuser1 / 1234
-member_t          -- 회원 (m_idx, name, email, password, linked_customer, reg_date, active)
+member            -- ★ 로그인·회원가입 (m_id, m_pw, m_name, m_phone, m_email) ← abcd 이관
+member_t          -- 구 회원 테이블 (더 이상 로그인에 사용하지 않음)
 customer_t        -- CRM 고객 (c_idx, name, phone, grade, visit_count, memo, active)
 board_t           -- 게시글 (b_idx, title, content, author, category, reg_date, active)
 comment_t         -- 댓글 (c_idx, b_idx, author, content, reg_date)
@@ -222,6 +225,6 @@ http://localhost:8080/
 ## 개발 환경
 
 - **IDE**: IntelliJ IDEA
-- **Java**: JDK 17
+- **Java**: JDK 21
 - **DB**: MySQL 8.x (로컬)
 - **Server**: Spring Boot 내장 Tomcat

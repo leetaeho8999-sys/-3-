@@ -33,7 +33,7 @@
                placeholder="제목 또는 작성자 검색..." class="bd-search-input">
         <button type="submit" class="bd-search-btn">검색</button>
       </form>
-      <c:if test="${not empty sessionScope.loginMember}">
+      <c:if test="${not empty sessionScope.m_id}">
         <a href="${pageContext.request.contextPath}/board/write" class="bd-write-btn">글쓰기</a>
       </c:if>
     </div>

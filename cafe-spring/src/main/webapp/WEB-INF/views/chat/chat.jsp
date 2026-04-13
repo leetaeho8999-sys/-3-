@@ -86,7 +86,7 @@
 
 <script>
 var ctx      = '${pageContext.request.contextPath}';
-var nickname = '${not empty sessionScope.loginMember ? sessionScope.loginMember.username : "손님"}';
+var nickname = '${not empty sessionScope.m_name ? sessionScope.m_name : "손님"}';
 </script>
 <script src="${pageContext.request.contextPath}/resources/js/chat-page.js"></script>
 

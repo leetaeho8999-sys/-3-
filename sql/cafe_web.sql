@@ -3,12 +3,27 @@
 -- ----------------------------------------------------------------
 -- DB     : project  (brew-crm-v2 와 같은 DB 공유)
 -- PORT   : 8080  (brew-crm-v2 는 8081)
+-- Java   : JDK 21
 --
--- ※ 실제 DB 구조는 brew-crm-v2/schema.sql 기준으로 생성한다.
---    이 파일은 cafe-spring 전용 테이블(board_t, comment_t, menu_t)과
---    공유 테이블(customer_t, member_t, membership_t) 전체를 기술한다.
+-- [2026-04-13] abcd 브랜치 이관
+--   ★ 로그인·회원가입은 아래 member 테이블 사용
+--   ★ 기존 member_t 는 남겨두되 더 이상 로그인에 사용하지 않음
+--   ★ 세션키: m_id(아이디), m_name(이름)
 -- ================================================================
 USE project;
+
+-- ================================================================
+-- [abcd 브랜치 이관] 로그인·회원가입용 member 테이블
+-- mypractice01(abcd) 방식 — m_id(아이디) 기반, 평문 비밀번호
+-- 기존 member_t 는 그대로 두고 이 테이블을 신규 로그인에 사용
+-- ================================================================
+CREATE TABLE IF NOT EXISTS member (
+    m_id   VARCHAR(50)  NOT NULL PRIMARY KEY COMMENT '아이디 (로그인 ID)',
+    m_pw   VARCHAR(255) NOT NULL              COMMENT '비밀번호 (평문 저장)',
+    m_name VARCHAR(50)  NOT NULL              COMMENT '이름',
+    m_phone VARCHAR(20) DEFAULT NULL          COMMENT '전화번호',
+    m_email VARCHAR(100) DEFAULT NULL         COMMENT '이메일'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='abcd 이관 회원 테이블 — MemberMapper.xml 참조';
 -- ================================================================
 -- 공유 테이블 (brew-crm-v2 와 동일 DB 사용)
 -- ================================================================

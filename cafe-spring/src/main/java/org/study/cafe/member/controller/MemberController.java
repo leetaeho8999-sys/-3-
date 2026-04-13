@@ -5,19 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.study.cafe.member.service.MemberService;
 import org.study.cafe.member.vo.MemberVO;
 
-/**
- * 회원 컨트롤러 — mypractice01 방식으로 재구성
- * RedirectAttributes 플래시 메시지, MemberVO 통합 파라미터 사용
- */
 @Controller
 @RequestMapping("/member")
 public class MemberController {
 
-    @Autowired private MemberService memberService;
+    @Autowired
+    private MemberService service;
+
+    // ── /member → /member/login 리다이렉트 ───────────────────────────────
+    @GetMapping({"", "/"})
+    public String root() {
+        return "redirect:/member/login";
+    }
 
     // ── 로그인 폼 ─────────────────────────────────────────────────────────
     @GetMapping("/login")
@@ -25,22 +27,21 @@ public class MemberController {
         return "member/login";
     }
 
-    // ── 로그인 처리 — mypractice01의 loginOk() 방식 ───────────────────────
+    // ── 로그인 처리 ───────────────────────────────────────────────────────
     @PostMapping("/loginOk")
-    public String loginOk(MemberVO vo, HttpSession session, RedirectAttributes rttr) {
-        MemberVO result = memberService.login(vo.getEmail(), vo.getPassword());
-
-        if (result != null) {
-            session.setAttribute("loginMember", result);
-            rttr.addFlashAttribute("msg", "환영합니다, " + result.getUsername() + "님! ☕");
+    public String loginOk(MemberVO vo, HttpSession session, Model model) {
+        MemberVO loginMember = service.login(vo);
+        if (loginMember != null) {
+            session.setAttribute("m_id", loginMember.getM_id());
+            session.setAttribute("m_name", loginMember.getM_name());
             return "redirect:/";
         } else {
-            rttr.addFlashAttribute("errorMsg", "이메일 또는 비밀번호가 올바르지 않습니다.");
-            return "redirect:/member/login";
+            model.addAttribute("errorMsg", "아이디 또는 비밀번호가 틀렸습니다.");
+            return "member/login";
         }
     }
 
-    // ── 로그아웃 — mypractice01의 logout() 방식 ─────────────────────────
+    // ── 로그아웃 ──────────────────────────────────────────────────────────
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
@@ -53,46 +54,50 @@ public class MemberController {
         return "member/register";
     }
 
-    // ── 회원가입 처리 — mypractice01의 joinOk() 방식 ─────────────────────
+    // ── 회원가입 처리 ─────────────────────────────────────────────────────
     @PostMapping("/registerOk")
-    public String registerOk(MemberVO vo, RedirectAttributes rttr) {
-        if (memberService.checkEmail(vo.getEmail()) > 0) {
-            rttr.addFlashAttribute("errorMsg", "이미 사용 중인 이메일입니다.");
-            return "redirect:/member/register";
+    public String registerOk(MemberVO vo, Model model) {
+        try {
+            service.join(vo);
+            return "redirect:/member/login";
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", "회원가입 중 문제가 발생했어요.");
+            return "member/register";
         }
-        memberService.register(vo);
-        rttr.addFlashAttribute("msg", "회원가입이 성공적으로 완료되었습니다!");
-        return "redirect:/member/login";
     }
 
-    // ── 마이페이지 ────────────────────────────────────────────────────────
-    @GetMapping("/mypage")
-    public String mypage(HttpSession session, Model model) {
-        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/member/login";
-        MemberVO info = memberService.findMyPageInfo(loginMember.getM_idx());
-        if (info != null) model.addAttribute("memberInfo", info);
-        return "member/mypage";
+    // ── 아이디 중복 확인 ──────────────────────────────────────────────────
+    @PostMapping("/idCheck")
+    @ResponseBody
+    public int idCheck(String m_id) {
+        return service.idCheck(m_id);
     }
 
-    // ── 정보 수정 ─────────────────────────────────────────────────────────
-    @PostMapping("/updateOk")
-    public String updateOk(MemberVO vo, HttpSession session, Model model) {
-        int r = memberService.updateMember(vo);
-        if (r > 0) {
-            MemberVO updated = memberService.findMyPageInfo(vo.getM_idx());
-            session.setAttribute("loginMember", updated);
-            model.addAttribute("memberInfo", updated);
-            model.addAttribute("success", "정보가 업데이트되었습니다.");
+    // ── 아이디 찾기 ───────────────────────────────────────────────────────
+    @PostMapping("/findId")
+    @ResponseBody
+    public String findId(String m_name, String m_phone) {
+        String foundId = service.findMemberId(m_name, m_phone);
+        return (foundId != null) ? foundId : "fail";
+    }
+
+    // ── 비밀번호 찾기 ─────────────────────────────────────────────────────
+    @PostMapping("/findPw")
+    @ResponseBody
+    public String findPw(String m_id, String m_phone) {
+        String foundPw = service.findMemberPw(m_id, m_phone);
+        return (foundPw != null) ? foundPw : "fail";
+    }
+
+    // ── 비밀번호 재설정 ───────────────────────────────────────────────────
+    @PostMapping("/updatePw")
+    @ResponseBody
+    public String updatePw(String m_id, String m_pw) {
+        try {
+            service.updatePw(m_id, m_pw);
+            return "success";
+        } catch (Exception e) {
+            return "fail";
         }
-        return "member/mypage";
-    }
-
-    // ── 회원탈퇴 ──────────────────────────────────────────────────────────
-    @PostMapping("/deleteOk")
-    public String deleteOk(@RequestParam String m_idx, HttpSession session) {
-        memberService.deleteMember(m_idx);
-        session.invalidate();
-        return "redirect:/";
     }
 }

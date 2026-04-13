@@ -9,7 +9,6 @@ import org.study.cafe.board.service.BoardService;
 import org.study.cafe.board.vo.BoardVO;
 import org.study.cafe.board.vo.CommentVO;
 import org.study.cafe.common.Paging;
-import org.study.cafe.member.vo.MemberVO;
 
 @Controller
 @RequestMapping("/board")
@@ -56,15 +55,15 @@ public class BoardController {
     // 글쓰기 폼
     @GetMapping("/write")
     public String writeForm(HttpSession session) {
-        if (session.getAttribute("loginMember") == null) return "redirect:/member/login";
+        if (session.getAttribute("m_id") == null) return "redirect:/member/login";
         return "board/write";
     }
 
     // 글쓰기 처리
     @PostMapping("/writeOk")
     public String writeOk(BoardVO vo, HttpSession session) {
-        MemberVO m = (MemberVO) session.getAttribute("loginMember");
-        if (m != null) vo.setAuthor(m.getUsername());
+        String author = (String) session.getAttribute("m_name");
+        if (author != null) vo.setAuthor(author);
         boardService.insertBoard(vo);
         return "redirect:/board/list";
     }
@@ -72,7 +71,7 @@ public class BoardController {
     // 수정 폼
     @GetMapping("/edit")
     public String editForm(@RequestParam String b_idx, Model model, HttpSession session) {
-        if (session.getAttribute("loginMember") == null) return "redirect:/member/login";
+        if (session.getAttribute("m_id") == null) return "redirect:/member/login";
         model.addAttribute("board", boardService.getDetail(b_idx));
         return "board/edit";
     }
@@ -94,8 +93,8 @@ public class BoardController {
     // 댓글 등록
     @PostMapping("/commentOk")
     public String commentOk(CommentVO vo, HttpSession session) {
-        MemberVO m = (MemberVO) session.getAttribute("loginMember");
-        if (m != null) vo.setAuthor(m.getUsername());
+        String author = (String) session.getAttribute("m_name");
+        if (author != null) vo.setAuthor(author);
         boardService.insertComment(vo);
         return "redirect:/board/detail?b_idx=" + vo.getB_idx();
     }
