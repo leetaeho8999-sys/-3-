@@ -1,12 +1,10 @@
 package org.study.cafe.member.vo;
-
-import lombok.Data;
-
-@Data
+import lombok.*;
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class MemberVO {
-    private String m_id;
-    private String m_pw;
-    private String m_name;
-    private String m_phone;
-    private String m_email;
+    private String m_idx, username, email, password, phone, regDate, active;
+    private String name;            // CRM 고객 이름 (customer_t.name)
+    private String linkedCustomer;  // customer_t.c_idx FK
+    private String grade;           // customer_t에서 JOIN
+    private int    visitCount;      // customer_t에서 JOIN
 }

@@ -96,4 +96,9 @@
         UPDATE board_t SET comments = GREATEST(0, comments - 1) WHERE b_idx = #{b_idx}
     </update>
 
+    <insert id="insert">
+        INSERT INTO tbl_board (bno, category, title, content, writer, tags)
+        VALUES (seq_board.nextval, #{category}, #{title}, #{content}, #{writer}, #{tags})
+    </insert>
+
 </mapper>

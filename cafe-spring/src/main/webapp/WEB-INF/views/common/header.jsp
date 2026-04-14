@@ -30,10 +30,11 @@
       <a href="${pageContext.request.contextPath}/faq" class="nav-link">FAQ</a>
       <div class="nav-auth">
         <c:choose>
-          <c:when test="${not empty sessionScope.m_id}">
+          <c:when test="${not empty sessionScope.loginMember}">
             <div class="nav-dropdown">
-              <button class="user-btn" onclick="toggleUserDropdown()">👤 ${sessionScope.m_name} ▾</button>
+              <button class="user-btn" onclick="toggleUserDropdown()">👤 ${sessionScope.loginMember.username} ▾</button>
               <div class="user-dropdown" id="user-dropdown">
+                <a href="${pageContext.request.contextPath}/member/mypage" class="dropdown-item">내 정보 관리</a>
                 <a href="${pageContext.request.contextPath}/member/logout" class="dropdown-item">로그아웃</a>
               </div>
             </div>
@@ -57,7 +58,8 @@
     <a href="${pageContext.request.contextPath}/faq" class="mobile-nav-link">FAQ</a>
     <div class="mobile-nav-divider"></div>
     <c:choose>
-      <c:when test="${not empty sessionScope.m_id}">
+      <c:when test="${not empty sessionScope.loginMember}">
+        <a href="${pageContext.request.contextPath}/member/mypage" class="mobile-nav-link">마이페이지</a>
         <a href="${pageContext.request.contextPath}/member/logout" class="mobile-nav-link">로그아웃</a>
       </c:when>
       <c:otherwise>

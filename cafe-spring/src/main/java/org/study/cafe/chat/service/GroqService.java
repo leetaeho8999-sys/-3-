@@ -12,12 +12,10 @@ import org.study.cafe.chat.mapper.ChatMapper;
 import org.study.cafe.menu.mapper.MenuMapper;
 import org.study.cafe.menu.vo.MenuVO;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.study.cafe.chat.vo.ChatVO;
 
 @Service
 public class GroqService {
@@ -142,12 +140,7 @@ public class GroqService {
         - 마크다운: # ## 같은 헤더 기호 사용 금지. 강조는 **단어** 형식만 허용
         - 이모티콘: 문장당 최대 1개, 커피·따뜻함 관련(☕ 🍃 ✨ 😊 🎁 ⭐)만 사용
         - 인사말은 **'로운카페 아메리입니다'** 형식을 기본으로
-        - 카페와 무관한 질문(정치, 뉴스, 날씨, 쇼핑 등)을 받았을 때는 아래 3단계로 답변하세요:
-          1단계 [공감]: 손님의 상황이나 감정에 먼저 공감해주세요. 짧고 따뜻하게.
-          2단계 [현실 답변]: 솔직하게 도움이 되는 현실적인 안내를 해주세요. (저희 카페에 없으면 어디서 구할 수 있는지 등)
-          3단계 [카페 언급]: 마지막 한 문장으로 로운카페와 자연스럽게 연결해 마무리해주세요. 억지스럽지 않게, 상황에 맞게.
-          예시(우산): "비가 갑자기 내리면 정말 당황스럽죠. 😊 저희는 음료 전문 카페라 우산은 없지만, 근처 편의점을 이용해보세요. 비 피하러 들어오신 김에 따뜻한 커피 한 잔 어떠세요? ☕"
-          예시(과일): "신선한 과일이 생각나는 날이 있죠! 저희는 커피·음료 전문이라 과일은 없지만, 근처 마트를 이용해보세요. 과일 향이 그리우시다면 저희 에이드 메뉴도 한번 들러보세요 ✨"
+        - 카페와 무관한 질문(정치, 뉴스, 개인 상담 등)은 정중하게 카페 관련 문의로 안내
 
         [페이지 링크 안내 규칙 — 반드시 아래 형식 그대로 복사해서 사용]
         링크 텍스트([ ] 안)에는 반드시 한국어만 사용. 한자·영어·기타 외국어 절대 금지.
@@ -194,37 +187,29 @@ public class GroqService {
         return sb.toString();
     }
 
-    /** 비로그인 손님: sessionId 기준 10쌍(20개), 로그인 회원: mIdx 기준 20쌍(40개) */
-    public String ask(String userMessage, List<ChatVO> history) {
+    public String ask(String userMessage) {
         String prompt = "역할에 맞게 아래 고객 질문에 답해주세요.\n\n고객 질문: " + userMessage;
-        return callGroq(prompt, history);
+        return callGroq(prompt);
     }
 
-    public String askWithHint(String userMessage, String dbResponse, List<ChatVO> history) {
+    public String askWithHint(String userMessage, String dbResponse) {
         String prompt =
             "아래 참고 정보를 바탕으로, 역할에 맞게 고객 질문에 자연스럽게 답해주세요. " +
             "참고 정보의 핵심 내용은 반드시 포함하세요.\n\n" +
             "고객 질문: " + userMessage + "\n" +
             "참고 정보: " + dbResponse;
-        return callGroq(prompt, history);
+        return callGroq(prompt);
     }
 
     @SuppressWarnings("unchecked")
-    private String callGroq(String userPrompt, List<ChatVO> history) {
-        // system + 이전 대화 히스토리 + 현재 질문 순으로 messages 구성
-        List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "system", "content", buildSystemPrompt()));
-
-        if (history != null) {
-            for (ChatVO chat : history) {
-                String role = "user".equals(chat.getSender()) ? "user" : "assistant";
-                messages.add(Map.of("role", role, "content", chat.getMessage()));
-            }
-        }
-
-        messages.add(Map.of("role", "user", "content", userPrompt));
-
-        Map<String, Object> body = Map.of("model", MODEL, "messages", messages);
+    private String callGroq(String userPrompt) {
+        Map<String, Object> body = Map.of(
+            "model", MODEL,
+            "messages", List.of(
+                Map.of("role", "system", "content", buildSystemPrompt()),
+                Map.of("role", "user",   "content", userPrompt)
+            )
+        );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

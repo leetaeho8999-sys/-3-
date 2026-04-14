@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.cafe.chat.service.ChatService;
 import org.study.cafe.chat.vo.ChatVO;
+import org.study.cafe.member.vo.MemberVO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,14 +23,15 @@ public class ChatController {
     public Map<String, String> send(@RequestBody Map<String, String> body, HttpSession session) {
         String userMessage = body.getOrDefault("message", "").trim();
         String sessionId   = session.getId();
-        String mId         = (String) session.getAttribute("m_id");
+        MemberVO login     = (MemberVO) session.getAttribute("loginMember");
+        String mIdx        = login != null ? login.getM_idx() : null;
 
         Map<String, String> result = new HashMap<>();
         if (userMessage.isEmpty()) {
             result.put("response", "");
             return result;
         }
-        String botResponse = chatService.sendMessage(userMessage, sessionId, mId);
+        String botResponse = chatService.sendMessage(userMessage, sessionId, mIdx);
         result.put("response", botResponse);
         return result;
     }

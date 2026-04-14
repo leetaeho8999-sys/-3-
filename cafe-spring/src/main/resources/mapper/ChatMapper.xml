@@ -54,21 +54,6 @@
         ORDER BY id ASC
     </select>
 
-    <!-- Groq 컨텍스트용: 비로그인=sessionId 기준, 로그인=mIdx 기준 최근 N개 -->
-    <select id="getContextHistory" parameterType="map" resultMap="chatMap">
-        SELECT session_id, m_idx, sender, message, reg_date FROM (
-            SELECT session_id, m_idx, sender, message, reg_date, log_idx
-            FROM chat_log_t
-            WHERE
-            <choose>
-                <when test="mIdx != null">m_idx = #{mIdx}</when>
-                <otherwise>session_id = #{sessionId}</otherwise>
-            </choose>
-            ORDER BY log_idx DESC
-            LIMIT #{limit}
-        ) recent ORDER BY log_idx ASC
-    </select>
-
     <!-- 만족도 평가 저장 -->
     <insert id="saveRating" parameterType="org.study.cafe.chat.vo.ChatRatingVO">
         INSERT INTO chat_rating (bot_message, rating)

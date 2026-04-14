@@ -9,9 +9,7 @@ import org.study.cafe.chat.vo.ChatHistoryVO;
 import org.study.cafe.chat.vo.ChatRatingVO;
 import org.study.cafe.chat.vo.ChatVO;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -27,21 +25,7 @@ public class ChatServiceImpl implements ChatService {
         // 1. 사용자 언어 감지
         String userLang = translationService.detectLanguage(userMessage);
 
-        // 2. Groq 컨텍스트용 히스토리 조회 (현재 메시지 저장 전에 조회해야 중복 방지)
-        //    로그인 회원: mIdx 기준 최근 40개(20쌍), 비로그인 손님: sessionId 기준 최근 20개(10쌍)
-        List<ChatVO> contextHistory = List.of();
-        try {
-            boolean isLoggedIn = mIdx != null && !mIdx.isEmpty();
-            Map<String, Object> histParams = new HashMap<>();
-            histParams.put("sessionId", sessionId);
-            histParams.put("mIdx",      isLoggedIn ? mIdx : null);
-            histParams.put("limit",     isLoggedIn ? 40   : 20);
-            contextHistory = chatMapper.getContextHistory(histParams);
-        } catch (Exception e) {
-            log.warn("컨텍스트 히스토리 조회 실패: {}", e.getMessage());
-        }
-
-        // 3. 사용자 메시지 저장 (chat_log_t)
+        // 2. 사용자 메시지 저장 (chat_log_t)
         ChatVO userLog = new ChatVO();
         userLog.setSessionId(sessionId);
         userLog.setMIdx(mIdx);
@@ -49,7 +33,7 @@ public class ChatServiceImpl implements ChatService {
         userLog.setMessage(userMessage);
         chatMapper.insertMessage(userLog);
 
-        // 4. AI 챗봇용 사용자 기록 저장 (chat_history)
+        // 3. AI 챗봇용 사용자 기록 저장 (chat_history)
         try {
             ChatHistoryVO userHistory = new ChatHistoryVO();
             userHistory.setSender("손님");
@@ -59,7 +43,7 @@ public class ChatServiceImpl implements ChatService {
             log.warn("chat_history 저장 실패 (테이블 미생성 가능): {}", e.getMessage());
         }
 
-        // 5. DB 키워드 힌트 조회 후 Groq AI 응답 생성 (히스토리 포함)
+        // 4. DB 키워드 힌트 조회 후 Groq AI 응답 생성
         String botResponse;
         try {
             ChatVO hint = null;
@@ -67,10 +51,10 @@ public class ChatServiceImpl implements ChatService {
             catch (Exception e) { log.warn("chat_keyword 조회 실패: {}", e.getMessage()); }
 
             if (hint != null) {
-                botResponse = groqService.askWithHint(userMessage, hint.getMessage(), contextHistory);
+                botResponse = groqService.askWithHint(userMessage, hint.getMessage());
                 if (isErrorResponse(botResponse)) botResponse = hint.getMessage();
             } else {
-                botResponse = groqService.ask(userMessage, contextHistory);
+                botResponse = groqService.ask(userMessage);
             }
         } catch (Exception e) {
             log.error("Groq AI 응답 생성 실패: {}", e.getMessage());
