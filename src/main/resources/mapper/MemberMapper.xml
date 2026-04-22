@@ -117,4 +117,9 @@
         WHERE c_idx = #{linkedCustomer}
     </update>
 
+    <!-- 비밀번호 변경 -->
+    <update id="updatePassword" parameterType="map">
+        UPDATE member_t SET password = #{newPassword} WHERE m_idx = #{m_idx}
+    </update>
+
 </mapper>

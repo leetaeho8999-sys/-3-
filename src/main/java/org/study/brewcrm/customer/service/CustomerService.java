@@ -43,4 +43,7 @@ public interface CustomerService {
     List<Map<String, Object>> getWeekdayStats();
     List<Map<String, Object>> getTopMenuItems(int limit);
     List<Map<String, Object>> getGradeAvgSpend();
+
+    // CSV 내보내기
+    List<CustomerVO> getAllCustomersForExport();
 }

@@ -19,4 +19,5 @@ public interface MemberMapper {
     int      updateMemberRole(Map<String, Object> params); // 권한 변경 (관리자 전용)
     int      deactivateMember(String m_idx);               // 계정 비활성화 (논리 삭제)
     List<MemberVO> getAllMembers();                         // 직원 계정 목록 (MEMBER 제외)
+    int updatePassword(Map<String, Object> params);        // 비밀번호 변경
 }

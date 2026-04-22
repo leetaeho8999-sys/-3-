@@ -355,6 +355,38 @@ CREATE TABLE board_t (
   COMMENT='게시판 테이블 — cafe-spring 커뮤니티 게시판 전용';
 
 
+-- ── board_report_t ───────────────────────────────────────────
+--  게시글·댓글 신고 테이블.
+--  cafe-spring 에서 신고 버튼 클릭 시 INSERT, brew-crm 에서 관리.
+CREATE TABLE IF NOT EXISTS board_report_t (
+    r_idx       INT           NOT NULL AUTO_INCREMENT
+        COMMENT '신고 번호 (PK)',
+
+    target_type ENUM('POST','COMMENT') NOT NULL
+        COMMENT '신고 대상 유형 (POST=게시글, COMMENT=댓글)',
+
+    target_idx  INT           NOT NULL
+        COMMENT '신고 대상 번호 (board_t.b_idx 또는 comment_t.c_idx)',
+
+    reporter    VARCHAR(100)  NOT NULL
+        COMMENT '신고자 (로그인 회원 username)',
+
+    reason      VARCHAR(500)  DEFAULT NULL
+        COMMENT '신고 사유',
+
+    status      ENUM('PENDING','PROCESSED','DISMISSED') DEFAULT 'PENDING'
+        COMMENT '처리 상태 (PENDING=미처리, PROCESSED=처리완료, DISMISSED=기각)',
+
+    reg_date    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+        COMMENT '신고 일시',
+
+    PRIMARY KEY (r_idx),
+    INDEX idx_target (target_type, target_idx),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='게시판 신고 테이블 — cafe-spring 신고, brew-crm 관리';
+
+
 -- ── comment_t ─────────────────────────────────────────────────
 CREATE TABLE comment_t (
     c_idx    INT          NOT NULL AUTO_INCREMENT

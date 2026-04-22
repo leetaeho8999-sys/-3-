@@ -81,6 +81,21 @@ public class MemberController {
         return "member/mypage";
     }
 
+    // ── 비밀번호 변경 ───────────────────────────────────────
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestParam String currentPw,
+                                 @RequestParam String newPw,
+                                 @RequestParam String confirmPw,
+                                 HttpSession session) {
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
+        if (loginMember == null) return "redirect:/member/login";
+        int result = memberService.changePassword(loginMember.getM_idx(), currentPw, newPw, confirmPw);
+        if (result == -1) return "redirect:/member/mypage?pwError=wrongCurrent";
+        if (result == -2) return "redirect:/member/mypage?pwError=mismatch";
+        if (result == -3) return "redirect:/member/mypage?pwError=tooShort";
+        return "redirect:/member/mypage?pwChanged=true";
+    }
+
     // ── 정보 수정 처리 ──────────────────────────────────────
     @PostMapping("/updateOk")
     public String updateOk(MemberVO memberVO, HttpSession session) {

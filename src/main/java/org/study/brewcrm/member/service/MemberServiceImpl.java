@@ -103,6 +103,18 @@ public class MemberServiceImpl implements MemberService {
      * ② linked_customer가 있으면 customer_t.phone, memo 도 UPDATE
      */
     @Override
+    public int changePassword(String m_idx, String currentPw, String newPw, String confirmPw) {
+        MemberVO m = memberMapper.findMyPageInfo(m_idx);
+        if (m == null || !enc.matches(currentPw, m.getPassword())) return -1;
+        if (!newPw.equals(confirmPw))  return -2;
+        if (newPw.length() < 6)        return -3;
+        java.util.Map<String, Object> params = new java.util.HashMap<>();
+        params.put("m_idx",       m_idx);
+        params.put("newPassword", enc.encode(newPw));
+        return memberMapper.updatePassword(params);
+    }
+
+    @Override
     @Transactional
     public int updateMember(MemberVO memberVO) {
         int result = memberMapper.updateMember(memberVO);

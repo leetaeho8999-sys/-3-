@@ -8,4 +8,6 @@ public interface MemberService {
     int      checkEmail(String email);
     MemberVO findMyPageInfo(String m_idx);
     int      updateMember(MemberVO memberVO);
+    // 반환: 0=성공, -1=현재비번틀림, -2=새비번불일치, -3=비번짧음
+    int      changePassword(String m_idx, String currentPw, String newPw, String confirmPw);
 }

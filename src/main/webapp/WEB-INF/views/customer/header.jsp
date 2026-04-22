@@ -48,6 +48,17 @@
          class="nav-item ${activeMenu == 'marketing' ? 'active' : ''}">
         <span class="nav-icon">◈</span> 마케팅
       </a>
+      <a href="${pageContext.request.contextPath}/customer/board"
+         class="nav-item ${activeMenu == 'board' ? 'active' : ''}"
+         style="position:relative">
+        <span class="nav-icon">📋</span> 게시판 관리
+        <c:if test="${pendingReportCount > 0}">
+          <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                       background:#e74c3c;color:#fff;font-size:11px;font-weight:700;
+                       border-radius:10px;padding:1px 6px;min-width:18px;text-align:center;
+                       line-height:16px">${pendingReportCount}</span>
+        </c:if>
+      </a>
       <a href="${pageContext.request.contextPath}/customer/admin"
          class="nav-item ${activeMenu == 'admin' ? 'active' : ''}">
         <span class="nav-icon">⚙</span> 시스템 관리

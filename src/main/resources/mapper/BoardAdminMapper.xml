@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.brewcrm.board.mapper.BoardAdminMapper">
+
+    <resultMap id="boardResultMap" type="org.study.brewcrm.board.vo.BoardVO">
+        <id     column="b_idx"        property="bIdx"/>
+        <result column="title"        property="title"/>
+        <result column="category"     property="category"/>
+        <result column="content"      property="content"/>
+        <result column="author"       property="author"/>
+        <result column="views"        property="views"/>
+        <result column="comments"     property="comments"/>
+        <result column="reg_date"     property="regDate"/>
+        <result column="active"       property="active"/>
+        <result column="report_count" property="reportCount"/>
+    </resultMap>
+
+    <resultMap id="reportResultMap" type="org.study.brewcrm.board.vo.BoardReportVO">
+        <id     column="r_idx"          property="rIdx"/>
+        <result column="target_type"    property="targetType"/>
+        <result column="target_idx"     property="targetIdx"/>
+        <result column="reporter"       property="reporter"/>
+        <result column="reason"         property="reason"/>
+        <result column="status"         property="status"/>
+        <result column="reg_date"       property="regDate"/>
+        <result column="target_title"   property="targetTitle"/>
+        <result column="target_content" property="targetContent"/>
+        <result column="target_author"  property="targetAuthor"/>
+    </resultMap>
+
+    <!-- ── 게시판 전체 수 ──────────────────────────────────── -->
+    <select id="getBoardCount" resultType="int">
+        SELECT COUNT(*)
+        FROM board_t
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%')
+                  OR author LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null and status == 'deleted'">
+                AND active = 1
+            </if>
+            <if test="status != null and status == 'normal'">
+                AND active = 0
+            </if>
+        </where>
+    </select>
+
+    <!-- ── 게시판 목록 ──────────────────────────────────────── -->
+    <select id="getBoardList" resultMap="boardResultMap">
+        SELECT b.*,
+               COALESCE(r.report_count, 0) AS report_count
+        FROM board_t b
+        LEFT JOIN (
+            SELECT target_idx, COUNT(*) AS report_count
+            FROM board_report_t
+            WHERE target_type = 'POST'
+            GROUP BY target_idx
+        ) r ON b.b_idx = r.target_idx
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (b.title LIKE CONCAT('%', #{keyword}, '%')
+                  OR b.author LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null and status == 'deleted'">
+                AND b.active = 1
+            </if>
+            <if test="status != null and status == 'normal'">
+                AND b.active = 0
+            </if>
+        </where>
+        ORDER BY b.b_idx DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- ── 게시글 상세 ──────────────────────────────────────── -->
+    <select id="getBoardDetail" resultMap="boardResultMap">
+        SELECT b.*,
+               COALESCE(r.report_count, 0) AS report_count
+        FROM board_t b
+        LEFT JOIN (
+            SELECT target_idx, COUNT(*) AS report_count
+            FROM board_report_t
+            WHERE target_type = 'POST'
+            GROUP BY target_idx
+        ) r ON b.b_idx = r.target_idx
+        WHERE b.b_idx = #{bIdx}
+    </select>
+
+    <!-- ── 게시글 삭제 (논리 삭제) ─────────────────────────── -->
+    <update id="deleteBoard">
+        UPDATE board_t SET active = 1 WHERE b_idx = #{bIdx}
+    </update>
+
+    <!-- ── 게시글 복구 ──────────────────────────────────────── -->
+    <update id="restoreBoard">
+        UPDATE board_t SET active = 0 WHERE b_idx = #{bIdx}
+    </update>
+
+    <!-- ── 신고 전체 수 ─────────────────────────────────────── -->
+    <select id="getReportCount" resultType="int">
+        SELECT COUNT(*)
+        FROM board_report_t
+        <where>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="targetType != null and targetType != ''">
+                AND target_type = #{targetType}
+            </if>
+        </where>
+    </select>
+
+    <!-- ── 신고 목록 ────────────────────────────────────────── -->
+    <select id="getReportList" resultMap="reportResultMap">
+        SELECT
+            r.r_idx, r.target_type, r.target_idx, r.reporter,
+            r.reason, r.status, r.reg_date,
+            CASE
+                WHEN r.target_type = 'POST'
+                    THEN b.title
+                ELSE CONCAT('[댓글] ', b.title)
+            END AS target_title,
+            CASE
+                WHEN r.target_type = 'POST'
+                    THEN b.content
+                ELSE c.content
+            END AS target_content,
+            CASE
+                WHEN r.target_type = 'POST'
+                    THEN b.author
+                ELSE c.author
+            END AS target_author
+        FROM board_report_t r
+        LEFT JOIN board_t b
+            ON (r.target_type = 'POST'    AND b.b_idx = r.target_idx)
+            OR (r.target_type = 'COMMENT' AND b.b_idx = (
+                SELECT b2.b_idx FROM comment_t c2
+                JOIN board_t b2 ON c2.b_idx = b2.b_idx
+                WHERE c2.c_idx = r.target_idx LIMIT 1
+            ))
+        LEFT JOIN comment_t c
+            ON r.target_type = 'COMMENT' AND c.c_idx = r.target_idx
+        <where>
+            <if test="status != null and status != ''">
+                AND r.status = #{status}
+            </if>
+            <if test="targetType != null and targetType != ''">
+                AND r.target_type = #{targetType}
+            </if>
+        </where>
+        ORDER BY r.reg_date DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- ── 신고 처리 (상태 변경) ─────────────────────────────── -->
+    <update id="processReport">
+        UPDATE board_report_t SET status = #{status} WHERE r_idx = #{rIdx}
+    </update>
+
+    <!-- ── 신고된 게시글 삭제 + 신고 처리 ────────────────────── -->
+    <update id="deleteReportedPost">
+        UPDATE board_t b
+        JOIN board_report_t r ON r.target_idx = b.b_idx AND r.target_type = 'POST'
+        SET b.active = 1, r.status = 'PROCESSED'
+        WHERE r.r_idx = #{rIdx}
+    </update>
+
+    <!-- ── 신고 유저 통계 ────────────────────────────────────── -->
+    <select id="getReportedUsers" resultType="map">
+        SELECT
+            target_author AS author,
+            COUNT(*)      AS report_count,
+            SUM(CASE WHEN status = 'PENDING'   THEN 1 ELSE 0 END) AS pending_count,
+            SUM(CASE WHEN status = 'PROCESSED' THEN 1 ELSE 0 END) AS processed_count,
+            MIN(reg_date) AS first_report,
+            MAX(reg_date) AS last_report
+        FROM (
+            SELECT
+                CASE WHEN r.target_type = 'POST'    THEN b.author
+                                                    ELSE c.author END AS target_author,
+                r.status, r.reg_date
+            FROM board_report_t r
+            LEFT JOIN board_t   b ON r.target_type = 'POST'    AND b.b_idx = r.target_idx
+            LEFT JOIN comment_t c ON r.target_type = 'COMMENT' AND c.c_idx = r.target_idx
+        ) sub
+        WHERE target_author IS NOT NULL
+        GROUP BY target_author
+        ORDER BY report_count DESC
+    </select>
+
+    <!-- ── 요약 카운트 ───────────────────────────────────────── -->
+    <select id="getPendingReportCount" resultType="int">
+        SELECT COUNT(*) FROM board_report_t WHERE status = 'PENDING'
+    </select>
+
+    <select id="getTotalBoardCount" resultType="int">
+        SELECT COUNT(*) FROM board_t WHERE active = 0
+    </select>
+
+    <select id="getDeletedBoardCount" resultType="int">
+        SELECT COUNT(*) FROM board_t WHERE active = 1
+    </select>
+
+</mapper>

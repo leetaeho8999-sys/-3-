@@ -54,4 +54,7 @@ public interface CustomerMapper {
     List<Map<String, Object>> getWeekdayStats();
     List<Map<String, Object>> getTopMenuItems(int limit);
     List<Map<String, Object>> getGradeAvgSpend();
+
+    // ── CSV 전체 내보내기 ─────────────────────────────────────
+    List<CustomerVO> getAllCustomersForExport();
 }

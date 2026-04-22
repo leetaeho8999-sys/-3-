@@ -1,5 +1,6 @@
 package org.study.brewcrm.customer.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +10,8 @@ import org.study.brewcrm.customer.mapper.CouponMapper;
 import org.study.brewcrm.customer.service.CustomerService;
 import org.study.brewcrm.customer.vo.CustomerVO;
 
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -170,6 +173,43 @@ public class CustomerController {
         catch (Exception e) { model.addAttribute("gradeAvgSpend", new ArrayList<>()); }
 
         return "customer/stats";
+    }
+
+    // ── CSV 내보내기 ────────────────────────────────────────────
+    @GetMapping("/export")
+    public void export(HttpServletResponse response) throws Exception {
+        String filename = URLEncoder.encode("고객목록_" +
+                java.time.LocalDate.now() + ".csv", StandardCharsets.UTF_8);
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+
+        List<CustomerVO> list = customerService.getAllCustomersForExport();
+
+        // BOM: Excel에서 한글 깨짐 방지
+        PrintWriter pw = new PrintWriter(
+                new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8));
+        pw.print('﻿');
+        pw.println("번호,이름,연락처,등급,총방문,이번달방문,이번달매출,생일,최근방문일,등록일,메모");
+        for (CustomerVO c : list) {
+            pw.printf("%s,%s,%s,%s,%d,%d,%d,%s,%s,%s,\"%s\"%n",
+                    esc(c.getC_idx()),
+                    esc(c.getName()),
+                    esc(c.getPhone()),
+                    esc(c.getGrade()),
+                    c.getVisitCount(),
+                    c.getMonthlyVisit(),
+                    c.getMonthlyAmount(),
+                    esc(c.getBirthday()),
+                    esc(c.getLastVisitDate()),
+                    esc(c.getRegDate()),
+                    esc(c.getMemo()));
+        }
+        pw.flush();
+    }
+
+    private String esc(String s) {
+        if (s == null) return "";
+        return s.replace("\"", "\"\"");
     }
 
     // ── 방문 기록 (결제액 + 메뉴 + 메모, 자동 등급 업데이트) ─

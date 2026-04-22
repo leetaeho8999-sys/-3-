@@ -678,8 +678,10 @@
 
 <%-- ── Chart.js ──────────────────────────────────────────── --%>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script>
 (function () {
+  Chart.register(ChartDataLabels);
   Chart.defaults.color = 'rgba(232,213,187,0.65)';
   Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
 
@@ -719,7 +721,16 @@
         cutout: '62%',
         plugins: {
           legend: { display: false },
-          tooltip: { ...TOOLTIP, callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '명' } }
+          tooltip: { ...TOOLTIP, callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '명' } },
+          datalabels: {
+            color: '#fff',
+            font: { size: 11, weight: '700' },
+            formatter: function(val, ctx) {
+              const total = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+              const pct = total > 0 ? Math.round(val / total * 100) : 0;
+              return pct >= 8 ? pct + '%' : '';
+            }
+          }
         },
         animation: { animateRotate: true, duration: 900 }
       }
@@ -772,10 +783,16 @@
         borderWidth: 1.5, borderRadius: 7, borderSkipped: false }] },
       options: {
         responsive: true, maintainAspectRatio: false,
-        layout: { padding: { top: 4, right: 4, bottom: 0, left: 0 } },
+        layout: { padding: { top: 22, right: 4, bottom: 0, left: 0 } },
         plugins: {
           legend: { display: false },
-          tooltip: { ...TOOLTIP, callbacks: { label: ctx => ' ' + ctx.raw + '명' } }
+          tooltip: { ...TOOLTIP, callbacks: { label: ctx => ' ' + ctx.raw + '명' } },
+          datalabels: {
+            anchor: 'end', align: 'top',
+            color: 'rgba(240,224,200,0.85)',
+            font: { size: 12, weight: '600' },
+            formatter: function(val) { return val > 0 ? val + '명' : ''; }
+          }
         },
         scales: {
           x: { grid: { color: GRIDX }, ticks: { font: { size: 12 } } },
@@ -815,9 +832,16 @@
       }] },
       options: {
         responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 22 } },
         plugins: {
           legend: { display: false },
-          tooltip: { ...TOOLTIP, callbacks: { label: ctx => ' 신규 고객: ' + ctx.raw + '명' } }
+          tooltip: { ...TOOLTIP, callbacks: { label: ctx => ' 신규 고객: ' + ctx.raw + '명' } },
+          datalabels: {
+            anchor: 'end', align: 'top', offset: 4,
+            color: 'rgba(127,214,127,0.95)',
+            font: { size: 11, weight: '700' },
+            formatter: function(val) { return val + '명'; }
+          }
         },
         scales: {
           x: { grid: { color: GRIDX }, ticks: { font: { size: 11 } } },
@@ -858,6 +882,7 @@
       options: {
         indexAxis: 'y',
         responsive: true, maintainAspectRatio: false,
+        layout: { padding: { right: 36 } },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -866,6 +891,12 @@
               label: ctx => ' ' + ctx.raw + '회',
               title: items => items[0].label + ' (' + grades[items[0].dataIndex] + ')'
             }
+          },
+          datalabels: {
+            anchor: 'end', align: 'right', offset: 4,
+            color: 'rgba(240,224,200,0.85)',
+            font: { size: 11, weight: '600' },
+            formatter: function(val) { return val + '회'; }
           }
         },
         scales: {
@@ -902,8 +933,16 @@
       }]},
       options: {
         responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 20 } },
         plugins: { legend: { display: false },
-          tooltip: { ...TOOLTIP, callbacks: { label: c => ' 방문 ' + c.raw + '건' } } },
+          tooltip: { ...TOOLTIP, callbacks: { label: c => ' 방문 ' + c.raw + '건' } },
+          datalabels: {
+            anchor: 'end', align: 'top',
+            color: 'rgba(240,224,200,0.75)',
+            font: { size: 9 },
+            formatter: function(val) { return val > 0 ? val : ''; }
+          }
+        },
         scales: {
           x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } },
           y: { grid: { color: GRID }, beginAtZero: true, ticks: { font: { size: 11 }, stepSize: 1 } }
@@ -931,8 +970,16 @@
       }]},
       options: {
         responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 22 } },
         plugins: { legend: { display: false },
-          tooltip: { ...TOOLTIP, callbacks: { label: c => ' 방문 ' + c.raw + '건' } } },
+          tooltip: { ...TOOLTIP, callbacks: { label: c => ' 방문 ' + c.raw + '건' } },
+          datalabels: {
+            anchor: 'end', align: 'top',
+            color: 'rgba(240,224,200,0.85)',
+            font: { size: 12, weight: '600' },
+            formatter: function(val) { return val > 0 ? val : ''; }
+          }
+        },
         scales: {
           x: { grid: { display: false }, ticks: { font: { size: 13 } } },
           y: { grid: { color: GRID }, beginAtZero: true, ticks: { font: { size: 11 }, stepSize: 1 } }

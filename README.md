@@ -37,7 +37,7 @@ http://localhost:8080/brew-crm/customer/dashboard
 
 ---
 
-## 프로젝트 구조 (기존 프로젝트와 동일)
+## 프로젝트 구조
 
 ```
 brew-crm/
@@ -45,28 +45,50 @@ brew-crm/
 ├── schema.sql                          ← DB 테이블 생성
 └── src/main/
     ├── java/org/study/brewcrm/
-    │   ├── BrewCrmApplication.java      ← Main 클래스
+    │   ├── BrewCrmApplication.java
     │   ├── ServletInitializer.java      ← WAR 배포용
+    │   ├── config/
+    │   │   ├── BCryptConfig.java        ← BCrypt 빈
+    │   │   ├── WebMvcConfig.java        ← 인터셉터 등록
+    │   │   ├── LoginInterceptor.java    ← 로그인/권한 체크
+    │   │   └── BadgeAdvice.java         ← 미처리 신고 배지 카운트 (전역)
     │   ├── customer/
-    │   │   ├── controller/CustomerController.java  ← BBSController와 동일 패턴
-    │   │   ├── service/CustomerService.java         ← BBSService (인터페이스)
-    │   │   ├── service/CustomerServiceImpl.java     ← BBSServiceImpl
-    │   │   ├── mapper/CustomerMapper.java            ← BBSMapper (인터페이스)
-    │   │   └── vo/CustomerVO.java                   ← BBSVO와 동일 패턴
-    │   ├── common/Paging.java           ← 기존 Paging.java와 동일
-    │   └── config/BCryptConfig.java     ← 기존 BCryptConfig.java와 동일
+    │   │   ├── controller/CustomerController.java   ← 고객 CRUD + CSV 내보내기
+    │   │   ├── controller/AdminController.java      ← 시스템 관리 (직원 권한)
+    │   │   ├── controller/MarketingController.java  ← 마케팅 + 쿠폰
+    │   │   ├── service/CustomerService(Impl).java
+    │   │   ├── mapper/CustomerMapper.java
+    │   │   └── vo/CustomerVO.java
+    │   ├── board/
+    │   │   ├── controller/BoardAdminController.java ← 게시판·신고 관리
+    │   │   ├── mapper/BoardAdminMapper.java
+    │   │   └── vo/BoardVO.java / BoardReportVO.java
+    │   ├── member/
+    │   │   ├── controller/MemberController.java     ← 로그인·마이페이지·비밀번호변경
+    │   │   ├── service/MemberService(Impl).java
+    │   │   ├── mapper/MemberMapper.java
+    │   │   └── vo/MemberVO.java
+    │   └── common/Paging.java
     ├── resources/
     │   ├── application.properties
-    │   └── mapper/CustomerMapper.xml    ← BBSMapper.xml과 동일 패턴
+    │   └── mapper/
+    │       ├── CustomerMapper.xml
+    │       ├── MemberMapper.xml
+    │       └── BoardAdminMapper.xml
     └── webapp/
         ├── WEB-INF/views/customer/
-        │   ├── header.jsp / footer.jsp  ← 공통 레이아웃
+        │   ├── header.jsp / footer.jsp  ← 공통 레이아웃 (사이드바 신고 배지 포함)
         │   ├── dashboard.jsp            ← 대시보드
-        │   ├── list.jsp                 ← 고객 목록 + 페이징
-        │   ├── register.jsp             ← 고객 등록
-        │   ├── detail.jsp               ← 고객 상세
-        │   ├── edit.jsp                 ← 고객 수정
-        │   └── error.jsp                ← 에러 화면
+        │   ├── list.jsp                 ← 고객 목록 + CSV 내보내기 버튼
+        │   ├── register.jsp / edit.jsp / detail.jsp
+        │   ├── stats.jsp                ← 통계 (Chart.js + datalabels)
+        │   ├── marketing.jsp            ← 마케팅 + 쿠폰 발급
+        │   ├── board.jsp                ← 게시판·신고·신고유저 관리
+        │   ├── admin.jsp                ← 시스템 관리 (직원 권한)
+        │   └── error.jsp
+        ├── WEB-INF/views/member/
+        │   ├── login.jsp / register.jsp
+        │   └── mypage.jsp               ← 등급 카드 + 비밀번호 변경 + 내 정보 수정
         └── resources/
             ├── css/style.css            ← 글래스모피즘 디자인
             └── js/app.js

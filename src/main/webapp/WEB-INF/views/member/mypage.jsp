@@ -66,6 +66,18 @@
       <c:if test="${param.updated == 'true'}">
         <div class="alert-success-banner">✓ 정보가 업데이트되었습니다.</div>
       </c:if>
+      <c:if test="${param.pwChanged == 'true'}">
+        <div class="alert-success-banner">✓ 비밀번호가 변경되었습니다.</div>
+      </c:if>
+      <c:if test="${param.pwError == 'wrongCurrent'}">
+        <div class="alert-error-banner">✗ 현재 비밀번호가 올바르지 않습니다.</div>
+      </c:if>
+      <c:if test="${param.pwError == 'mismatch'}">
+        <div class="alert-error-banner">✗ 새 비밀번호와 확인 비밀번호가 일치하지 않습니다.</div>
+      </c:if>
+      <c:if test="${param.pwError == 'tooShort'}">
+        <div class="alert-error-banner">✗ 비밀번호는 6자 이상이어야 합니다.</div>
+      </c:if>
 
       <!-- ══════════════════════════════════════════
            등급 카드 (마이페이지 핵심)
@@ -184,6 +196,30 @@
             <div class="grade-step-desc">30회 이상</div>
           </div>
         </div>
+      </div>
+
+      <!-- 비밀번호 변경 -->
+      <div class="glass-card form-card">
+        <div class="card-header"><h3>비밀번호 변경</h3></div>
+        <form action="${pageContext.request.contextPath}/member/changePassword" method="post" id="pwForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="currentPw">현재 비밀번호</label>
+              <input type="password" id="currentPw" name="currentPw" required placeholder="현재 비밀번호 입력">
+            </div>
+            <div class="form-group">
+              <label for="newPw">새 비밀번호</label>
+              <input type="password" id="newPw" name="newPw" required placeholder="6자 이상">
+            </div>
+            <div class="form-group">
+              <label for="confirmPw">새 비밀번호 확인</label>
+              <input type="password" id="confirmPw" name="confirmPw" required placeholder="새 비밀번호 재입력">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">비밀번호 변경</button>
+          </div>
+        </form>
       </div>
 
       <!-- 개인 정보 수정 -->

@@ -565,6 +565,15 @@ a { text-decoration: none; color: inherit; }
     font-size: 13px;
     margin-bottom: 18px;
 }
+.alert-error-banner {
+    background: rgba(231,76,60,.10);
+    border: 1px solid rgba(231,76,60,.28);
+    border-radius: var(--radius-sm);
+    padding: 10px 15px;
+    color: #e87070;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
 
 .grade-hero-card { margin-bottom: 18px; }
 .grade-hero-inner {

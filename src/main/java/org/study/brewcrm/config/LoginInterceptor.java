@@ -64,7 +64,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                 return false;
             }
         } else if (path.startsWith(ctx + "/customer/marketing")
-                || path.startsWith(ctx + "/customer/stats")) {
+                || path.startsWith(ctx + "/customer/stats")
+                || path.startsWith(ctx + "/customer/board")) {
             if (!"ADMIN".equals(role) && !"MANAGER".equals(role)) {
                 response.sendRedirect(ctx + "/customer/dashboard?accessDenied=true");
                 return false;

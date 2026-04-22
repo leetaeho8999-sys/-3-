@@ -194,4 +194,5 @@ public class CustomerServiceImpl implements CustomerService {
     @Override public List<Map<String, Object>> getWeekdayStats()        { return customerMapper.getWeekdayStats(); }
     @Override public List<Map<String, Object>> getTopMenuItems(int lim) { return customerMapper.getTopMenuItems(lim); }
     @Override public List<Map<String, Object>> getGradeAvgSpend()       { return customerMapper.getGradeAvgSpend(); }
+    @Override public List<CustomerVO>          getAllCustomersForExport() { return customerMapper.getAllCustomersForExport(); }
 }

@@ -7,16 +7,24 @@
 <div class="glass-card">
   <div class="card-header">
     <h3>고객 목록 <span class="count-badge">${paging.totalRecord}명</span></h3>
-    <form action="${pageContext.request.contextPath}/customer/list" method="get" style="display:inline">
-      <input type="hidden" name="keyword" value="${keyword}">
-      <select name="grade" class="filter-select" onchange="this.form.submit()">
-        <option value="전체" ${grade == '전체' ? 'selected' : ''}>전체 등급</option>
-        <option value="일반" ${grade == '일반' ? 'selected' : ''}>일반</option>
-        <option value="실버" ${grade == '실버' ? 'selected' : ''}>실버</option>
-        <option value="골드" ${grade == '골드' ? 'selected' : ''}>골드</option>
-        <option value="VIP"  ${grade == 'VIP'  ? 'selected' : ''}>VIP</option>
-      </select>
-    </form>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <form action="${pageContext.request.contextPath}/customer/list" method="get" style="display:inline">
+        <input type="hidden" name="keyword" value="${keyword}">
+        <select name="grade" class="filter-select" onchange="this.form.submit()">
+          <option value="전체" ${grade == '전체' ? 'selected' : ''}>전체 등급</option>
+          <option value="일반" ${grade == '일반' ? 'selected' : ''}>일반</option>
+          <option value="실버" ${grade == '실버' ? 'selected' : ''}>실버</option>
+          <option value="골드" ${grade == '골드' ? 'selected' : ''}>골드</option>
+          <option value="VIP"  ${grade == 'VIP'  ? 'selected' : ''}>VIP</option>
+        </select>
+      </form>
+      <a href="${pageContext.request.contextPath}/customer/export"
+         class="btn-reset"
+         style="background:rgba(39,174,96,.22);color:#2ecc71;border:1px solid rgba(39,174,96,.35);
+                padding:6px 14px;border-radius:6px;font-size:13px;text-decoration:none;white-space:nowrap">
+        ↓ CSV 내보내기
+      </a>
+    </div>
   </div>
 
   <table class="crm-table">
