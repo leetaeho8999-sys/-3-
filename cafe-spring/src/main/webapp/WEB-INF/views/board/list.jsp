@@ -1,11 +1,11 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="pageTitle" value="게시판 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board.css">
 
 <style>
-    /* 네이버 카페 스타일 고도화 커스텀 CSS */
+    /* ── 기존 스타일 유지 및 우선순위 강화 ── */
     .bd-title-link {
         font-weight: 500;
         color: #333;
@@ -24,6 +24,7 @@
         font-weight: bold;
     }
 
+    /* 뱃지 공통 스타일 */
     .c-badge {
         padding: 2px 8px;
         border-radius: 12px;
@@ -32,31 +33,52 @@
         display: inline-block;
     }
 
-    /* 카테고리별 색상 분기 */
-    .cat-공지 {
-        background: #fee2e2;
-        color: #ef4444;
+    /* 카테고리별 컬러 (강력 적용) */
+    .bd-table .cat-공지 {
+        background-color: #fee2e2 !important;
+        color: #ef4444 !important;
     }
 
-    .cat-질문 {
-        background: #e0f2fe;
-        color: #0ea5e9;
+    .bd-table .cat-질문 {
+        background-color: #e0f2fe !important;
+        color: #0ea5e9 !important;
     }
 
-    .cat-자유 {
-        background: #f3f4f6;
-        color: #4b5563;
+    .bd-table .cat-자유 {
+        background-color: #f3f4f6 !important;
+        color: #4b5563 !important;
     }
 
-    .cat-정보 {
-        background: #dcfce7;
-        color: #16a34a;
+    .bd-table .cat-정보 {
+        background-color: #dcfce7 !important;
+        color: #16a34a !important;
     }
 
-    .bd-page-btn.active {
-        background-color: #03c75a !important;
-        border-color: #03c75a !important;
-        color: #fff !important;
+    .bd-table .cat-후기 {
+        background-color: #fef3c7 !important;
+        color: #d97706 !important;
+    }
+
+    .bd-table .cat-건의 {
+        background-color: #ede9fe !important;
+        color: #7c3aed !important;
+    }
+
+    /* [추가] 블라인드 게시글 스타일 */
+    .blind-text {
+        color: #999;
+        font-size: 0.95rem;
+        font-style: italic;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* 블라인드 행 배경색 (강력 적용) */
+    .bd-table tr.blind-row,
+    .bd-table tr.blind-row td {
+        background-color: #f8f8f8 !important; /* 미세한 회색으로 변경 */
+        color: #ccc !important;
     }
 </style>
 
@@ -82,8 +104,8 @@
             <form action="${pageContext.request.contextPath}/board/list" method="get" class="bd-search-form"
                   style="display: flex; gap: 5px;">
                 <input type="hidden" name="category" value="${category}">
-                <input type="text" name="keyword" value="${keyword}"
-                       placeholder="제목 또는 작성자 검색..." class="bd-search-input"
+                <input type="text" name="keyword" value="${keyword}" placeholder="제목 또는 작성자 검색..."
+                       class="bd-search-input"
                        style="padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
                 <button type="submit" class="bd-search-btn"
                         style="background: #333; color: #fff; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer;">
@@ -91,10 +113,8 @@
                 </button>
             </form>
 
-            <%-- 로그인 상태 확인 로직 (세션) --%>
-            <c:if test="${not empty sessionScope.loginMember}">
-                <a href="${pageContext.request.contextPath}/board/write" class="bd-write-btn"
-                   style="background: #03c75a; color: #fff; padding: 0.6rem 1.5rem; border-radius: 4px; text-decoration: none; font-weight: 600;">글쓰기</a>
+            <c:if test="${not empty sessionScope.m_id}">
+                <a href="${pageContext.request.contextPath}/board/write" class="bd-write-btn">글쓰기</a>
             </c:if>
         </div>
 
@@ -121,27 +141,39 @@
                     </c:when>
                     <c:otherwise>
                         <c:forEach var="b" items="${list}">
-                            <tr style="border-bottom: 1px solid #f9f9f9;">
+                            <%-- [신고 블라인드 로직] report_cnt가 5회 이상인 경우 처리 --%>
+                            <tr style="border-bottom: 1px solid #f9f9f9;"
+                                class="${b.report_cnt >= 5 ? 'blind-row' : ''}">
                                 <td style="padding: 1rem; text-align: center;">
                                     <span class="c-badge cat-${b.category}">${b.category}</span>
                                 </td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/board/detail?b_idx=${b.b_idx}"
-                                       class="bd-title-link">
-                                            ${b.title}
-                                    </a>
-                                        <%-- 댓글 수가 0보다 크면 표시 --%>
-                                    <c:if test="${b.commentCount > 0}">
-                                        <span class="comment-count">[${b.commentCount}]</span>
-                                    </c:if>
+                                    <c:choose>
+                                        <c:when test="${b.report_cnt >= 5}">
+                                            <%-- 신고 누적 시 제목 비노출 --%>
+                                            <span class="blind-text">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle
+                                                        cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93"
+                                                                                              x2="19.07"
+                                                                                              y2="19.07"></line></svg>
+                                                다수의 신고에 의해 블라인드 처리된 게시글입니다.
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="${pageContext.request.contextPath}/board/detail?b_idx=${b.b_idx}"
+                                               class="bd-title-link">${b.title}</a>
+                                            <c:if test="${b.comments > 0}">
+                                                <span class="comment-count">[${b.comments}]</span>
+                                            </c:if>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                                 <td class="bd-meta">${b.author}</td>
-                                <td class="bd-meta">${b.regdate}</td>
-                                    <%-- 수정된 필드명: regdate --%>
-                                <td class="bd-meta" style="text-align:center">${b.viewcnt}</td>
-                                    <%-- 수정된 필드명: viewcnt --%>
-                                <td class="bd-meta" style="text-align:center">${b.commentCount}</td>
-                                    <%-- 수정된 필드명: commentCount --%>
+                                <td class="bd-meta">${b.regDate}</td>
+                                <td class="bd-meta" style="text-align:center">${b.views}</td>
+                                <td class="bd-meta" style="text-align:center">${b.comments}</td>
                             </tr>
                         </c:forEach>
                     </c:otherwise>
@@ -153,27 +185,21 @@
         <div class="bd-paging" style="display: flex; justify-content: center; gap: 8px; margin-top: 3rem;">
             <c:if test="${paging.beginBlock > 1}">
                 <a href="${pageContext.request.contextPath}/board/list?nowPage=${paging.beginBlock-1}&keyword=${keyword}&category=${category}"
-                   class="bd-page-btn"
-                   style="padding: 0.5rem 0.8rem; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #666;">&lt;</a>
+                   class="bd-page-btn">&lt;</a>
             </c:if>
-
             <c:forEach begin="${paging.beginBlock}" end="${paging.endBlock}" var="i">
                 <a href="${pageContext.request.contextPath}/board/list?nowPage=${i}&keyword=${keyword}&category=${category}"
-                   class="bd-page-btn ${paging.nowPage==i?'active':''}"
-                   style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #333;">${i}</a>
+                   class="bd-page-btn ${paging.nowPage==i?'active':''}">${i}</a>
             </c:forEach>
-
             <c:if test="${paging.endBlock < paging.totalPage}">
                 <a href="${pageContext.request.contextPath}/board/list?nowPage=${paging.endBlock+1}&keyword=${keyword}&category=${category}"
-                   class="bd-page-btn"
-                   style="padding: 0.5rem 0.8rem; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #666;">&gt;</a>
+                   class="bd-page-btn">&gt;</a>
             </c:if>
         </div>
     </div>
 </div>
 
 <script>
-    // 성공 메시지 처리 (RedirectAttributes 대응)
     const msg = "${msg}";
     if (msg) alert(msg);
 </script>

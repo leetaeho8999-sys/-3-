@@ -29,9 +29,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="에스프레소" data-type="HOT" data-price="3,600원"
-                 data-img="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/에스프레소.jpg"
                  data-story="에스프레소는 이탈리아어로 '빠른'이라는 뜻을 지닌 커피의 정수입니다. 20세기 초 밀라노에서 탄생한 이 음료는 9기압의 고압으로 25~30초 만에 추출하여 커피의 진한 풍미와 황금빛 크레마를 완성합니다. 한 모금에 담긴 깊은 농도가 이탈리아인들의 하루를 깨워왔듯, 오늘 당신의 하루도 시작해 드립니다.">
-                <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&h=280&fit=crop&auto=format" alt="에스프레소" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/에스프레소.jpg" alt="에스프레소" onerror="imgError(this)">
                 <p class="item-name">에스프레소</p>
                 <p class="item-type">HOT</p>
                 <div class="price-row"><span class="price">3,600원</span></div>
@@ -39,9 +39,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="아메리카노" data-type="HOT / ICE" data-price="4,200원"
-                 data-img="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/아메리카노.jpg"
                  data-story="제2차 세계대전 당시 이탈리아에 주둔한 미군 병사들이 에스프레소의 강한 맛을 물로 희석해 마시기 시작한 것이 아메리카노의 유래입니다. 이탈리아 바리스타들이 '카페 아메리카노'라 부르며 놀린 것이 오늘날 세계에서 가장 사랑받는 커피가 되었습니다. 에스프레소의 깊은 향과 물의 부드러움이 어우러진 균형의 미학입니다.">
-                <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=280&fit=crop&auto=format" alt="아메리카노" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/아메리카노.jpg" alt="아메리카노" onerror="imgError(this)">
                 <p class="item-name">아메리카노</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">4,200원</span></div>
@@ -49,9 +49,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="카페라떼" data-type="HOT / ICE" data-price="4,700원"
-                 data-img="https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/카페라떼.jpg"
                  data-story="라떼는 이탈리아어로 '우유'를 의미합니다. 이탈리아 가정에서 아침 식사와 함께 마시던 문화에서 시작된 카페라떼는 에스프레소 위에 스팀 밀크를 부어 부드럽고 크리미한 풍미를 완성합니다. 바리스타의 손끝에서 탄생하는 라떼아트는 한 잔의 커피를 작은 예술로 만들어 드립니다.">
-                <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&h=280&fit=crop&auto=format" alt="카페라떼" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/카페라떼.jpg" alt="카페라떼" onerror="imgError(this)">
                 <p class="item-name">카페라떼</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">4,700원</span></div>
@@ -59,9 +59,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="카푸치노" data-type="HOT / ICE" data-price="4,700원"
-                 data-img="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/카푸치노.jpg"
                  data-story="카푸치노는 이탈리아 카푸친 수도회 수도사들의 갈색 수도복에서 이름이 유래했습니다. 에스프레소·스팀 밀크·우유 거품을 1:1:1 비율로 담아내는 것이 정통 방식이며, 풍성한 거품이 만들어내는 벨벳 같은 식감이 특징입니다. 오전 11시 이전에 마시는 것이 이탈리아의 전통입니다.">
-                <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&h=280&fit=crop&auto=format" alt="카푸치노" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/카푸치노.jpg" alt="카푸치노" onerror="imgError(this)">
                 <p class="item-name">카푸치노</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">4,700원</span></div>
@@ -69,9 +69,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="바닐라라떼" data-type="HOT / ICE" data-price="5,300원"
-                 data-img="https://images.unsplash.com/photo-1561047029-3000c68339ca?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/라떼-에스.jpg"
                  data-story="바닐라는 멕시코 원주민 토토낙족이 처음 발견한 향신료로, 16세기 스페인 탐험가들에 의해 유럽에 전해졌습니다. 마다가스카르의 뜨거운 태양 아래 재배된 바닐라빈의 달콤하고 따뜻한 향이 에스프레소의 쌉쌀함과 만나 완벽한 균형을 이룹니다. 하루 중 가장 달콤한 순간을 선물해 드립니다.">
-                <img src="https://images.unsplash.com/photo-1561047029-3000c68339ca?w=400&h=280&fit=crop&auto=format" alt="바닐라라떼" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/라떼-에스.jpg" alt="바닐라라떼" onerror="imgError(this)">
                 <p class="item-name">바닐라라떼</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">5,300원</span></div>
@@ -79,9 +79,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="카라멜마키아토" data-type="HOT / ICE" data-price="5,650원"
-                 data-img="https://images.unsplash.com/photo-1590138695581-1e82b57e78d1?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/카라멜_마끼아또.jpg"
                  data-story="마키아토는 이탈리아어로 '점을 찍다'라는 뜻입니다. 바닐라 시럽과 스팀 밀크 위에 에스프레소를 천천히 부어 아름다운 레이어를 만들고, 황금빛 카라멜 소스로 마무리합니다. 마실수록 층층이 변하는 맛의 여정이 카라멜마키아토만의 특별한 이야기를 만들어냅니다.">
-                <img src="https://images.unsplash.com/photo-1590138695581-1e82b57e78d1?w=400&h=280&fit=crop&auto=format" alt="카라멜마키아토" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/카라멜_마끼아또.jpg" alt="카라멜마키아토" onerror="imgError(this)">
                 <p class="item-name">카라멜마키아토</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">5,650원</span></div>
@@ -99,9 +99,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="헤이즐넛라떼" data-type="HOT / ICE" data-price="5,300원"
-                 data-img="https://images.unsplash.com/photo-1574914629377-e97c19438717?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/헤이즐넛라떼.png"
                  data-story="이탈리아 피에몬테 지방은 세계 최고의 헤이즐넛 산지로 유명합니다. 이 지역에서 탄생한 헤이즐넛 향은 에스프레소와 만나 고소하면서도 달콤한 풍미의 라떼를 완성했습니다. 구운 견과류의 따뜻한 향이 가득한 한 잔은 가을 낙엽처럼 마음을 포근하게 감싸줍니다.">
-                <img src="https://images.unsplash.com/photo-1574914629377-e97c19438717?w=400&h=280&fit=crop&auto=format" alt="헤이즐넛라떼" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/헤이즐넛라떼.png" alt="헤이즐넛라떼" onerror="imgError(this)">
                 <p class="item-name">헤이즐넛라떼</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">5,300원</span></div>
@@ -119,9 +119,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="아포가토" data-type="ICE" data-price="5,600원"
-                 data-img="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/아포가토.png"
                  data-story="아포가토(Affogato)는 이탈리아어로 '물에 빠진'이라는 뜻입니다. 뜨거운 에스프레소 한 샷을 바닐라 아이스크림 위에 부으면 뜨거움과 차가움, 쓴맛과 단맛이 어우러지며 천천히 녹아드는 마법이 시작됩니다. 이탈리아에서는 식후 디저트로 즐기는 특별한 한 잔입니다.">
-                <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=280&fit=crop&auto=format" alt="아포가토" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/아포가토.png" alt="아포가토" onerror="imgError(this)">
                 <p class="item-name">아포가토</p>
                 <p class="item-type">ICE</p>
                 <div class="price-row"><span class="price">5,600원</span></div>
@@ -129,9 +129,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="콜드브루" data-type="ICE" data-price="4,450원"
-                 data-img="https://images.unsplash.com/photo-1556791766-66ac915737cf?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/콜드브루.jpg"
                  data-story="콜드브루는 일본 교토의 전통 냉침 추출 방식에서 유래했습니다. 뜨거운 물 대신 차가운 물로 12~24시간 천천히 추출하여 산도는 낮추고 자연스러운 단맛과 깊은 풍미를 최대한 끌어냅니다. 시간이 만들어내는 커피, 서두르지 않는 느림의 미학을 담은 한 잔입니다.">
-                <img src="https://images.unsplash.com/photo-1556791766-66ac915737cf?w=400&h=280&fit=crop&auto=format" alt="콜드브루" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/콜드브루.jpg" alt="콜드브루" onerror="imgError(this)">
                 <p class="item-name">콜드브루</p>
                 <p class="item-type">ICE</p>
                 <div class="price-row"><span class="price">4,450원</span></div>
@@ -139,9 +139,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="콜드브루라떼" data-type="ICE" data-price="5,150원"
-                 data-img="https://images.unsplash.com/photo-1545285179-78da7c2b8f83?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/콜드브루라떼.png"
                  data-story="12시간 냉침 추출한 콜드브루에 신선한 우유를 더해 완성됩니다. 콜드브루 특유의 낮은 산도와 깊은 단맛이 고소한 우유와 만나 부드럽고 진한 풍미를 만들어냅니다. 더운 여름날 한 모금에 온몸이 시원해지는 여름의 단골 메뉴입니다.">
-                <img src="https://images.unsplash.com/photo-1545285179-78da7c2b8f83?w=400&h=280&fit=crop&auto=format" alt="콜드브루라떼" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/콜드브루라떼.png" alt="콜드브루라떼" onerror="imgError(this)">
                 <p class="item-name">콜드브루라떼</p>
                 <p class="item-type">ICE</p>
                 <div class="price-row"><span class="price">5,150원</span></div>
@@ -149,12 +149,22 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="드립커피" data-type="HOT / ICE" data-price="4,000원"
-                 data-img="https://images.unsplash.com/photo-1439242088854-0c76045f4124?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/드립커피.png"
                  data-story="핸드드립은 바리스타의 손으로 직접 물을 부어 커피를 추출하는 방식입니다. 물의 온도, 붓는 속도, 원두의 분쇄도가 한 잔의 맛을 결정하는 정성의 과정입니다. 기계가 아닌 사람의 온도가 담긴 드립커피는 바리스타와 손님 사이에 존재하는 조용한 대화입니다.">
-                <img src="https://images.unsplash.com/photo-1439242088854-0c76045f4124?w=400&h=280&fit=crop&auto=format" alt="드립커피" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/드립커피.png" alt="드립커피" onerror="imgError(this)">
                 <p class="item-name">드립커피</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">4,000원</span></div>
+            </div>
+
+            <div class="menu-card" onclick="openDetail(this)"
+                 data-name="아인슈페너" data-type="HOT / ICE" data-price="5,200원"
+                 data-img="${pageContext.request.contextPath}/resources/images/아인슈페너.jpg"
+                 data-story="아인슈페너(Einspänner)는 오스트리아 빈의 마부들이 즐겨 마시던 커피에서 유래했습니다. 한 손으로 고삐를 잡고 마셔야 했던 마부들을 위해 유리잔에 진한 에스프레소를 담고 그 위에 달콤한 생크림을 두툼하게 얹었습니다. 크림을 젓지 않고 그대로 마시는 것이 정통 방식으로, 씁쓸한 커피와 달콤한 크림의 대비가 빈 카페 문화의 정수를 담고 있습니다.">
+                <img src="${pageContext.request.contextPath}/resources/images/아인슈페너.jpg" alt="아인슈페너" onerror="imgError(this)">
+                <p class="item-name">아인슈페너</p>
+                <p class="item-type">HOT / ICE</p>
+                <div class="price-row"><span class="price">5,200원</span></div>
             </div>
 
         </div>
@@ -168,9 +178,9 @@
 
             <div class="menu-card" onclick="openDetail(this)"
                  data-name="녹차라떼" data-type="HOT / ICE" data-price="5,400원"
-                 data-img="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&h=400&fit=crop&auto=format"
+                 data-img="${pageContext.request.contextPath}/resources/images/녹차라떼.png"
                  data-story="일본 우지(宇治) 지방의 말차는 차 문화의 정점으로 불립니다. 고온을 피해 재배된 찻잎을 맷돌로 곱게 갈아 만든 말차는 선명한 녹색과 깊은 감칠맛이 특징입니다. 이 고귀한 말차가 부드러운 스팀 밀크와 만나 일본 다도의 고요함을 한 잔에 담아냅니다.">
-                <img src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400&h=280&fit=crop&auto=format" alt="녹차라떼" onerror="imgError(this)">
+                <img src="${pageContext.request.contextPath}/resources/images/녹차라떼.png" alt="녹차라떼" onerror="imgError(this)">
                 <p class="item-name">녹차라떼</p>
                 <p class="item-type">HOT / ICE</p>
                 <div class="price-row"><span class="price">5,400원</span></div>

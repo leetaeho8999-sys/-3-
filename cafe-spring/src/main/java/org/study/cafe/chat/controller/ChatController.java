@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.cafe.chat.service.ChatService;
 import org.study.cafe.chat.vo.ChatVO;
-import org.study.cafe.member.vo.MemberVO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,23 +22,31 @@ public class ChatController {
     public Map<String, String> send(@RequestBody Map<String, String> body, HttpSession session) {
         String userMessage = body.getOrDefault("message", "").trim();
         String sessionId   = session.getId();
-        MemberVO login     = (MemberVO) session.getAttribute("loginMember");
-        String mIdx        = login != null ? login.getM_idx() : null;
+        String mId         = (String) session.getAttribute("m_id");
 
         Map<String, String> result = new HashMap<>();
         if (userMessage.isEmpty()) {
             result.put("response", "");
             return result;
         }
-        String botResponse = chatService.sendMessage(userMessage, sessionId, mIdx);
+        String botResponse = chatService.sendMessage(userMessage, sessionId, mId);
         result.put("response", botResponse);
         return result;
     }
 
-    // 현재 세션 채팅 내역 조회
+    // 현재 세션 채팅 내역 조회 (비로그인: session 기준, 로그인: m_idx 기준)
     @GetMapping("/history")
     public List<ChatVO> history(HttpSession session) {
-        return chatService.getHistory(session.getId());
+        String mId = (String) session.getAttribute("m_id");
+        return chatService.getHistory(session.getId(), mId);
+    }
+
+    // 현재 세션 대화 내역 초기화 (비로그인: session 기준, 로그인: m_idx 기준)
+    @PostMapping("/reset")
+    public ResponseEntity<Void> reset(HttpSession session) {
+        String mId = (String) session.getAttribute("m_id");
+        chatService.resetHistory(session.getId(), mId);
+        return ResponseEntity.ok().build();
     }
 
     // 만족도 평가 저장

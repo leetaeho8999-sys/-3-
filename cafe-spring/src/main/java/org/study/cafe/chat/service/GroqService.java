@@ -12,10 +12,12 @@ import org.study.cafe.chat.mapper.ChatMapper;
 import org.study.cafe.menu.mapper.MenuMapper;
 import org.study.cafe.menu.vo.MenuVO;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.study.cafe.chat.vo.ChatVO;
 
 @Service
 public class GroqService {
@@ -115,104 +117,96 @@ public class GroqService {
     @NonNull
     private static final HttpMethod HTTP_POST   = java.util.Objects.requireNonNull(HttpMethod.POST);
 
-    /** 정적 파트 — 정체성·말투·응답 형식·링크 규칙만 포함 (카페 정보는 DB에서 동적 로드) */
+    /** 정적 파트 — 경량화 버전 (~800 토큰, CLAUDE.md 규칙 5 준수) */
     private static final String SYSTEM_PROMPT_BASE = """
-        당신은 **로운카페(ROWN CAFE)**의 전담 AI 안내원 **아메리**입니다.
+        당신은 로운카페(ROWN CAFE)의 AI 안내원 **아메리**입니다.
 
-        [정체성]
-        - 이름: 아메리
-        - 소속: 로운카페(ROWN CAFE) — 프리미엄 스페셜티 커피 전문 카페
-        - 역할: 메뉴 안내, 매장 정보, 멤버십 혜택, 이벤트 등 카페 관련 모든 문의 응대
+        [말투] 따뜻하고 세련되게, 2~4문장으로 간결하게. 이모티콘은 문장당 최대 1개 (☕🍃✨😊🎁⭐).
+        [언어] 오직 한국어(한글)만. 외국 문자 일체 금지. 외국어 질문도 한국어로 답변.
+        [금지] 확인 안 된 할인율·혜택·없는 등급(브론즈·플래티넘 등) 임의 안내 금지.
 
-        [말투 & 태도]
-        - 따뜻하고 세련된 어조: 친근하지만 품위 있게, 과하게 밝거나 가볍지 않게
-        - 로운카페의 감성(고급스럽고 편안한 공간)을 언어에도 담아주세요
-        - 모르는 정보는 솔직하게 "확인이 어렵다"고 안내하고 매장 방문 또는 [문의하기](/contact) 안내
-        - 아래 [메뉴·매장·멤버십 정보]에 없는 내용(할인율, 없는 혜택 등)은 임의로 만들어 안내하지 말 것
+        [링크 규칙 — 주제에 맞는 것 1~2개만 자연스럽게 배치]
+        메뉴/가격/음료/원두        → [메뉴 페이지](/menu/list)
+        멤버십/쿠폰/등급/혜택      → [멤버십 페이지](/membership/list)
+        이벤트/공지/후기/커뮤니티  → [게시판](/board/list)
+        회원가입/신규 가입          → [회원가입](/member/register)
+        로그인/아이디·비밀번호 찾기 → [로그인](/member/login)
+        내 정보/내 글/탈퇴/개인설정 → [마이페이지](/member/mypage)
+        위치/영업시간/주차/예약    → [문의하기](/contact)
+        자주 묻는 질문              → [FAQ](/faq)
 
-        [응답 형식 규칙 — 반드시 준수]
-        - 언어: **오직 한국어(한글)만** 사용. 아래 언어들은 단 한 글자도 절대 포함 금지:
-          영어(English), 중국어(中文), 일본어(日本語), 힌디어(हिन्दी), 아랍어(العربية),
-          러시아어(Русский), 태국어(ภาษาไทย), 베트남어(Tiếng Việt), 그리스어(Ελληνικά),
-          키릴문자, 데바나가리문자, 아랍문자, 히브리어 등 모든 외국 문자 사용 금지
-        - 외국어로 질문이 들어와도 반드시 한국어로만 답변할 것
-        - 분량: 2~4문장, 너무 길지 않게
-        - 마크다운: # ## 같은 헤더 기호 사용 금지. 강조는 **단어** 형식만 허용
-        - 이모티콘: 문장당 최대 1개, 커피·따뜻함 관련(☕ 🍃 ✨ 😊 🎁 ⭐)만 사용
-        - 인사말은 **'로운카페 아메리입니다'** 형식을 기본으로
-        - 카페와 무관한 질문(정치, 뉴스, 개인 상담 등)은 정중하게 카페 관련 문의로 안내
+        [문의하기]는 매장 운영 관련에만 사용. 다른 주제의 도피처로 쓰지 말 것.
+        링크 텍스트는 한국어만, URL 경로(/menu/list 등)는 그대로 복사. 수정·번역 금지.
 
-        [페이지 링크 안내 규칙 — 반드시 아래 형식 그대로 복사해서 사용]
-        링크 텍스트([ ] 안)에는 반드시 한국어만 사용. 한자·영어·기타 외국어 절대 금지.
-        아래 링크 형식을 글자 하나도 바꾸지 말고 그대로 사용하세요:
-        - 메뉴 관련 → [메뉴 페이지](/menu/list)
-        - 멤버십·등급·쿠폰 관련 → [멤버십 페이지](/membership/list)
-        - 이벤트·공지·커뮤니티 관련 → [게시판](/board/list)
-        - 위치·연락처·예약 관련 → [문의하기](/contact)
-        - 자주 묻는 질문 관련 → [FAQ](/faq)
-        - AI 챗봇 전체 페이지 → [아메리와 대화하기](/chat)
-        예시: "자세한 내용은 [멤버십 페이지](/membership/list)에서 확인하세요!"
-        링크는 응답당 최대 1개만 사용하고, 자연스럽게 문장 끝에 배치하세요.
+        [카페 외 질문] 3단계: 공감 → 현실 답변 → 카페 자연스럽게 언급.
+        예: "비 오면 당황스럽죠 😊 저희는 우산은 없어요. 따뜻한 커피 한 잔 어떠세요 ☕"
 
-        [언어 규칙 최우선 적용]
-        이 규칙은 다른 모든 규칙보다 우선합니다.
-        응답에 한글 이외의 문자가 포함되어 있다면 즉시 한국어로 바꾸세요.
+        [예시 3가지]
+        - "아메리카노 얼마?" → "아메리카노는 4,500원입니다 ☕ 전체 메뉴는 [메뉴 페이지](/menu/list)에서 확인하세요."
+        - "비밀번호 잊었어요" → "[로그인](/member/login) 페이지의 '비밀번호 찾기'에서 재설정하실 수 있어요 😊"
+        - "내가 쓴 글 보고 싶어" → "작성하신 글은 [마이페이지](/member/mypage)의 '내가 쓴 글'에서 확인 가능합니다 ☕"
         """;
 
     /**
      * 시스템 프롬프트 동적 생성:
-     * 정적 규칙(SYSTEM_PROMPT_BASE) + DB 카페 정보(cafeInfoContext) + DB 외국어 금지 목록
+     * 정적 규칙(SYSTEM_PROMPT_BASE) + 로그인 상태별 짧은 가이드 + DB 카페 정보(cafeInfoContext)
+     * ※ 외국어 사전(wordMap) 프롬프트 주입은 제거 — foreignWordFilter.filter() 후처리로 충분, 토큰 절약
      */
-    private String buildSystemPrompt() {
+    private String buildSystemPrompt(boolean isLoggedIn) {
         StringBuilder sb = new StringBuilder(SYSTEM_PROMPT_BASE);
 
-        // DB에서 로드한 메뉴·매장·멤버십 정보 주입
-        if (!cafeInfoContext.isEmpty()) {
-            sb.append(cafeInfoContext);
+        // 로그인 상태별 짧은 가이드
+        sb.append("\n[고객 상태] ");
+        if (isLoggedIn) {
+            sb.append("로그인 회원 — [로그인]·[회원가입] 링크 사용 금지. 개인 기능은 [마이페이지]로 안내.");
+        } else {
+            sb.append("비로그인 손님 — [마이페이지] 링크 사용 금지. 회원 기능은 [로그인] 또는 [회원가입]으로 안내.");
         }
 
-        // DB 외국어 사전 주입
-        Map<String, String> wordMap = foreignWordFilter.getWordMap();
-        if (!wordMap.isEmpty()) {
-            sb.append("\n        【외국어 금지 목록 — DB 기준】\n");
-            sb.append("        아래 외국어가 답변에 나오면 즉시 오른쪽 한국어로 바꾸세요:\n");
-            for (Map.Entry<String, String> entry : wordMap.entrySet()) {
-                if (!entry.getValue().isEmpty()) {
-                    sb.append("        ").append(entry.getKey())
-                      .append(" → ").append(entry.getValue()).append("\n");
-                }
-            }
+        // DB 메뉴·매장·멤버십 정보 (cafeInfoContext) 는 유지
+        if (!cafeInfoContext.isEmpty()) {
+            sb.append(cafeInfoContext);
         }
 
         return sb.toString();
     }
 
-    public String ask(String userMessage) {
+    /** 비로그인 손님: sessionId 기준 10쌍(20개), 로그인 회원: mIdx 기준 20쌍(40개) */
+    public String ask(String userMessage, List<ChatVO> history, boolean isLoggedIn) {
         String prompt = "역할에 맞게 아래 고객 질문에 답해주세요.\n\n고객 질문: " + userMessage;
-        return callGroq(prompt);
+        return callGroq(prompt, history, isLoggedIn);
     }
 
-    public String askWithHint(String userMessage, String dbResponse) {
+    public String askWithHint(String userMessage, String dbResponse, List<ChatVO> history, boolean isLoggedIn) {
         String prompt =
             "아래 참고 정보를 바탕으로, 역할에 맞게 고객 질문에 자연스럽게 답해주세요. " +
             "참고 정보의 핵심 내용은 반드시 포함하세요.\n\n" +
             "고객 질문: " + userMessage + "\n" +
             "참고 정보: " + dbResponse;
-        return callGroq(prompt);
+        return callGroq(prompt, history, isLoggedIn);
     }
 
     @SuppressWarnings("unchecked")
-    private String callGroq(String userPrompt) {
-        Map<String, Object> body = Map.of(
-            "model", MODEL,
-            "messages", List.of(
-                Map.of("role", "system", "content", buildSystemPrompt()),
-                Map.of("role", "user",   "content", userPrompt)
-            )
-        );
+    private String callGroq(String userPrompt, List<ChatVO> history, boolean isLoggedIn) {
+        // system + 이전 대화 히스토리 + 현재 질문 순으로 messages 구성
+        List<Map<String, String>> messages = new ArrayList<>();
+        messages.add(Map.of("role", "system", "content", buildSystemPrompt(isLoggedIn)));
+
+        if (history != null) {
+            for (ChatVO chat : history) {
+                String msg = chat.getMessage();
+                if (msg == null || msg.isBlank()) continue;
+                String role = "user".equals(chat.getSender()) ? "user" : "assistant";
+                messages.add(Map.of("role", role, "content", msg));
+            }
+        }
+
+        messages.add(Map.of("role", "user", "content", userPrompt));
+
+        Map<String, Object> body = Map.of("model", MODEL, "messages", messages);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(new MediaType("application", "json", java.nio.charset.StandardCharsets.UTF_8));
         headers.setBearerAuth(apiKey);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
@@ -236,13 +230,23 @@ public class GroqService {
             return text != null ? foreignWordFilter.filter(text) : "답변 텍스트가 없습니다.";
 
         } catch (org.springframework.web.client.HttpClientErrorException e) {
-            log.error("Groq API HTTP 오류: {} {}", e.getStatusCode(), e.getMessage());
+            if (e.getStatusCode().value() == 429) {
+                log.warn("Groq API 사용량 한도 초과 (429): {}", e.getMessage());
+                return "지금 문의가 많아 조금 기다려 주세요 ☕ 잠시 후 다시 여쭤봐 주시면 감사하겠습니다.";
+            }
+            log.error("Groq API HTTP 오류 status={}", e.getStatusCode());
+            log.error("Groq API 응답 본문: {}", e.getResponseBodyAsString());
+            log.error("Groq API 응답 헤더: {}", e.getResponseHeaders());
+            return "AI 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.";
+        } catch (org.springframework.web.client.HttpServerErrorException e) {
+            log.error("Groq API 5xx 오류 status={}", e.getStatusCode());
+            log.error("Groq API 응답 본문: {}", e.getResponseBodyAsString());
             return "AI 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.";
         } catch (org.springframework.web.client.RestClientException e) {
-            log.error("Groq API 네트워크 오류: {}", e.getMessage());
+            log.error("Groq API 네트워크 오류 (스택 전체): ", e);
             return "AI 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.";
         } catch (Exception e) {
-            log.error("Groq API 오류: {}", e.getMessage(), e);
+            log.error("Groq API 오류 (스택 전체): ", e);
             return "AI 답변 중 오류가 발생했습니다.";
         }
     }

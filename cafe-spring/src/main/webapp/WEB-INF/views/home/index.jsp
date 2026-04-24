@@ -15,7 +15,7 @@
   <div class="rn-hero__inner">
     <div class="rn-hero__eyebrow">Rowoon Cafe &nbsp;·&nbsp; Since 2025</div>
     <h1 class="rn-hero__title">로<em>운</em></h1>
-    <p class="rn-hero__subtitle-ko">두리의 앞시내로, 로운</p>
+    <p class="rn-hero__subtitle-ko">우리만의 방식으로 꽃을 피우다</p>
     <p class="rn-hero__subtitle-en">Our Own Way to Bloom</p>
     <div>
       <a href="${pageContext.request.contextPath}/menu/list" class="rn-hero__cta">View Menu</a>
@@ -274,7 +274,7 @@
       </div>
     </div>
     <c:choose>
-      <c:when test="${empty sessionScope.loginMember}">
+      <c:when test="${empty sessionScope.m_id}">
         <a href="${pageContext.request.contextPath}/member/register" class="rn-btn-gold">멤버십 가입하기 →</a>
       </c:when>
       <c:otherwise>
@@ -393,7 +393,7 @@
         <div class="rn-footer__col-title">Account</div>
         <div class="rn-footer__links">
           <c:choose>
-            <c:when test="${not empty sessionScope.loginMember}">
+            <c:when test="${not empty sessionScope.m_id}">
               <a href="${pageContext.request.contextPath}/member/mypage">마이페이지</a>
               <a href="${pageContext.request.contextPath}/member/logout">로그아웃</a>
             </c:when>

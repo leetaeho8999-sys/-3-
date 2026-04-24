@@ -96,9 +96,23 @@
         UPDATE board_t SET comments = GREATEST(0, comments - 1) WHERE b_idx = #{b_idx}
     </update>
 
-    <insert id="insert">
-        INSERT INTO tbl_board (bno, category, title, content, writer, tags)
-        VALUES (seq_board.nextval, #{category}, #{title}, #{content}, #{writer}, #{tags})
+    <select id="getMyPosts" parameterType="String" resultMap="boardMap">
+        SELECT * FROM board_t WHERE active = 0 AND author = #{author}
+        ORDER BY b_idx DESC LIMIT 10
+    </select>
+
+    <insert id="insertReport" parameterType="org.study.cafe.board.vo.ReportVO">
+        INSERT INTO tbl_report (b_idx, reporter, reason, content)
+        VALUES (#{b_idx}, #{reporter}, #{reason}, #{content})
     </insert>
 
+    <update id="updateReportCnt" parameterType="int">
+        UPDATE tbl_board SET report_cnt = report_cnt + 1 WHERE b_idx = #{b_idx}
+    </update>
+
+    <select id="checkDuplicateReport" parameterType="org.study.cafe.board.vo.ReportVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tbl_report
+        WHERE b_idx = #{b_idx} AND reporter = #{reporter}
+    </select>
 </mapper>

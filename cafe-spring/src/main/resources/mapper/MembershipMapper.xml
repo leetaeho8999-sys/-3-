@@ -21,4 +21,18 @@
         UPDATE membership_t SET grade = #{grade}, points = #{points} WHERE user_id = #{userId}
     </update>
 
+    <!-- member 테이블에서 이름 조회 -->
+    <select id="getMemberName" parameterType="String" resultType="String">
+        SELECT m_name FROM member WHERE m_id = #{mId}
+    </select>
+
+    <!-- member.m_phone = customer_t.phone 조인으로 방문 횟수 조회 -->
+    <select id="getVisitCountByMId" parameterType="String" resultType="java.lang.Integer">
+        SELECT c.visit_count
+        FROM member m
+        JOIN customer_t c ON m.m_phone = c.phone AND c.active = 0
+        WHERE m.m_id = #{mId}
+        LIMIT 1
+    </select>
+
 </mapper>

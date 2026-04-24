@@ -10,6 +10,8 @@
             <div class="header-name">아메리</div>
             <div class="header-status">☕ 로운카페 AI 안내원</div>
         </div>
+        <button type="button" id="resetBtn" onclick="resetChat()" aria-label="대화 초기화" title="대화 초기화">↺</button>
+        <button type="button" id="closeBtn" onclick="closeChat()" aria-label="챗봇 닫기">✕</button>
     </div>
     <div id="greetingBox">
         <div class="greeting-bubble">

@@ -1,13 +1,34 @@
+var chatbotBusy = false;
+
 function openChat() {
     document.getElementById('openBtn').style.display = 'none';
-    document.getElementById('chatContainer').style.display = 'flex';
+    var container = document.getElementById('chatContainer');
+    container.classList.remove('chat-opening');
+    container.style.display = 'flex';
+    void container.offsetWidth; // reflow로 애니메이션 리셋
+    container.classList.add('chat-opening');
+    var input = document.getElementById('userInput');
+    if (input) setTimeout(function() { input.focus(); }, 50);
+}
+
+function closeChat() {
+    document.getElementById('chatContainer').style.display = 'none';
+    document.getElementById('openBtn').style.display = 'block';
+}
+
+function resetChat() {
+    if (!confirm('대화 내역을 초기화할까요?')) return;
+    document.getElementById('chatBox').innerHTML = '';
+    fetch(chatCtx + '/chat/reset', { method: 'POST' }).catch(function() {});
 }
 
 function sendChatbotMessage() {
+    if (chatbotBusy) return;
     var input = document.getElementById('userInput');
     var message = input.value.trim();
     if (!message) return;
 
+    chatbotBusy = true;
     appendChatMessage('손님', message);
     input.value = '';
 
@@ -37,6 +58,10 @@ function sendChatbotMessage() {
         var w = document.getElementById('waitingMsg');
         if (w) w.remove();
         appendChatMessage('아메리', '메시지 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    })
+    .finally(function() {
+        chatbotBusy = false;
+        if (input) input.focus();
     });
 }
 
@@ -108,7 +133,35 @@ function sendChatbotRating(ratingDiv, botMessage, rating) {
     });
 }
 
+/* 이전 대화 내역 복원 — 플로팅 챗봇 전용 렌더 (평가 버튼 없이 깔끔하게) */
+function loadChatbotHistory() {
+    fetch(chatCtx + '/chat/history')
+    .then(function(res) { return res.ok ? res.json() : []; })
+    .then(function(history) {
+        if (!history || history.length === 0) return;
+        var box = document.getElementById('chatBox');
+        history.forEach(function(item) {
+            var div = document.createElement('div');
+            if (item.sender === 'user') {
+                div.className = 'msg-user';
+                var escaped = item.message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                div.innerHTML = escaped.replace(/\n/g, '<br>');
+            } else {
+                div.className = 'msg-bot';
+                div.innerHTML = renderBotText(item.message);
+            }
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    })
+    .catch(function() { /* 조용히 무시 */ });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    /* 대화 내역 복원 */
+    loadChatbotHistory();
+
+    /* Enter 키 전송 */
     var input = document.getElementById('userInput');
     if (input) {
         input.addEventListener('keypress', function(e) {
@@ -116,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    /* 외부 클릭 시 닫기 (닫기 버튼 추가됐지만 기존 UX도 유지) */
     document.addEventListener('click', function(e) {
         var container = document.getElementById('chatContainer');
         var openBtn   = document.getElementById('openBtn');

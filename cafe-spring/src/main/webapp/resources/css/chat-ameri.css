@@ -11,7 +11,7 @@
 
 /* ── 사이드바 ── */
 .ameri-sidebar {
-    width: 260px;
+    width: clamp(200px, 22vw, 300px);
     flex-shrink: 0;
     background: #3B2314;
     display: flex;
@@ -20,7 +20,7 @@
 }
 
 .ameri-sidebar-brand {
-    padding: 32px 24px 20px;
+    padding: clamp(20px, 2.5vw, 32px) clamp(16px, 2vw, 24px) clamp(14px, 1.8vw, 20px);
     border-bottom: 1px solid rgba(200, 169, 126, 0.2);
 }
 
@@ -176,7 +176,7 @@
 .ameri-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 32px;
+    padding: clamp(16px, 2.5vw, 32px);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -190,7 +190,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
+    padding: clamp(24px, 3.5vw, 40px) clamp(12px, 2vw, 20px);
     text-align: center;
     gap: 12px;
 }
@@ -329,7 +329,7 @@
 
 /* ── 입력 영역 ── */
 .ameri-input-wrap {
-    padding: 20px 32px 24px;
+    padding: clamp(14px, 1.8vw, 20px) clamp(20px, 2.8vw, 32px) clamp(16px, 2vw, 24px);
     background: #FFFFFF;
     border-top: 1px solid #EDE5DA;
     flex-shrink: 0;

@@ -42,7 +42,7 @@
 /* ── 본문 섹션 ── */
 .ct-section {
   background: var(--rown-cream);
-  padding: 5rem 1.5rem;
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem);
 }
 .ct-inner {
   max-width: 1100px; margin: 0 auto;
@@ -88,7 +88,7 @@
   display: flex; flex-direction: column; gap: .75rem;
 }
 .ct-map__iframe {
-  width: 100%; height: 440px;
+  width: 100%; height: clamp(280px, 35vw, 440px);
   border: 1px solid var(--rown-border);
   border-radius: 6px;
   display: block;

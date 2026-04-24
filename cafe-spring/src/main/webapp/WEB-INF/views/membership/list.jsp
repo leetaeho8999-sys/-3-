@@ -1,71 +1,77 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="pageTitle" value="멤버십 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/membership.css">
 
 <!-- ══════════════════════════════════════════
-     히어로 + 내 멤버십 카드 (다크 통합)
+     히어로 + 내 멤버십 카드
 ══════════════════════════════════════════ -->
 <div class="ms-top">
-  <!-- 배경 이미지 오버레이 -->
   <div class="ms-top__bg"></div>
 
   <!-- 히어로 텍스트 -->
   <div class="ms-top__hero">
     <p class="ms-top__eyebrow">Membership</p>
-    <h1 class="ms-top__title">정성 클럽</h1>
-    <p class="ms-top__sub">함께하는 커피의 즐거움</p>
+    <h1 class="ms-top__title">ROWN Lounge</h1>
+    <p class="ms-top__sub">여유로운 커피 한 잔, 특별한 멤버를 위한 공간</p>
   </div>
 
   <!-- 내 멤버십 카드 -->
   <c:if test="${not empty memberInfo}">
+  <c:set var="grade" value="${memberInfo.grade}"/>
   <div class="ms-top__card-wrap">
-    <div class="ms-top__card">
+    <div class="ms-top__card ms-card--${grade}">
 
-      <!-- 등급 뱃지 -->
-      <div class="ms-top__grade">
-        <div class="ms-top__grade-icon">
-          <c:choose>
-            <c:when test="${memberInfo.grade == 'VIP'}">👑</c:when>
-            <c:when test="${memberInfo.grade == '골드'}">⭐</c:when>
-            <c:when test="${memberInfo.grade == '실버'}">🥈</c:when>
-            <c:otherwise>☕</c:otherwise>
-          </c:choose>
+      <!-- 상단: 등급 뱃지 + 이름 -->
+      <div class="ms-card__header">
+        <div class="ms-card__grade-badge">
+          <span class="ms-card__grade-icon">
+            <c:choose>
+              <c:when test="${grade == 'VIP'}">👑</c:when>
+              <c:when test="${grade == '골드'}">⭐</c:when>
+              <c:when test="${grade == '실버'}">🥈</c:when>
+              <c:otherwise>☕</c:otherwise>
+            </c:choose>
+          </span>
+          <span class="ms-card__grade-name grade-${grade}">${grade}</span>
         </div>
-        <span class="ms-top__grade-name grade-${memberInfo.grade}">${memberInfo.grade}</span>
+        <div class="ms-card__username">${memberInfo.username} 님</div>
       </div>
 
-      <!-- 구분선 -->
-      <div class="ms-top__divider"></div>
-
-      <!-- 사용자 정보 -->
-      <div class="ms-top__info">
-        <div class="ms-top__username">${memberInfo.username} 님</div>
-        <div class="ms-top__stats">
-          <span>이번 달 방문 <b>${memberInfo.visitCount}회</b></span>
-          <span class="ms-top__dot">·</span>
-          <span>누적 포인트 <b>${membership.points}P</b></span>
+      <!-- 중간: 큰 숫자 스탯 -->
+      <div class="ms-card__stats">
+        <div class="ms-card__stat">
+          <span class="ms-card__stat-num">${memberInfo.visitCount}</span>
+          <span class="ms-card__stat-label">이번 달 방문</span>
+        </div>
+        <div class="ms-card__stat-divider"></div>
+        <div class="ms-card__stat">
+          <span class="ms-card__stat-num">${membership.points}</span>
+          <span class="ms-card__stat-label">누적 포인트</span>
         </div>
       </div>
 
-      <!-- 다음 등급 -->
-      <div class="ms-top__next">
+      <!-- 하단: 프로그레스 바 -->
+      <div class="ms-card__progress-wrap">
         <c:choose>
-          <c:when test="${memberInfo.grade == 'VIP'}">
-            <span class="ms-top__next-label">최상위 등급 🎉</span>
-          </c:when>
-          <c:when test="${memberInfo.grade == '골드'}">
-            <span class="ms-top__next-label">VIP까지</span>
-            <span class="ms-top__next-count">${30 - memberInfo.visitCount}회</span>
-          </c:when>
-          <c:when test="${memberInfo.grade == '실버'}">
-            <span class="ms-top__next-label">골드까지</span>
-            <span class="ms-top__next-count">${10 - memberInfo.visitCount}회</span>
+          <c:when test="${grade == 'VIP'}">
+            <div class="ms-card__progress-label">
+              <span>최상위 등급 달성 🎉</span>
+            </div>
+            <div class="ms-card__progress-bar">
+              <div class="ms-card__progress-fill" style="width:100%"></div>
+            </div>
           </c:when>
           <c:otherwise>
-            <span class="ms-top__next-label">실버까지</span>
-            <span class="ms-top__next-count">${3 - memberInfo.visitCount}회</span>
+            <div class="ms-card__progress-label">
+              <span>${memberInfo.nextGrade}까지</span>
+              <span class="ms-card__remain">${memberInfo.remainCount}회 남음</span>
+            </div>
+            <div class="ms-card__progress-bar">
+              <div class="ms-card__progress-fill" style="width:${memberInfo.progressPct}%"></div>
+            </div>
+            <div class="ms-card__progress-pct">${memberInfo.progressPct}%</div>
           </c:otherwise>
         </c:choose>
       </div>

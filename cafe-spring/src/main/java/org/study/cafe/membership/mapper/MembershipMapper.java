@@ -6,4 +6,7 @@ public interface MembershipMapper {
     MembershipVO getByUserId(String userId);
     int insertMembership(MembershipVO vo);
     int updateMembership(MembershipVO vo);
+
+    String getMemberName(String mId);
+    Integer getVisitCountByMId(String mId);
 }

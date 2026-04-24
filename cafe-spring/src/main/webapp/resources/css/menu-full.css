@@ -9,7 +9,7 @@
 
 .menu-header {
     text-align: center;
-    padding: 60px 20px 40px;
+    padding: clamp(30px, 5vw, 60px) clamp(1rem, 3vw, 20px) clamp(20px, 3.5vw, 40px);
 }
 
 .menu-header > p {
@@ -22,7 +22,7 @@
 
 .menu-header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 2.8rem;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
     color: #3B2314;
     margin-bottom: 16px;
 }
@@ -73,7 +73,7 @@
 .menu-page .menu-section {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 50px 40px;
+    padding: clamp(25px, 4.5vw, 50px) clamp(1.5rem, 4vw, 40px);
     display: none;
 }
 
@@ -116,8 +116,8 @@
 /* Menu Grid */
 .menu-page .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(160px, 18vw, 220px), 1fr));
+    gap: clamp(12px, 1.5vw, 20px);
 }
 
 @media (max-width: 640px) {
@@ -128,7 +128,7 @@
 .menu-page .menu-card {
     background: #FFFFFF;
     border: 1px solid #EDE5DA;
-    padding: 28px 24px;
+    padding: clamp(16px, 2.2vw, 28px) clamp(14px, 2vw, 24px);
     transition: box-shadow 0.3s, transform 0.2s;
     cursor: pointer;
     display: block;
@@ -218,7 +218,7 @@
 
 .modal-box {
     background: #FFFFFF;
-    max-width: 520px;
+    max-width: clamp(360px, 50vw, 520px);
     width: 90%;
     position: relative;
     animation: mfadeUp 0.25s ease;

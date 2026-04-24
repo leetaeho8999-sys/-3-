@@ -37,7 +37,7 @@
 
 /* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px;scroll-behavior:smooth}
+html{font-size:clamp(14px, 0.9vw + 0.5rem, 20px);scroll-behavior:smooth}
 body{font-family:var(--font-sans);color:var(--rown-text);background:var(--rown-cream);line-height:1.6}
 img{max-width:100%;display:block}
 a{text-decoration:none;color:inherit}
@@ -73,22 +73,22 @@ body:has(.hero-section) .site-header:not(.scrolled) {
 }
 .header-inner {
   max-width: var(--max-w); margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 clamp(1rem, 4vw, 2.5rem);
   display: flex; align-items: center; justify-content: space-between;
   height: 64px;
 }
 /* 로고 */
 .header-logo {
-  font-family: var(--font-serif); font-size: 1.2rem;
+  font-family: var(--font-serif); font-size: clamp(1rem, 1.5vw, 1.35rem);
   color: var(--rown-gold); letter-spacing: .06em;
   transition: color .2s;
 }
 .header-logo:hover { color: var(--rown-cream); }
 
 /* 네비 */
-.header-nav { display: flex; align-items: center; gap: 1.75rem; }
+.header-nav { display: flex; align-items: center; gap: clamp(1rem, 2.2vw, 2.5rem); }
 .nav-link {
-  font-size: .845rem; color: rgba(250,247,242,.72);
+  font-size: clamp(0.78rem, 1vw, 0.9rem); color: rgba(250,247,242,.72);
   background: none; border: none; padding: 0; cursor: pointer;
   transition: color .2s; letter-spacing: .02em;
 }
@@ -129,9 +129,9 @@ body:has(.hero-section) .site-header:not(.scrolled) {
 }
 .user-dropdown.open { display: block; }
 .btn-register {
-  padding: .42rem 1.1rem;
+  padding: clamp(0.35rem, 0.6vw, 0.5rem) clamp(0.75rem, 1.5vw, 1.25rem);
   border-radius: var(--radius-full);
-  font-size: .845rem; font-weight: 500;
+  font-size: clamp(0.78rem, 1vw, 0.9rem); font-weight: 500;
   background: var(--rown-gold); color: var(--rown-dark);
   border: 1px solid transparent;
   transition: background .2s, transform .15s;
@@ -161,7 +161,7 @@ body:has(.hero-section) .site-header:not(.scrolled) {
 
 /* ── PAGE BASE ── */
 .page-main { padding-top: 64px; min-height: 100vh; }
-.section-header { text-align: center; margin-bottom: 3rem; }
+.section-header { text-align: center; margin-bottom: clamp(1.5rem, 4vw, 3rem); }
 .section-header h2 {
   font-family: var(--font-serif);
   font-size: clamp(1.75rem, 4vw, 2.5rem);
@@ -644,7 +644,7 @@ body:has(.hero-section) .site-header:not(.scrolled) {
   overflow: hidden; box-shadow: var(--shadow);
 }
 .about-img img, .about-img-wrap img {
-  width: 100%; height: 380px; object-fit: cover;
+  width: 100%; height: clamp(240px, 30vw, 380px); object-fit: cover;
 }
 .feature-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
@@ -935,10 +935,10 @@ body:has(.hero-section) .site-header:not(.scrolled) {
 .legal-contact p { margin: .25rem 0; font-size: .875rem; }
 
 /* ── FOOTER ── */
-.site-footer { background: var(--rown-dark); color: var(--rown-cream); padding: 3.5rem 0 2rem; border-top: 1px solid rgba(200,169,126,.15); }
+.site-footer { background: var(--rown-dark); color: var(--rown-cream); padding: clamp(2rem, 5vw, 3.5rem) 0 clamp(1rem, 2.5vw, 2rem); border-top: 1px solid rgba(200,169,126,.15); }
 .footer-grid {
   display: grid; grid-template-columns: 2fr 1fr 1fr;
-  gap: 2.5rem; margin-bottom: 2.5rem;
+  gap: clamp(1.5rem, 3vw, 2.5rem); margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
 }
 @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr; } }
 .footer-brand h3 {

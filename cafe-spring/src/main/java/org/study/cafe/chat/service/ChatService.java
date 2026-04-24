@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface ChatService {
     String sendMessage(String userMessage, String sessionId, String mIdx);
-    List<ChatVO> getHistory(String sessionId);
+    List<ChatVO> getHistory(String sessionId, String mIdx);
+    void resetHistory(String sessionId, String mIdx);
     void saveRating(String botMessage, String rating);
 }

@@ -1,24 +1,38 @@
 package org.study.cafe.board.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.study.cafe.board.service.BoardService;
 import org.study.cafe.board.vo.BoardVO;
 import org.study.cafe.board.vo.CommentVO;
+import org.study.cafe.board.vo.ReportVO;
 import org.study.cafe.common.Paging;
 import org.study.cafe.member.vo.MemberVO;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 @Controller
 @RequestMapping("/board")
-@RequiredArgsConstructor // final 필드인 boardService를 자동으로 주입합니다.
 public class BoardController {
 
-    // @Autowired를 삭제하고 final로 선언하여 중복 정의 오류를 해결했습니다.
-    private final BoardService boardService;
+    private static final Logger log = LoggerFactory.getLogger(BoardController.class);
+    private static final List<String> ALLOWED_EXT = List.of("jpg", "jpeg", "png", "gif", "webp");
+    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
+    @Autowired
+    private BoardService boardService;
 
     // 게시판 목록
     @GetMapping("/list")
@@ -65,30 +79,31 @@ public class BoardController {
     // 글쓰기 폼
     @GetMapping("/write")
     public String writeForm(HttpSession session) {
-        if (session.getAttribute("loginMember") == null) return "redirect:/member/login";
+        if (session.getAttribute("m_id") == null) return "redirect:/member/login";
         return "board/write";
     }
 
     // 글쓰기 처리
     @PostMapping("/writeOk")
     public String writeOk(BoardVO vo, HttpSession session, RedirectAttributes rttr) {
-        MemberVO m = (MemberVO) session.getAttribute("loginMember");
-        if (m != null) {
-            // MemberVO의 필드명이 username인지 userId인지 확인 필요 (일반적으로 username 사용)
-            vo.setAuthor(m.getUsername());
-        }
-
-        int result = boardService.insertBoard(vo);
-        if (result > 0) {
+        String mId = (String) session.getAttribute("m_id");
+        if (mId == null) return "redirect:/member/login";
+        vo.setAuthor(mId);
+        try {
+            boardService.insertBoard(vo);
             rttr.addFlashAttribute("msg", "게시글이 성공적으로 등록되었습니다.");
+            return "redirect:/board/list";
+        } catch (Exception e) {
+            log.error("글 등록 실패", e);
+            rttr.addFlashAttribute("errorMsg", "글 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            return "redirect:/board/write";
         }
-        return "redirect:/board/list";
     }
 
     // 수정 폼
     @GetMapping("/edit")
     public String editForm(@RequestParam String b_idx, Model model, HttpSession session) {
-        if (session.getAttribute("loginMember") == null) return "redirect:/member/login";
+        if (session.getAttribute("m_id") == null) return "redirect:/member/login";
         model.addAttribute("board", boardService.getDetail(b_idx));
         return "board/edit";
     }
@@ -96,11 +111,15 @@ public class BoardController {
     // 수정 처리
     @PostMapping("/editOk")
     public String editOk(BoardVO vo, RedirectAttributes rttr) {
-        int result = boardService.updateBoard(vo);
-        if (result > 0) {
+        try {
+            boardService.updateBoard(vo);
             rttr.addFlashAttribute("msg", "수정되었습니다.");
+            return "redirect:/board/detail?b_idx=" + vo.getB_idx();
+        } catch (Exception e) {
+            log.error("글 수정 실패", e);
+            rttr.addFlashAttribute("errorMsg", "수정 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            return "redirect:/board/edit?b_idx=" + vo.getB_idx();
         }
-        return "redirect:/board/detail?b_idx=" + vo.getB_idx();
     }
 
     // 삭제
@@ -116,8 +135,8 @@ public class BoardController {
     // 댓글 등록
     @PostMapping("/commentOk")
     public String commentOk(CommentVO vo, HttpSession session) {
-        MemberVO m = (MemberVO) session.getAttribute("loginMember");
-        if (m != null) vo.setAuthor(m.getUsername());
+        String mId = (String) session.getAttribute("m_id");
+        if (mId != null) vo.setAuthor(mId);
         boardService.insertComment(vo);
         return "redirect:/board/detail?b_idx=" + vo.getB_idx();
     }
@@ -127,5 +146,59 @@ public class BoardController {
     public String commentDelete(@RequestParam String c_idx, @RequestParam String b_idx) {
         boardService.deleteComment(c_idx, b_idx);
         return "redirect:/board/detail?b_idx=" + b_idx;
+    }
+
+    // 이미지 업로드 API
+    @PostMapping("/uploadImage")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> uploadImage(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+
+        String originalName = file.getOriginalFilename();
+        if (originalName == null || !originalName.contains(".")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "올바르지 않은 파일입니다."));
+        }
+
+        String ext = originalName.substring(originalName.lastIndexOf('.') + 1).toLowerCase();
+        if (!ALLOWED_EXT.contains(ext)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "허용되지 않는 파일 형식입니다. (jpg, png, gif, webp만 가능)"));
+        }
+
+        if (file.getSize() > MAX_IMAGE_SIZE) {
+            return ResponseEntity.badRequest().body(Map.of("error", "파일 크기는 5MB를 초과할 수 없습니다."));
+        }
+
+        try {
+            String uploadDir = request.getServletContext().getRealPath("/resources/upload/board/");
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+
+            String fileName = UUID.randomUUID().toString() + "." + ext;
+            file.transferTo(new File(dir, fileName));
+
+            String url = request.getContextPath() + "/resources/upload/board/" + fileName;
+            return ResponseEntity.ok(Map.of("url", url));
+        } catch (Exception e) {
+            log.error("이미지 업로드 실패", e);
+            return ResponseEntity.internalServerError().body(Map.of("error", "업로드 중 오류가 발생했습니다."));
+        }
+    }
+
+    @PostMapping("/report")
+    @ResponseBody
+    public String report(ReportVO vo, HttpSession session) {
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
+        if (loginMember == null) return "login_required";
+
+        vo.setReporter(loginMember.getUsername());
+
+        int result = boardService.reportBoard(vo);
+
+        if (result == -1) {
+            return "duplicate"; // 중복 신고 시 응답
+        }
+
+        return result > 0 ? "success" : "fail";
     }
 }

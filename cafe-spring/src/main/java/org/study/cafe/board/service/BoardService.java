@@ -1,11 +1,13 @@
 package org.study.cafe.board.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.study.cafe.board.vo.BoardVO;
 import org.study.cafe.board.vo.CommentVO;
+import org.study.cafe.board.vo.ReportVO;
+
 import java.util.List;
 
 public interface BoardService {
-    // 게시글 관련
     int           getCount(String category);
     int           getSearchCount(String keyword, String category);
     List<BoardVO> getBoardList(int numPerPage, int offset, String category);
@@ -13,14 +15,16 @@ public interface BoardService {
     List<BoardVO> getPopularList(int limit);
     List<BoardVO> getRecentList(int limit);
     BoardVO       getDetail(String b_idx);
-
-    int           insertBoard(BoardVO vo); // 고도화된 UI 데이터(category, tags 등) 포함
+    int           insertBoard(BoardVO vo);
     int           updateBoard(BoardVO vo);
     int           deleteBoard(String b_idx);
     int           addViews(String b_idx);
-
-    // 댓글 관련
     List<CommentVO> getComments(String b_idx);
     int           insertComment(CommentVO vo);
     int           deleteComment(String c_idx, String b_idx);
+    List<BoardVO> getMyPosts(String author);
+
+    @Transactional
+        // 신고 저장과 카운트 증가가 동시에 일어나야 함
+    int reportBoard(ReportVO vo);
 }
