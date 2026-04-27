@@ -1,13 +1,10 @@
 package org.study.mypractice01.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import jakarta.servlet.http.HttpSession;
-
+import org.springframework.web.bind.annotation.*;
 import org.study.mypractice01.service.MemberService;
 import org.study.mypractice01.vo.MemberVO;
 
@@ -17,95 +14,105 @@ public class MemberController {
     @Autowired
     private MemberService service;
 
-    // ========================================================
-    // 🚪 1. 화면(방)으로 안내하는 길잡이 역할 (@GetMapping)
-    // ========================================================
-
-    // 메인(로그인) 화면 띄우기
+    /**
+     * 1. 메인 페이지 (index.jsp) 길잡이
+     * 로그인 성공 후 "/" 주소로 올 때 404 에러를 방지합니다.
+     */
     @GetMapping("/")
-    public String showMainPage() {
+    public String home() {
         return "index";
     }
 
-    // 회원가입 화면 띄우기
-    @GetMapping("/member/joinForm")
+    /**
+     * 2. 로그인/회원가입 폼 화면 (join.jsp)
+     */
+    @GetMapping("/join")
     public String showJoinForm() {
-        return "joinForm";
+        return "join";
     }
 
-    // 로그아웃 처리 (세션 비우기)
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/";
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "join";
     }
 
-    // ========================================================
-    // 🧑‍🍳 2. 데이터를 처리하는 진짜 업무 역할 (@PostMapping)
-    // ========================================================
-
-    // [회원가입] 진짜 데이터 저장하기
-    @PostMapping("/member/join")
-    public String join(MemberVO vo, Model model) {
-        try {
-            service.join(vo);
-            return "redirect:/";
-        } catch (Exception e) {
-            model.addAttribute("errorMsg", "회원가입 중 문제가 발생했어요.");
-            return "joinForm";
-        }
-    }
-
-    // [로그인] 아이디/비번 확인 및 세션 저장
+    /**
+     * 3. 로그인 처리 (POST)
+     */
     @PostMapping("/member/loginOk")
-    public String loginOk(MemberVO vo, HttpSession session, Model model) {
-        MemberVO loginMember = service.login(vo);
-        if(loginMember != null) {
-            session.setAttribute("m_id", loginMember.getM_id());
-            session.setAttribute("m_name", loginMember.getM_name());
+    public String loginOk(String m_id, String m_pw, HttpSession session, Model model) {
+        MemberVO vo = service.login(m_id);
+
+        if (vo != null && vo.getM_pw().equals(m_pw)) {
+            // 로그인 성공 시 세션에 정보 저장
+            session.setAttribute("m_id", vo.getM_id());
+            session.setAttribute("m_name", vo.getM_name());
+            // 메인 페이지("/")로 이동
             return "redirect:/";
         } else {
+            // 로그인 실패 시 에러 메시지와 함께 다시 로그인 페이지로
             model.addAttribute("errorMsg", "아이디 또는 비밀번호가 틀렸습니다.");
-            return "index";
+            return "join";
         }
     }
 
-    // ========================================================
-    // ⚡ 3. 화면 새로고침 없이 '글자'만 주고받는 창구 (@ResponseBody)
-    // ========================================================
+    /**
+     * 4. 로그아웃 처리
+     * index.jsp의 로그아웃 버튼 주소가 "/member/logout"일 때 작동합니다.
+     */
+    @GetMapping("/member/logout")
+    public String logout(HttpSession session) {
+        // 세션 정보 삭제
+        session.invalidate();
+        // 로그아웃 후 다시 로그인 페이지로 이동
+        return "redirect:/join";
+    }
 
-    // [NEW] 아이디 중복 확인 (0: 사용가능, 1: 중복)
+    /**
+     * 5. 회원가입 처리
+     */
+    @PostMapping("/member/join")
+    public String join(MemberVO vo) {
+        service.join(vo);
+        return "redirect:/join";
+    }
+
+    /**
+     * 6. 아이디 중복 체크 (AJAX)
+     */
     @PostMapping("/member/idCheck")
     @ResponseBody
-    public int idCheck(String m_id) {
+    public int idCheck(@RequestParam("m_id") String m_id) {
         return service.idCheck(m_id);
     }
 
-    // [NEW] 아이디 찾기 (이름, 전화번호 필요)
+    /**
+     * 7. 아이디 찾기 (AJAX)
+     */
     @PostMapping("/member/findId")
     @ResponseBody
     public String findId(String m_name, String m_phone) {
-        String foundId = service.findMemberId(m_name, m_phone);
-        return (foundId != null) ? foundId : "fail";
+        String id = service.findMemberId(m_name, m_phone);
+        return (id != null) ? id : "fail";
     }
 
-    // [기존] 비밀번호 찾기 (아이디, 전화번호 필요)
+    /**
+     * 8. 비밀번호 찾기 (AJAX)
+     */
     @PostMapping("/member/findPw")
     @ResponseBody
     public String findPw(String m_id, String m_phone) {
-        String foundPw = service.findMemberPw(m_id, m_phone);
-        return (foundPw != null) ? foundPw : "fail";
+        String pw = service.findMemberPw(m_id, m_phone);
+        return (pw != null) ? pw : "fail";
     }
 
-    // [기존] 비밀번호 재설정 (아이디, 새 비번 필요)
+    /**
+     * 9. 비밀번호 재설정 (AJAX)
+     */
     @PostMapping("/member/updatePw")
     @ResponseBody
     public String updatePw(String m_id, String m_pw) {
-        try {
-            service.updatePw(m_id, m_pw);
-            return "success";
-        } catch (Exception e) {
-            return "fail";
-        }
+        service.updatePw(m_id, m_pw);
+        return "success";
     }
 }

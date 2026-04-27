@@ -4,25 +4,22 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.study.mypractice01.vo.MemberVO;
 
-@Mapper // DB 창고의 문을 여는 마스터 키 세트
+@Mapper
 public interface MemberMapper {
+    // ⚠️ 중요: @Insert, @Select 같은 "요리법"은 다 지우고 "이름"만 남깁니다.
+    // 진짜 요리법은 사용자님이 올려주신 XML에 이미 들어있으니까요!
 
-    // 1. 회원가입: 새로운 손님 정보 장부에 적기
     int join(MemberVO vo);
 
-    // 2. 로그인: 아이디로 손님 정보 찾아오기
     MemberVO login(String m_id);
 
-    // 3. 아이디 찾기: 이름과 전화번호로 아이디 검색
+    // XML에서 파라미터가 2개 이상일 때는 @Param을 붙여주는 게 안전합니다.
     String findMemberId(@Param("m_name") String m_name, @Param("m_phone") String m_phone);
 
-    // 4. 비밀번호 찾기: 아이디와 전화번호로 기존 비번 검색
     String findMemberPw(@Param("m_id") String m_id, @Param("m_phone") String m_phone);
 
-    // 5. 비밀번호 재설정: 새 비밀번호로 덮어쓰기
     void updatePw(@Param("m_id") String m_id, @Param("m_pw") String m_pw);
 
-    // 6. [NEW] 아이디 중복 확인: 같은 아이디가 몇 개 있는지 확인 (0이면 사용 가능)
+    // 드디어 완성된 중복 체크!
     int idCheck(String m_id);
-
 }
