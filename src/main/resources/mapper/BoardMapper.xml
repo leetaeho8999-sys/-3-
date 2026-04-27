@@ -101,4 +101,22 @@
         ORDER BY b_idx DESC LIMIT 10
     </select>
 
+    <insert id="insertReport" parameterType="org.study.cafe.board.vo.ReportVO">
+        INSERT INTO report_t (b_idx, reporter, reason, content)
+        VALUES (#{b_idx}, #{reporter}, #{reason}, #{content})
+    </insert>
+
+    <update id="updateReportCnt" parameterType="int">
+        UPDATE board_t
+           SET report_cnt = report_cnt + 1
+         WHERE b_idx = #{b_idx}
+    </update>
+
+    <select id="checkDuplicateReport" parameterType="org.study.cafe.board.vo.ReportVO" resultType="int">
+        SELECT COUNT(*)
+          FROM report_t
+         WHERE b_idx    = #{b_idx}
+           AND reporter = #{reporter}
+    </select>
+
 </mapper>
