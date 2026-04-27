@@ -71,7 +71,8 @@ CREATE TABLE IF NOT EXISTS board_t (
     reg_date DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     views    INT          NOT NULL DEFAULT 0,
     comments INT          NOT NULL DEFAULT 0,
-    active   TINYINT      NOT NULL DEFAULT 0 COMMENT '0=정상, 1=삭제'
+    active     TINYINT      NOT NULL DEFAULT 0 COMMENT '0=정상, 1=삭제',
+    report_cnt INT          NOT NULL DEFAULT 0 COMMENT '신고 누적 카운트'
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_0900_ai_ci;
@@ -87,6 +88,26 @@ CREATE TABLE IF NOT EXISTS comment_t (
     reg_date DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_comment_board FOREIGN KEY (b_idx)
         REFERENCES board_t(b_idx) ON DELETE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci;
+
+-- ──────────────────────────────────────────────────────────────
+-- 5-A. report_t — 게시글 신고 내역
+-- ──────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS report_t (
+    rno       INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    b_idx     INT          NOT NULL                COMMENT '신고 대상 게시글',
+    reporter  VARCHAR(50)  NOT NULL                COMMENT '신고자 m_id',
+    reason    VARCHAR(50)  NOT NULL                COMMENT '신고 사유 (드롭다운 선택)',
+    content   VARCHAR(500) NULL                    COMMENT '추가 사유 (선택)',
+    reg_date  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_report_unique (b_idx, reporter)
+        COMMENT '한 게시글당 한 회원 1회 신고',
+    CONSTRAINT fk_report_board FOREIGN KEY (b_idx)
+        REFERENCES board_t(b_idx) ON DELETE CASCADE,
+    CONSTRAINT fk_report_member FOREIGN KEY (reporter)
+        REFERENCES member(m_id) ON DELETE CASCADE
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_0900_ai_ci;

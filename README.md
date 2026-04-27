@@ -307,6 +307,7 @@ mvn spring-boot:run
 | 2026-04-24 | `cart_t` (신규) + `init_schema.sql` 통합 | 장바구니 테이블 신설 (`cart_idx`/`m_id`/`menu_name`/`temperature`/`size`/`quantity`/`unit_price`/`reg_date` + FK→member) + `init_schema.sql` 을 "최종 완성본" 으로 업그레이드 — 기존 alter 3종 내용(menu_t size 추가금 2컬럼, order_t cancel 5컬럼, order_item_t size 1컬럼)을 본문에 통합. 신규 환경은 `init_schema.sql` 한 번만 실행하면 완성. **기존 alter_*.sql / migrate_all_*.sql / update_menu_images_*.sql 은 이력 보존 목적으로 유지 (재실행 불필요)** |
 | 2026-04-27 | `menu_t` | image_url 경로 단축 (`/resources/images/` → `/images/`) — 정적 자원 classpath 이전(`webapp/resources` → `resources/static`) 동반 |
 | 2026-04-27 | 업로드 디렉토리 외부화 | `BoardController` 가 `getServletContext().getRealPath()` 대신 `app.upload.dir` (기본 `./uploads`, Docker 는 `/app/uploads`) 사용. URL 패턴(`/resources/upload/...`) 은 보존하여 기존 게시글 호환성 유지. `docker-compose.yml` 에 `./uploads:/app/uploads` 볼륨 마운트 추가. |
+| 2026-04-27 | `report_t` (신규) + `board_t` | 게시글 신고 기능 — 신규 테이블, `board_t.report_cnt` 카운터 추가 |
 
 ---
 
