@@ -80,7 +80,17 @@
         </div>
         <input type="hidden" id="isPhoneVerified" value="false">
 
-        <input type="email" name="m_email" placeholder="이메일 주소" required>
+        <div class="input-group">
+            <input type="email" id="joinEmail" name="m_email" placeholder="이메일 주소" required>
+            <button type="button" class="sub-btn" onclick="sendEmailAuth()">인증요청</button>
+        </div>
+        <div id="emailAuthBox" style="display:none; background-color:#FFF3E0; padding:15px; border-radius:8px; margin-top:5px;">
+            <div class="input-group">
+                <input type="text" id="emailAuthInput" placeholder="메일로 받은 4자리 입력" maxlength="4">
+                <button type="button" class="sub-btn" style="background-color: #6D4C41;" onclick="verifyEmail()">확인</button>
+            </div>
+        </div>
+        <input type="hidden" id="isEmailVerified" value="false">
 
         <button type="submit" class="join-btn">가입 신청하기</button>
         <button type="button" class="cancel-btn" onclick="location.href='${pageContext.request.contextPath}/member/login'">취소</button>
@@ -96,6 +106,7 @@
 <script>
     var ctx = '${pageContext.request.contextPath}';
     var generatedCode = "";
+    var generatedEmailCode = "";
 
     function checkId() {
         var id = document.getElementById('joinId').value;
@@ -145,6 +156,46 @@
         } else showAlert("인증번호를 다시 확인해주세요.", '인증 실패', 'error');
     }
 
+    function sendEmailAuth() {
+        var email = document.getElementById('joinEmail').value;
+        if (!email) { showToast("이메일을 입력해주세요.", 'info'); return; }
+
+        showToast("인증 메일을 발송하는 중...", 'info');
+        var formData = new URLSearchParams();
+        formData.append('email', email);
+
+        fetch(ctx + '/member/mailCheck', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        })
+            .then(function(res) { return res.text(); })
+            .then(function(code) {
+                if (!code) {
+                    showAlert("메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.", '발송 실패', 'error');
+                    return;
+                }
+                generatedEmailCode = code;
+                document.getElementById('emailAuthBox').style.display = 'block';
+                document.getElementById('joinEmail').readOnly = true;
+                showToast("메일이 발송되었습니다. 메일함을 확인해 주세요.", 'success');
+            })
+            .catch(function() {
+                showAlert("네트워크 오류가 발생했습니다.", '오류', 'error');
+            });
+    }
+
+    function verifyEmail() {
+        var inputCode = document.getElementById('emailAuthInput').value;
+        if (inputCode === generatedEmailCode && generatedEmailCode !== "") {
+            showToast("이메일 인증 성공.", 'success');
+            document.getElementById('isEmailVerified').value = "true";
+            document.getElementById('emailAuthBox').style.display = 'none';
+        } else {
+            showAlert("인증번호가 올바르지 않습니다.", '인증 실패', 'error');
+        }
+    }
+
     function finalCheck() {
         if (document.getElementById('isIdChecked').value !== "true") {
             showToast("아이디 중복확인을 해주세요.", 'info'); return false;
@@ -154,6 +205,9 @@
         }
         if (document.getElementById('isPhoneVerified').value !== "true") {
             showToast("전화번호 인증을 해주세요.", 'info'); return false;
+        }
+        if (document.getElementById('isEmailVerified').value !== "true") {
+            showToast("이메일 인증을 해주세요.", 'info'); return false;
         }
         return true;
     }
