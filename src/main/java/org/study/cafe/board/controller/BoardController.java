@@ -149,6 +149,23 @@ public class BoardController {
         return "redirect:/board/detail?b_idx=" + b_idx;
     }
 
+    // 게시글 신고 API
+    @PostMapping("/report")
+    @ResponseBody
+    public String report(org.study.cafe.board.vo.ReportVO vo,
+                         jakarta.servlet.http.HttpSession session) {
+
+        // 우리 main 컨벤션: 세션 키는 "m_id" (String 그대로 보관)
+        String m_id = (String) session.getAttribute("m_id");
+        if (m_id == null) return "login_required";
+
+        vo.setReporter(m_id);
+        int result = boardService.reportBoard(vo);
+
+        if (result == -1) return "duplicate";
+        return result > 0 ? "success" : "fail";
+    }
+
     // 이미지 업로드 API
     @PostMapping("/uploadImage")
     @ResponseBody

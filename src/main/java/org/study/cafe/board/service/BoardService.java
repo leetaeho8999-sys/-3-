@@ -20,4 +20,5 @@ public interface BoardService {
     int           insertComment(CommentVO vo);
     int           deleteComment(String c_idx, String b_idx);
     List<BoardVO> getMyPosts(String author);
+    int reportBoard(org.study.cafe.board.vo.ReportVO vo);
 }

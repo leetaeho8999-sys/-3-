@@ -3,6 +3,7 @@ package org.study.cafe.board.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.study.cafe.board.vo.BoardVO;
 import org.study.cafe.board.vo.CommentVO;
+import org.study.cafe.board.vo.ReportVO;
 
 import java.util.List;
 import java.util.Map;
@@ -28,4 +29,8 @@ public interface BoardMapper {
     int        deleteComment(String c_idx);
     int        addCommentCount(String b_idx);
     int        subtractCommentCount(String b_idx);
+
+    int insertReport(ReportVO vo);
+    int updateReportCnt(int b_idx);
+    int checkDuplicateReport(ReportVO vo);
 }

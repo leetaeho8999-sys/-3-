@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.study.cafe.board.mapper.BoardMapper;
 import org.study.cafe.board.vo.BoardVO;
 import org.study.cafe.board.vo.CommentVO;
+import org.study.cafe.board.vo.ReportVO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,5 +60,21 @@ public class BoardServiceImpl implements BoardService {
 
     @Override public List<BoardVO> getMyPosts(String author) {
         return boardMapper.getMyPosts(author);
+    }
+
+    @Override
+    public int reportBoard(ReportVO vo) {
+        // 1. 중복 신고 확인 (애플리케이션 레벨 1차 가드)
+        int dup = boardMapper.checkDuplicateReport(vo);
+        if (dup > 0) return -1;
+
+        // 2. 신고 정보 저장 (DB UNIQUE 제약이 2차 안전망)
+        int result = boardMapper.insertReport(vo);
+
+        // 3. 게시글 신고 카운트 증가
+        if (result > 0) {
+            boardMapper.updateReportCnt(vo.getB_idx());
+        }
+        return result;
     }
 }
