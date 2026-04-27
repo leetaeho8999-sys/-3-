@@ -32,6 +32,9 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
+    @Autowired
+    private org.study.cafe.config.WebUploadConfig webUploadConfig;
+
     // 게시판 목록
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "1") int nowPage,
@@ -168,14 +171,18 @@ public class BoardController {
         }
 
         try {
-            String uploadDir = request.getServletContext().getRealPath("/resources/upload/board/");
-            File dir = new File(uploadDir);
+            // 외부 업로드 디렉토리 + 'board' 서브디렉토리
+            java.nio.file.Path boardDir = webUploadConfig.getResolvedPath().resolve("board");
+            java.io.File dir = boardDir.toFile();
             if (!dir.exists()) dir.mkdirs();
 
             String fileName = UUID.randomUUID().toString() + "." + ext;
             file.transferTo(new File(dir, fileName));
 
-            String url = request.getContextPath() + "/resources/upload/board/" + fileName;
+            // URL 은 기존 그대로 (DB 호환성). url-prefix 는 설정에서 가져옴
+            String url = request.getContextPath()
+                       + webUploadConfig.getUrlPrefix()
+                       + "/board/" + fileName;
             return ResponseEntity.ok(Map.of("url", url));
         } catch (Exception e) {
             log.error("이미지 업로드 실패", e);
