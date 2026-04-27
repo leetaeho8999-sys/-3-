@@ -17,22 +17,22 @@
         border-radius: 15px; box-shadow: 0 10px 25px rgba(111, 78, 55, 0.15);
         width: 440px; text-align: center; border-top: 8px solid #8B5A2B;
     }
-    h2 { color: #5D4037; margin-bottom: 20px; font-weight: 800; }
-    .input-group { display: flex; gap: 8px; margin: 8px 0; }
-    input {
+    .register-box h2 { color: #5D4037; margin-bottom: 20px; font-weight: 800; }
+    .register-box .input-group { display: flex; gap: 8px; margin: 8px 0; }
+    .register-box input {
         width: 100%; padding: 12px;
         border: 1px solid #D7CCC8; border-radius: 8px;
         background-color: #FAFAFA; transition: all 0.3s ease;
         box-sizing: border-box; font-size: 14px;
     }
-    input:focus { border-color: #8B5A2B; outline: none; box-shadow: 0 0 8px rgba(139, 90, 43, 0.3); }
-    input[readonly] { background-color: #EFEBE9; color: #8D6E63; cursor: not-allowed; }
-    button {
+    .register-box input:focus { border-color: #8B5A2B; outline: none; box-shadow: 0 0 8px rgba(139, 90, 43, 0.3); }
+    .register-box input[readonly] { background-color: #EFEBE9; color: #8D6E63; cursor: not-allowed; }
+    .register-box button {
         padding: 12px; background-color: #8B5A2B; color: white;
         border: none; border-radius: 8px; cursor: pointer;
         font-size: 14px; font-weight: bold; transition: background-color 0.3s ease;
     }
-    button:hover { background-color: #6F4E37; }
+    .register-box button:hover { background-color: #6F4E37; }
     .sub-btn { width: 140px; background-color: #A1887F; }
     .join-btn { width: 100%; margin-top: 20px; font-size: 17px; }
     .cancel-btn { width: 100%; background-color: #A0522D; margin-top: 10px; }
