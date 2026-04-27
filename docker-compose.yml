@@ -36,10 +36,13 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    environment:
+      - APP_UPLOAD_DIR=/app/uploads
     expose:
       - "8080"
     volumes:
       - ./logs:/app/logs
+      - ./uploads:/app/uploads
 
   nginx:
     image: nginx:1.27-alpine
