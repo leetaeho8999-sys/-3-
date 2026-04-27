@@ -159,30 +159,10 @@
     function sendEmailAuth() {
         var email = document.getElementById('joinEmail').value;
         if (!email) { showToast("이메일을 입력해주세요.", 'info'); return; }
-
-        showToast("인증 메일을 발송하는 중...", 'info');
-        var formData = new URLSearchParams();
-        formData.append('email', email);
-
-        fetch(ctx + '/member/mailCheck', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: formData
-        })
-            .then(function(res) { return res.text(); })
-            .then(function(code) {
-                if (!code) {
-                    showAlert("메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.", '발송 실패', 'error');
-                    return;
-                }
-                generatedEmailCode = code;
-                document.getElementById('emailAuthBox').style.display = 'block';
-                document.getElementById('joinEmail').readOnly = true;
-                showToast("메일이 발송되었습니다. 메일함을 확인해 주세요.", 'success');
-            })
-            .catch(function() {
-                showAlert("네트워크 오류가 발생했습니다.", '오류', 'error');
-            });
+        generatedEmailCode = Math.floor(1000 + Math.random() * 9000).toString();
+        showAlert("인증번호: " + generatedEmailCode, '인증번호 발송', 'info');
+        document.getElementById('emailAuthBox').style.display = 'block';
+        document.getElementById('joinEmail').readOnly = true;
     }
 
     function verifyEmail() {
