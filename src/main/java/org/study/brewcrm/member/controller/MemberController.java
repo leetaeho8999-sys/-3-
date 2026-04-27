@@ -31,7 +31,11 @@ public class MemberController {
         }
         session.setAttribute("loginMember", member);
         // 인터셉터가 보내준 원래 페이지로 복귀 (오픈 리다이렉트 방지: 내부 경로만 허용)
-        if (!redirect.isEmpty() && redirect.startsWith("/")) {
+        // `//evil.com`, `/\evil.com` 같은 protocol-relative 변종을 차단해야 외부 도메인으로 튕기지 않음
+        if (!redirect.isEmpty()
+                && redirect.startsWith("/")
+                && !redirect.startsWith("//")
+                && !redirect.startsWith("/\\")) {
             return "redirect:" + redirect;
         }
         // 역할별 기본 이동: 고객(MEMBER) → 마이페이지, 직원/관리자 → CRM 대시보드
@@ -101,8 +105,12 @@ public class MemberController {
     public String updateOk(MemberVO memberVO, HttpSession session) {
         MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
         if (loginMember == null) return "redirect:/member/login";
-        // 폼 hidden 값 변조 방어: m_idx는 반드시 세션에서 적용
+        // 폼 hidden 값 변조 방어: m_idx·linkedCustomer 는 반드시 서버(DB) 값으로 덮어씀
+        // (그대로 두면 타 고객의 c_idx 로 조작 → customer_t.phone/memo 무단 변경 가능)
         memberVO.setM_idx(loginMember.getM_idx());
+        MemberVO current = memberService.findMyPageInfo(loginMember.getM_idx());
+        if (current == null) return "redirect:/member/login";
+        memberVO.setLinkedCustomer(current.getLinkedCustomer());
         memberService.updateMember(memberVO);
         MemberVO updated = memberService.findMyPageInfo(loginMember.getM_idx());
         session.setAttribute("loginMember", updated);

@@ -255,32 +255,35 @@
           </c:when>
           <c:otherwise>
             <c:forEach var="b" items="${boards}">
-              <tr class="${b.active == 1 ? 'deleted-row' : ''}">
-                <td style="text-align:center;color:var(--text-faint)">${b.bIdx}</td>
+              <%-- 모든 필드 null-safe 렌더링 (EL 에서 null-bean property 접근 시 발생 가능한 NPE 예방) --%>
+              <tr class="${(not empty b.active and b.active == 1) ? 'deleted-row' : ''}">
+                <td style="text-align:center;color:var(--text-faint)"><c:out value="${b.bIdx}"/></td>
                 <td>
                   <span style="font-size:11px;padding:2px 7px;border-radius:6px;
-                    background:rgba(255,255,255,0.06);color:var(--text-dim)">${b.category}</span>
+                    background:rgba(255,255,255,0.06);color:var(--text-dim)"><c:out value="${b.category}"/></span>
                 </td>
                 <td class="td-name" style="max-width:220px">
                   <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">
-                    ${b.title}
-                    <c:if test="${b.active == 1}">
+                    <c:out value="${b.title}"/>
+                    <c:if test="${not empty b.active and b.active == 1}">
                       <span style="font-size:10px;color:rgba(255,80,60,0.7);margin-left:4px">[삭제됨]</span>
                     </c:if>
                   </span>
                 </td>
-                <td style="font-size:13px">${b.author}</td>
-                <td style="text-align:center;color:var(--text-faint);font-size:12px">${b.views}</td>
-                <td style="text-align:center;color:var(--text-faint);font-size:12px">${b.comments}</td>
+                <td style="font-size:13px"><c:out value="${b.author}"/></td>
+                <td style="text-align:center;color:var(--text-faint);font-size:12px">${empty b.views ? 0 : b.views}</td>
+                <td style="text-align:center;color:var(--text-faint);font-size:12px">${empty b.comments ? 0 : b.comments}</td>
                 <td style="text-align:center">
-                  <c:if test="${b.reportCount > 0}">
-                    <span class="report-badge">${b.reportCount}</span>
-                  </c:if>
-                  <c:if test="${b.reportCount == 0}">
-                    <span style="color:var(--text-faint);font-size:11px">—</span>
-                  </c:if>
+                  <c:choose>
+                    <c:when test="${not empty b.reportCount and b.reportCount > 0}">
+                      <span class="report-badge">${b.reportCount}</span>
+                    </c:when>
+                    <c:otherwise>
+                      <span style="color:var(--text-faint);font-size:11px">—</span>
+                    </c:otherwise>
+                  </c:choose>
                 </td>
-                <td class="td-faint" style="font-size:11px">${b.regDate}</td>
+                <td class="td-faint" style="font-size:11px"><c:out value="${b.regDate}"/></td>
                 <td>
                   <c:choose>
                     <c:when test="${b.active == 0}">

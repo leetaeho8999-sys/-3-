@@ -20,13 +20,13 @@
 
 <div id="app">
   <aside id="sidebar">
-    <div id="sidebar-logo">
+    <a href="${pageContext.request.contextPath}/customer/dashboard" id="sidebar-logo" style="text-decoration:none">
       <span class="logo-icon">☕</span>
       <div>
         <div class="logo-title">BREW</div>
         <div class="logo-sub">Customer CRM</div>
       </div>
-    </div>
+    </a>
     <nav id="sidebar-nav">
       <a href="${pageContext.request.contextPath}/customer/dashboard"
          class="nav-item ${activeMenu == 'dashboard' ? 'active' : ''}">
@@ -51,7 +51,7 @@
       <a href="${pageContext.request.contextPath}/customer/board"
          class="nav-item ${activeMenu == 'board' ? 'active' : ''}"
          style="position:relative">
-        <span class="nav-icon">📋</span> 게시판 관리
+        <span class="nav-icon">▤</span> 게시판 관리
         <c:if test="${pendingReportCount > 0}">
           <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
                        background:#e74c3c;color:#fff;font-size:11px;font-weight:700;
@@ -74,6 +74,7 @@
       </a>
     </nav>
     <div id="sidebar-footer">
+      <div class="sidebar-time" id="sidebar-time"></div>
       <div class="sidebar-date" id="sidebar-date"></div>
     </div>
   </aside>

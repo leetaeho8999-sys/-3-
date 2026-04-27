@@ -9,6 +9,7 @@ import org.study.brewcrm.common.Paging;
 import org.study.brewcrm.customer.mapper.CouponMapper;
 import org.study.brewcrm.customer.service.CustomerService;
 import org.study.brewcrm.customer.vo.CustomerVO;
+import org.study.brewcrm.order.mapper.OrderMapper;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -23,6 +24,7 @@ public class CustomerController {
 
     @Autowired private CustomerService customerService;
     @Autowired private CouponMapper    couponMapper;
+    @Autowired private OrderMapper     orderMapper;
 
     // ── 대시보드 ────────────────────────────────────────────
     @GetMapping("/dashboard")
@@ -36,6 +38,19 @@ public class CustomerController {
         model.addAttribute("totalMonthlyVisit", customerService.getTotalMonthlyVisit());
         List<CustomerVO> recentList = customerService.getCustomerList(5, 0, "전체");
         model.addAttribute("recentList", recentList);
+
+        // ── 웹사이트 주문(order_t) 실시간 반영 ─────────────────
+        // cafe-spring 이 같은 team3_db 의 order_t 에 PAID 로 저장하면 즉시 반영됨.
+        // order_t / order_item_t 가 미생성된 환경에서도 페이지 로드 보장.
+        try {
+            model.addAttribute("webMonthlyAmount", orderMapper.getPaidTotalThisMonth());
+            model.addAttribute("webMonthlyCount",  orderMapper.getPaidCountThisMonth());
+            model.addAttribute("recentWebOrders",  orderMapper.getRecentPaidOrders(8));
+        } catch (Exception e) {
+            model.addAttribute("webMonthlyAmount", 0L);
+            model.addAttribute("webMonthlyCount",  0);
+            model.addAttribute("recentWebOrders",  new ArrayList<>());
+        }
         return "customer/dashboard";
     }
 
@@ -102,6 +117,9 @@ public class CustomerController {
         // 보유 쿠폰 목록 (coupon_t, customer_coupon_t 미존재 시 빈 목록)
         try { model.addAttribute("customerCoupons", couponMapper.getCustomerCoupons(c_idx)); }
         catch (Exception e) { model.addAttribute("customerCoupons", new java.util.ArrayList<>()); }
+        // 웹 주문 내역 (order_t 미생성 환경에서도 페이지 로드 보장)
+        try { model.addAttribute("webOrders", orderMapper.getOrdersByCustomer(c_idx)); }
+        catch (Exception e) { model.addAttribute("webOrders", new java.util.ArrayList<>()); }
         return "customer/detail";
     }
 
@@ -132,7 +150,7 @@ public class CustomerController {
     @PostMapping("/editOk")
     public String editOk(CustomerVO customerVO) {
         return customerService.updateCustomer(customerVO) > 0
-               ? "redirect:/customer/detail?c_idx=" + customerVO.getC_idx()
+               ? "redirect:/customer/detail?c_idx=" + customerVO.getC_idx() + "&edited=true"
                : "customer/error";
     }
 

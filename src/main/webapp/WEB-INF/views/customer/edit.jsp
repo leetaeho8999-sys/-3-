@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="form-actions">
-            <button type="submit" class="btn-primary">저장하기</button>
+            <button type="submit" class="btn-primary">다음</button>
             <a href="${pageContext.request.contextPath}/customer/detail?c_idx=${customer.c_idx}" class="btn-ghost">취소</a>
         </div>
     </form>

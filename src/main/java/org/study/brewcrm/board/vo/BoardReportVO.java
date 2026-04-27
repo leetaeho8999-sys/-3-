@@ -15,4 +15,8 @@ public class BoardReportVO {
     private String targetTitle;
     private String targetContent;
     private String targetAuthor;
+
+    // Jakarta EL strict JavaBeans 규약 호환용 소문자-시작 getter/setter (BoardVO 와 동일 사유)
+    public int  getrIdx()         { return rIdx; }
+    public void setrIdx(int rIdx) { this.rIdx = rIdx; }
 }

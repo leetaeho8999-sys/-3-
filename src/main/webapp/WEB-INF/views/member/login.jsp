@@ -39,7 +39,7 @@
     </c:if>
 
     <form action="${pageContext.request.contextPath}/member/loginOk" method="post">
-      <input type="hidden" name="redirect" value="${param.redirect}">
+      <input type="hidden" name="redirect" value="<c:out value='${param.redirect}'/>">
       <div class="form-group">
         <label for="email">이메일</label>
         <input type="email" id="email" name="email" placeholder="example@email.com" required>

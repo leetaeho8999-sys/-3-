@@ -124,43 +124,15 @@
         </div>
     </div>
 
-    <%-- ── 방문 기록 폼 ─────────────────────────────────── --%>
-    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-        <div style="font-size:12px;color:var(--text-faint);margin-bottom:10px">
-            방문 결제액을 입력하면 등급이 자동으로 산정됩니다.
-        </div>
-        <form action="${pageContext.request.contextPath}/customer/addVisit"
-              method="post">
-            <input type="hidden" name="c_idx"    value="${customer.c_idx}">
-            <input type="hidden" name="redirect" value="detail">
-            <div class="visit-form-row" style="flex-wrap:wrap;gap:8px;margin-bottom:8px">
-                <input type="number" name="amount" min="0" step="100"
-                       placeholder="결제액 (원)"
-                       class="visit-amount-input">
-                <input type="text" name="menuItem" maxlength="200"
-                       placeholder="주문 메뉴 (예: 아이스 아메리카노)"
-                       class="visit-amount-input" style="width:220px">
-                <input type="text" name="note" maxlength="300"
-                       placeholder="메모 (선택)"
-                       class="visit-amount-input" style="width:200px">
-                <button type="submit" class="btn-primary">방문 기록</button>
-            </div>
-        </form>
-    </div>
-
-    <%-- ── 포인트 조정 (회원 연동 계정 보유 고객만 의미 있음) ── --%>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-      <form action="${pageContext.request.contextPath}/customer/marketing/adjustPoints"
-            method="post" class="visit-form-row">
-        <input type="hidden" name="c_idx" value="${customer.c_idx}">
-        <input type="number" name="delta" placeholder="포인트 조정 (양수=적립, 음수=차감)"
-               class="visit-amount-input" style="width:260px">
-        <button type="submit" class="btn-ghost" style="font-size:12px">포인트 조정</button>
-      </form>
-    </div>
-
     <div class="form-actions" style="margin-top:16px">
-        <a href="${pageContext.request.contextPath}/customer/edit?c_idx=${customer.c_idx}" class="btn-ghost">수정</a>
+        <c:choose>
+            <c:when test="${param.edited == 'true'}">
+                <a href="${pageContext.request.contextPath}/customer/list" class="btn-primary">수정완료</a>
+            </c:when>
+            <c:otherwise>
+                <a href="${pageContext.request.contextPath}/customer/edit?c_idx=${customer.c_idx}" class="btn-ghost">수정</a>
+            </c:otherwise>
+        </c:choose>
         <a href="${pageContext.request.contextPath}/customer/list" class="btn-ghost">목록</a>
         <a href="${pageContext.request.contextPath}/customer/delete?c_idx=${customer.c_idx}"
            class="btn-delete-lg"
@@ -463,6 +435,67 @@
                   border-radius:var(--radius-sm);color:var(--text);padding:7px 12px;font-size:13px">
     <button type="submit" class="btn-ghost" style="font-size:12px">+ 추가</button>
   </form>
+</div>
+
+<%-- ══════════════════════════════════════════════════════
+     웹사이트 주문 내역 (order_t 실시간 반영)
+     ══════════════════════════════════════════════════════ --%>
+<div class="glass-card" style="margin-top:18px">
+  <div class="card-header">
+    <h3>🌐 웹사이트 주문 내역
+      <span style="font-size:11px;font-weight:400;color:var(--text-faint);margin-left:6px">
+        (최근 20건)
+      </span>
+    </h3>
+  </div>
+  <c:choose>
+    <c:when test="${empty webOrders}">
+      <div class="empty-msg" style="padding:20px 0">웹사이트 주문 기록이 없습니다.</div>
+    </c:when>
+    <c:otherwise>
+      <table class="crm-table">
+        <thead>
+          <tr>
+            <th style="width:160px">주문번호</th>
+            <th style="width:140px">결제 시각</th>
+            <th style="text-align:right;width:110px">결제액</th>
+            <th style="text-align:center;width:90px">상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach var="o" items="${webOrders}">
+            <tr>
+              <td class="td-faint" style="font-family:monospace;font-size:11px">${o.orderId}</td>
+              <td class="td-faint" style="font-size:12px">
+                ${empty o.paidDate ? o.regDate : o.paidDate}
+              </td>
+              <td style="text-align:right;font-weight:600">
+                <fmt:formatNumber value="${o.totalAmount}" pattern="#,###"/>원
+              </td>
+              <td style="text-align:center">
+                <c:choose>
+                  <c:when test="${o.status == 'PAID'}">
+                    <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;
+                                 background:rgba(80,210,120,0.15);color:rgba(120,230,140,0.95);
+                                 border:1px solid rgba(80,210,120,0.3)">결제완료</span>
+                  </c:when>
+                  <c:when test="${o.status == 'READY'}">
+                    <span style="font-size:11px;color:rgba(240,200,60,0.9)">대기</span>
+                  </c:when>
+                  <c:when test="${o.status == 'CANCELLED'}">
+                    <span style="font-size:11px;color:var(--text-faint)">취소</span>
+                  </c:when>
+                  <c:otherwise>
+                    <span style="font-size:11px;color:rgba(255,100,80,0.85)">${o.status}</span>
+                  </c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </c:otherwise>
+  </c:choose>
 </div>
 
 <%-- ══════════════════════════════════════════════════════

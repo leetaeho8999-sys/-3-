@@ -8,6 +8,7 @@ import org.study.brewcrm.board.mapper.BoardAdminMapper;
 import org.study.brewcrm.board.vo.BoardReportVO;
 import org.study.brewcrm.board.vo.BoardVO;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ public class BoardAdminController {
         int offset = (page - 1) * PAGE_SIZE;
 
         // ── 게시판 관리 탭 ──────────────────────────────────────
+        // board_report_t 가 미생성된 환경에서도 페이지 로드를 보장하기 위해 try/catch.
+        // (getBoardList 가 LEFT JOIN board_report_t 를 포함하므로 테이블 미존재 시 실패)
         if ("board".equals(tab)) {
             Map<String, Object> params = new HashMap<>();
             params.put("keyword",  keyword);
@@ -39,12 +42,17 @@ public class BoardAdminController {
             params.put("offset",   offset);
             params.put("pageSize", PAGE_SIZE);
 
-            int total = boardAdminMapper.getBoardCount(params);
-            List<BoardVO> boards = boardAdminMapper.getBoardList(params);
-
-            model.addAttribute("boards",    boards);
-            model.addAttribute("total",     total);
-            model.addAttribute("totalPage", (int) Math.ceil((double) total / PAGE_SIZE));
+            try {
+                int total = boardAdminMapper.getBoardCount(params);
+                List<BoardVO> boards = boardAdminMapper.getBoardList(params);
+                model.addAttribute("boards",    boards);
+                model.addAttribute("total",     total);
+                model.addAttribute("totalPage", (int) Math.ceil((double) total / PAGE_SIZE));
+            } catch (Exception e) {
+                model.addAttribute("boards",    new ArrayList<>());
+                model.addAttribute("total",     0);
+                model.addAttribute("totalPage", 0);
+            }
         }
 
         // ── 신고 관리 탭 ────────────────────────────────────────
@@ -56,23 +64,32 @@ public class BoardAdminController {
             params.put("offset",     offset);
             params.put("pageSize",   PAGE_SIZE);
 
-            int total = boardAdminMapper.getReportCount(params);
-            List<BoardReportVO> reports = boardAdminMapper.getReportList(params);
-
-            model.addAttribute("reports",    reports);
-            model.addAttribute("total",      total);
-            model.addAttribute("totalPage",  (int) Math.ceil((double) total / PAGE_SIZE));
+            try {
+                int total = boardAdminMapper.getReportCount(params);
+                List<BoardReportVO> reports = boardAdminMapper.getReportList(params);
+                model.addAttribute("reports",    reports);
+                model.addAttribute("total",      total);
+                model.addAttribute("totalPage",  (int) Math.ceil((double) total / PAGE_SIZE));
+            } catch (Exception e) {
+                model.addAttribute("reports",    new ArrayList<>());
+                model.addAttribute("total",      0);
+                model.addAttribute("totalPage",  0);
+            }
         }
 
         // ── 신고 유저 탭 ────────────────────────────────────────
         if ("users".equals(tab)) {
-            model.addAttribute("reportedUsers", boardAdminMapper.getReportedUsers());
+            try { model.addAttribute("reportedUsers", boardAdminMapper.getReportedUsers()); }
+            catch (Exception e) { model.addAttribute("reportedUsers", new ArrayList<>()); }
         }
 
-        // ── 공통 요약 수치 ───────────────────────────────────────
-        model.addAttribute("pendingReportCount", boardAdminMapper.getPendingReportCount());
-        model.addAttribute("totalBoardCount",    boardAdminMapper.getTotalBoardCount());
-        model.addAttribute("deletedBoardCount",  boardAdminMapper.getDeletedBoardCount());
+        // ── 공통 요약 수치 (각각 독립 try/catch — 테이블 하나 미존재 해도 나머지는 표시) ──
+        try { model.addAttribute("pendingReportCount", boardAdminMapper.getPendingReportCount()); }
+        catch (Exception e) { model.addAttribute("pendingReportCount", 0); }
+        try { model.addAttribute("totalBoardCount",    boardAdminMapper.getTotalBoardCount()); }
+        catch (Exception e) { model.addAttribute("totalBoardCount",    0); }
+        try { model.addAttribute("deletedBoardCount",  boardAdminMapper.getDeletedBoardCount()); }
+        catch (Exception e) { model.addAttribute("deletedBoardCount",  0); }
 
         model.addAttribute("tab",        tab);
         model.addAttribute("page",       page);

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core"  prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"   prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core"      prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"       prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="pageTitle" value="대시보드"/>
 <c:set var="activeMenu" value="dashboard"/>
 <%@ include file="header.jsp" %>
@@ -35,14 +36,14 @@
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">이번 달 신규</div>
+    <div class="stat-label">이번 달 고객 신규</div>
     <div class="stat-value">
       ${newCount}
       <span style="font-size:14px;color:var(--text-faint)">명</span>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">이번 달 방문</div>
+    <div class="stat-label">이번 달 총 고객님 카페 방문횟수</div>
     <div class="stat-value">
       ${totalMonthlyVisit}
       <span style="font-size:14px;color:var(--text-faint)">회</span>
@@ -51,8 +52,19 @@
   <div class="stat-card">
     <div class="stat-label">이번 달 매출</div>
     <div class="stat-value">
-      <fmt:formatNumber value="${totalMonthlyAmount}" pattern="#,###"/>
+      <fmt:formatNumber value="${totalMonthlyAmount + webMonthlyAmount}" pattern="#,###"/>
       <span style="font-size:14px;color:var(--text-faint)">원</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-faint);margin-top:6px">
+      오프라인 <fmt:formatNumber value="${totalMonthlyAmount}" pattern="#,###"/>원
+      &nbsp;+&nbsp; 웹 <fmt:formatNumber value="${webMonthlyAmount}" pattern="#,###"/>원
+    </div>
+  </div>
+  <div class="stat-card" style="border-color:rgba(100,180,255,0.28)">
+    <div class="stat-label">🌐 웹 주문 건수</div>
+    <div class="stat-value" style="color:rgba(130,190,255,0.95)">
+      ${webMonthlyCount}
+      <span style="font-size:14px;color:var(--text-faint)">건</span>
     </div>
   </div>
 </div>
@@ -79,6 +91,80 @@
               <td><span class="grade-badge grade-${c.grade}">${c.grade}</span></td>
               <td class="td-muted">${c.visitCount}회</td>
               <td class="td-faint">${c.regDate}</td>
+            </tr>
+          </c:forEach>
+        </c:otherwise>
+      </c:choose>
+    </tbody>
+  </table>
+</div>
+
+<%-- ══════════════════════════════════════════════════════
+     최근 웹사이트 주문 (order_t 실시간 반영)
+     ══════════════════════════════════════════════════════ --%>
+<div class="glass-card" style="margin-top:24px">
+  <div class="card-header">
+    <h3>🌐 최근 웹사이트 주문
+      <span style="font-size:11px;font-weight:400;color:var(--text-faint);margin-left:6px">
+        cafe-spring 결제 완료 → 실시간 반영
+      </span>
+    </h3>
+    <span style="font-size:12px;color:var(--text-faint)">결제완료 ${webMonthlyCount}건 / 이번달</span>
+  </div>
+  <table class="crm-table">
+    <thead>
+      <tr>
+        <th>주문번호</th>
+        <th>주문자</th>
+        <th>등급</th>
+        <th style="text-align:right">결제액</th>
+        <th>결제시각</th>
+        <th style="text-align:center">상태</th>
+      </tr>
+    </thead>
+    <tbody>
+      <c:choose>
+        <c:when test="${empty recentWebOrders}">
+          <tr><td colspan="6" class="empty-msg">웹사이트 결제 내역이 없습니다.</td></tr>
+        </c:when>
+        <c:otherwise>
+          <c:forEach var="o" items="${recentWebOrders}">
+            <tr>
+              <td class="td-faint" style="font-family:monospace;font-size:11px">
+                <c:choose>
+                  <c:when test="${fn:length(o.orderId) > 12}">
+                    ${fn:substring(o.orderId, 0, 8)}…${fn:substring(o.orderId, fn:length(o.orderId)-4, fn:length(o.orderId))}
+                  </c:when>
+                  <c:otherwise>${o.orderId}</c:otherwise>
+                </c:choose>
+              </td>
+              <td class="td-name">
+                <c:choose>
+                  <c:when test="${not empty o.c_idx}">
+                    <a href="${pageContext.request.contextPath}/customer/detail?c_idx=${o.c_idx}">${o.customerName}</a>
+                  </c:when>
+                  <c:otherwise>
+                    <span class="td-faint">${o.customerName}</span>
+                    <span style="font-size:10px;color:var(--text-faint);margin-left:4px">(미연결)</span>
+                  </c:otherwise>
+                </c:choose>
+              </td>
+              <td>
+                <c:if test="${not empty o.customerGrade}">
+                  <span class="grade-badge grade-${o.customerGrade}">${o.customerGrade}</span>
+                </c:if>
+              </td>
+              <td style="text-align:right;font-weight:600">
+                <fmt:formatNumber value="${o.totalAmount}" pattern="#,###"/>원
+              </td>
+              <td class="td-faint" style="font-size:12px">
+                ${empty o.paidDate ? o.regDate : o.paidDate}
+              </td>
+              <td style="text-align:center">
+                <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;
+                             background:rgba(80,210,120,0.15);color:rgba(120,230,140,0.95);
+                             border:1px solid rgba(80,210,120,0.3)">결제완료</span>
+              </td>
             </tr>
           </c:forEach>
         </c:otherwise>

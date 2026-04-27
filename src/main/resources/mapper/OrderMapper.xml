@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.brewcrm.order.mapper.OrderMapper">
+
+    <!--
+        order_t 는 varchar PK(order_id) + m_id(cafe-spring member PK) 구조.
+        CRM 측 고객 연결은:
+           order_t.m_id → member.m_id → member.m_email
+                        → member_t.email → member_t.linked_customer → customer_t.c_idx
+        비회원/미연결 주문은 c_idx 가 NULL 로 반환된다.
+    -->
+
+    <resultMap id="orderResultMap" type="OrderVO">
+        <id     column="order_id"      property="orderId"/>
+        <result column="m_id"          property="m_id"/>
+        <result column="total_amount"  property="totalAmount"/>
+        <result column="status"        property="status"/>
+        <result column="payment_key"   property="paymentKey"/>
+        <result column="reg_date"      property="regDate"/>
+        <result column="paid_date"     property="paidDate"/>
+        <result column="c_idx"         property="c_idx"/>
+        <result column="customer_name" property="customerName"/>
+        <result column="customer_grade" property="customerGrade"/>
+        <result column="member_email"  property="memberEmail"/>
+    </resultMap>
+
+    <resultMap id="orderItemResultMap" type="OrderItemVO">
+        <id     column="oi_idx"      property="oiIdx"/>
+        <result column="order_id"    property="orderId"/>
+        <result column="menu_name"   property="menuName"/>
+        <result column="temperature" property="temperature"/>
+        <result column="quantity"    property="quantity"/>
+        <result column="unit_price"  property="unitPrice"/>
+        <result column="subtotal"    property="subtotal"/>
+    </resultMap>
+
+    <!-- 이번달 결제완료 매출 합계 (paid_date 기준, null 이면 reg_date) -->
+    <select id="getPaidTotalThisMonth" resultType="long">
+        SELECT COALESCE(SUM(total_amount), 0)
+        FROM order_t
+        WHERE status = 'PAID'
+          AND DATE_FORMAT(COALESCE(paid_date, reg_date), '%Y-%m')
+              = DATE_FORMAT(NOW(), '%Y-%m')
+    </select>
+
+    <!-- 이번달 결제완료 주문 건수 -->
+    <select id="getPaidCountThisMonth" resultType="int">
+        SELECT COUNT(*)
+        FROM order_t
+        WHERE status = 'PAID'
+          AND DATE_FORMAT(COALESCE(paid_date, reg_date), '%Y-%m')
+              = DATE_FORMAT(NOW(), '%Y-%m')
+    </select>
+
+    <!--
+        최근 결제완료 주문 + CRM 고객 연결 (대시보드용).
+        고객명 우선순위: customer_t.name → member.m_name → '-'
+    -->
+    <select id="getRecentPaidOrders" parameterType="int" resultMap="orderResultMap">
+        SELECT
+            o.order_id,
+            o.m_id,
+            o.total_amount,
+            o.status,
+            o.payment_key,
+            o.reg_date,
+            o.paid_date,
+            ct.c_idx                                        AS c_idx,
+            COALESCE(ct.name, cs.m_name, '-')               AS customer_name,
+            ct.grade                                        AS customer_grade,
+            cs.m_email                                      AS member_email
+        FROM order_t o
+        LEFT JOIN member   cs ON o.m_id = cs.m_id
+        LEFT JOIN member_t mt ON mt.email = cs.m_email AND mt.active = 0
+        LEFT JOIN customer_t ct ON ct.c_idx = mt.linked_customer AND ct.active = 0
+        WHERE o.status = 'PAID'
+        ORDER BY COALESCE(o.paid_date, o.reg_date) DESC
+        LIMIT #{limit}
+    </select>
+
+    <!--
+        특정 CRM 고객의 웹 주문 내역.
+        c_idx → member_t.linked_customer → member_t.email → member.m_email → order_t.m_id
+    -->
+    <select id="getOrdersByCustomer" parameterType="String" resultMap="orderResultMap">
+        SELECT
+            o.order_id,
+            o.m_id,
+            o.total_amount,
+            o.status,
+            o.payment_key,
+            o.reg_date,
+            o.paid_date
+        FROM order_t o
+        WHERE o.m_id IN (
+            SELECT cs.m_id
+            FROM member cs
+            JOIN member_t mt ON mt.email = cs.m_email AND mt.active = 0
+            WHERE mt.linked_customer = #{c_idx}
+        )
+        ORDER BY COALESCE(o.paid_date, o.reg_date) DESC
+        LIMIT 20
+    </select>
+
+    <!-- 주문 상세 아이템 -->
+    <select id="getOrderItems" parameterType="String" resultMap="orderItemResultMap">
+        SELECT oi_idx, order_id, menu_name, temperature, quantity, unit_price, subtotal
+        FROM order_item_t
+        WHERE order_id = #{orderId}
+        ORDER BY oi_idx
+    </select>
+
+</mapper>
