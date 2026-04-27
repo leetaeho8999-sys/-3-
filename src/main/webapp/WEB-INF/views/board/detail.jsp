@@ -109,6 +109,47 @@
         border: 1px solid #fca5a5; transition: background .2s;
     }
     .btn-del:hover { background: #fecaca; }
+    .btn-report {
+        display: inline-flex;
+        align-items: center;
+        padding: .55rem 1.2rem;
+        background: #fff;
+        color: #dc2626;
+        border-radius: 4px;
+        font-size: .875rem;
+        font-weight: 600;
+        border: 1px solid #fca5a5;
+        transition: all .2s;
+        cursor: pointer;
+    }
+    .btn-report:hover { background: #fff1f2; border-color: #dc2626; }
+
+    /* 신고 모달 */
+    .report-modal-overlay {
+        display: none; position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 10000;
+        backdrop-filter: blur(2px);
+    }
+    .report-modal-card {
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px; max-width: 90vw;
+        background: #fff; border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        padding: 1.5rem;
+    }
+    .report-modal-title { margin: 0 0 .5rem; color: var(--rown-dark); }
+    .report-select, .report-textarea {
+        width: 100%; padding: .65rem;
+        border: 1px solid var(--rown-border);
+        border-radius: 4px; outline: none;
+        margin-bottom: 1rem;
+        font-family: inherit;
+    }
+    .report-textarea { height: 100px; resize: none; }
+    .report-modal-footer { display: flex; gap: .5rem; justify-content: flex-end; }
 
     /* 댓글 섹션 */
     .comment-area { padding: 1rem 0; }
@@ -248,6 +289,9 @@
                 <div class="board-detail-actions">
                     <a href="${pageContext.request.contextPath}/board/list" class="btn-back">← 목록으로</a>
                     <div class="owner-btns">
+                        <c:if test="${not empty sessionScope.m_id and sessionScope.m_id != board.author}">
+                            <button type="button" class="btn-report" onclick="openReportModal()">신고</button>
+                        </c:if>
                         <c:if test="${not empty sessionScope.m_id and sessionScope.m_id == board.author}">
                             <a href="${pageContext.request.contextPath}/board/edit?b_idx=${board.b_idx}" class="btn-edit">수정</a>
                             <a href="${pageContext.request.contextPath}/board/delete?b_idx=${board.b_idx}" class="btn-del"
@@ -325,9 +369,72 @@
     </main>
 </div>
 
+<div id="reportModalOverlay" class="report-modal-overlay">
+    <div class="report-modal-card">
+        <h3 class="report-modal-title">게시글 신고</h3>
+        <p style="font-size: 0.85rem; color: var(--rown-muted); margin-bottom: 1rem;">
+            부적절한 게시글에 대해 사유를 선택해 주세요.
+        </p>
+        <form id="reportForm">
+            <input type="hidden" name="b_idx" value="${board.b_idx}">
+            <select name="reason" class="report-select">
+                <option value="부적절한 홍보/스팸">부적절한 홍보/스팸</option>
+                <option value="욕설 및 비하 발언">욕설 및 비하 발언</option>
+                <option value="음란성/청소년유해">음란성/청소년 유해물</option>
+                <option value="도배/사기성 게시글">도배/사기성 게시글</option>
+                <option value="기타">기타</option>
+            </select>
+            <textarea name="content" class="report-textarea"
+                      placeholder="추가 사유가 있다면 입력해 주세요. (선택사항)"></textarea>
+            <div class="report-modal-footer">
+                <button type="button" class="btn-back" onclick="closeReportModal()">취소</button>
+                <button type="button" class="btn-del"
+                        style="background: var(--rown-dark); color: var(--rown-gold); border-color: var(--rown-dark);"
+                        onclick="submitReport()">신고하기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     const msg = "${msg}";
     if (msg) showToast(msg, 'info');
+
+    function openReportModal()  { document.getElementById('reportModalOverlay').style.display = 'block'; }
+    function closeReportModal() { document.getElementById('reportModalOverlay').style.display = 'none';  }
+
+    function submitReport() {
+        const form = document.getElementById('reportForm');
+        const data = new URLSearchParams(new FormData(form));
+
+        fetch('${pageContext.request.contextPath}/board/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: data
+        })
+        .then(r => r.text())
+        .then(res => {
+            if (res === 'success') {
+                (typeof showToast === 'function')
+                    ? showToast('신고가 정상적으로 접수되었습니다.', 'info')
+                    : alert('신고가 정상적으로 접수되었습니다.');
+                closeReportModal();
+            } else if (res === 'duplicate') {
+                (typeof showToast === 'function')
+                    ? showToast('이미 신고하신 게시글입니다.', 'error')
+                    : alert('이미 신고하신 게시글입니다.');
+                closeReportModal();
+            } else if (res === 'login_required') {
+                alert('로그인이 필요합니다.');
+                location.href = '${pageContext.request.contextPath}/member/login';
+            } else {
+                (typeof showToast === 'function')
+                    ? showToast('신고 처리 중 오류가 발생했습니다.', 'error')
+                    : alert('신고 처리 중 오류가 발생했습니다.');
+            }
+        })
+        .catch(() => alert('네트워크 오류'));
+    }
 </script>
 
 <%@ include file="../common/footer.jsp" %>
