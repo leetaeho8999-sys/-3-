@@ -41,6 +41,9 @@ public class MemberController {
     @Autowired
     private PointService pointService;
 
+    @Autowired
+    private org.study.cafe.member.service.EmailService emailService;
+
     // ── /member → /member/login 리다이렉트 ───────────────────────────────
     @GetMapping({"", "/"})
     public String root() {
@@ -122,6 +125,19 @@ public class MemberController {
     @ResponseBody
     public int idCheck(String m_id) {
         return service.idCheck(m_id);
+    }
+
+    /**
+     * 이메일 인증 코드 발송. 성공 시 4자리 코드 문자열 응답 (클라이언트가 보관).
+     * 메일 발송 실패 시 빈 문자열 "" 응답 → 클라이언트가 분기.
+     * (별도 EmailController 를 만들지 않고 MemberController 에 통합:
+     *  회원가입 흐름의 일부이고, idCheck 와 같은 책임 영역이라.)
+     */
+    @PostMapping("/mailCheck")
+    @ResponseBody
+    public String mailCheck(@RequestParam("email") String email) {
+        if (email == null || email.isBlank()) return "";
+        return emailService.sendAuthCode(email);
     }
 
     // ── 아이디 찾기 ───────────────────────────────────────────────────────
