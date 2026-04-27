@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="pageTitle" value="멤버십 — 로운"/>
 <%@ include file="../common/header.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/membership.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/membership.css">
 
 <!-- ── 히어로 ── -->
 <div class="ms-hero">

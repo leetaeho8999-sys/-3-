@@ -3,7 +3,7 @@
 <c:set var="pageTitle" value="오시는 길 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/contact.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/contact.css">
 
 <main>
 

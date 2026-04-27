@@ -4,8 +4,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <c:set var="pageTitle" value="마이페이지 — 로운"/>
 <%@ include file="../common/header.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/mypage.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/mypage-theme.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage-theme.css">
 
 <div class="mp-page">
 
@@ -507,5 +507,5 @@
 </div>
 
 <script>window.ctxPath = '${pageContext.request.contextPath}';</script>
-<script src="${pageContext.request.contextPath}/resources/js/my-orders.js"></script>
+<script src="${pageContext.request.contextPath}/js/my-orders.js"></script>
 <%@ include file="../common/footer.jsp" %>

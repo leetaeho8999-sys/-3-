@@ -8,9 +8,9 @@
   <title>${not empty pageTitle ? pageTitle : '로운'}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/ui-dialog.css">
-  <script src="${pageContext.request.contextPath}/resources/js/ui-dialog.js"></script>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ui-dialog.css">
+  <script src="${pageContext.request.contextPath}/js/ui-dialog.js"></script>
 </head>
 <body>
 <header class="site-header" id="site-header">

@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/chatbot.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/chatbot.css">
 
 <button id="openBtn" onclick="openChat()">☕ AI 상담</button>
 
@@ -29,4 +29,4 @@
 </div>
 
 <script>var chatCtx = '${pageContext.request.contextPath}';</script>
-<script src="${pageContext.request.contextPath}/resources/js/chatbot.js"></script>
+<script src="${pageContext.request.contextPath}/js/chatbot.js"></script>

@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"  prefix="fn"  %>
 <c:set var="pageTitle" value="메뉴 — 로운"/>
 <%@ include file="../common/header.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/menu-full.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/menu-full.css">
 
 <div class="menu-page">
 
@@ -362,14 +362,14 @@
 </div>
 
 <script src="https://js.tosspayments.com/v1/payment"></script>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/order.css?v=20260427c">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/order.css?v=20260427c">
 <script>
   window.contextPath      = '${pageContext.request.contextPath}';
   window.customerName     = '${sessionScope.m_name}';
   window.userPointBalance = ${userPointBalance != null ? userPointBalance : 0};
 </script>
-<script src="${pageContext.request.contextPath}/resources/js/menu.js?v=20260424"></script>
-<script src="${pageContext.request.contextPath}/resources/js/detail.js?v=20260424"></script>
-<script src="${pageContext.request.contextPath}/resources/js/order.js?v=20260427"></script>
+<script src="${pageContext.request.contextPath}/js/menu.js?v=20260424"></script>
+<script src="${pageContext.request.contextPath}/js/detail.js?v=20260424"></script>
+<script src="${pageContext.request.contextPath}/js/order.js?v=20260427"></script>
 
 <%@ include file="../common/footer.jsp" %>

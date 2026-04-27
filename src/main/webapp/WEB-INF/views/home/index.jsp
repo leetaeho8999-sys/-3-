@@ -3,7 +3,7 @@
 <c:set var="pageTitle" value="로운 — Our Own Way to Bloom"/>
 <%@ include file="../common/header.jsp" %>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/home.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/home.css">
 
 
 <main>
@@ -51,7 +51,7 @@
   <div class="rn-story__inner">
     <div class="rn-story__img-wrap">
       <img class="rn-story__img"
-        src="${pageContext.request.contextPath}/resources/images/barista-drip.jpg"
+        src="${pageContext.request.contextPath}/images/barista-drip.jpg"
         alt="로운 카페 내부" loading="lazy">
       <div class="rn-story__badge">SINCE<br>2025<br>ROWOON</div>
     </div>
@@ -103,7 +103,7 @@
     <div class="rn-grid">
       <a href="${pageContext.request.contextPath}/menu/list" class="rn-card rn-card--wide">
         <img class="rn-card__img"
-          src="${pageContext.request.contextPath}/resources/images/espresso.jpg"
+          src="${pageContext.request.contextPath}/images/espresso.jpg"
           alt="커피 메뉴" loading="lazy">
         <div class="rn-card__overlay"></div>
         <div class="rn-card__body">
@@ -115,7 +115,7 @@
       </a>
       <a href="${pageContext.request.contextPath}/about" class="rn-card">
         <img class="rn-card__img"
-          src="${pageContext.request.contextPath}/resources/images/cafe-interior.jpg"
+          src="${pageContext.request.contextPath}/images/cafe-interior.jpg"
           alt="카페 공간" loading="lazy">
         <div class="rn-card__overlay"></div>
         <div class="rn-card__body">
@@ -127,7 +127,7 @@
       </a>
       <a href="${pageContext.request.contextPath}/membership/list" class="rn-card">
         <img class="rn-card__img"
-          src="${pageContext.request.contextPath}/resources/images/barista-team.jpg"
+          src="${pageContext.request.contextPath}/images/barista-team.jpg"
           alt="멤버십" loading="lazy">
         <div class="rn-card__overlay"></div>
         <div class="rn-card__body">
@@ -139,7 +139,7 @@
       </a>
       <a href="${pageContext.request.contextPath}/board/list" class="rn-card">
         <img class="rn-card__img"
-          src="${pageContext.request.contextPath}/resources/images/beans-origin.jpg"
+          src="${pageContext.request.contextPath}/images/beans-origin.jpg"
           alt="커뮤니티" loading="lazy">
         <div class="rn-card__overlay"></div>
         <div class="rn-card__body">
@@ -151,7 +151,7 @@
       </a>
       <a href="${pageContext.request.contextPath}/chat" class="rn-card">
         <img class="rn-card__img"
-          src="${pageContext.request.contextPath}/resources/images/latte-swan.jpg"
+          src="${pageContext.request.contextPath}/images/latte-swan.jpg"
           alt="AI 상담" loading="lazy">
         <div class="rn-card__overlay"></div>
         <div class="rn-card__body">
@@ -176,7 +176,7 @@
       <a href="${pageContext.request.contextPath}/menu/list" class="rn-menu-card">
         <div class="rn-menu-card__img-wrap">
           <img class="rn-menu-card__img"
-            src="${pageContext.request.contextPath}/resources/images/americano.jpg"
+            src="${pageContext.request.contextPath}/images/americano.jpg"
             alt="아메리카노" loading="lazy">
         </div>
         <div class="rn-menu-card__body">
@@ -192,7 +192,7 @@
       <a href="${pageContext.request.contextPath}/menu/list" class="rn-menu-card">
         <div class="rn-menu-card__img-wrap">
           <img class="rn-menu-card__img"
-            src="${pageContext.request.contextPath}/resources/images/cafe-latte.jpg"
+            src="${pageContext.request.contextPath}/images/cafe-latte.jpg"
             alt="카페라떼" loading="lazy">
         </div>
         <div class="rn-menu-card__body">
@@ -224,7 +224,7 @@
       <a href="${pageContext.request.contextPath}/menu/list" class="rn-menu-card">
         <div class="rn-menu-card__img-wrap">
           <img class="rn-menu-card__img"
-            src="${pageContext.request.contextPath}/resources/images/cold-brew.jpg"
+            src="${pageContext.request.contextPath}/images/cold-brew.jpg"
             alt="콜드브루" loading="lazy">
         </div>
         <div class="rn-menu-card__body">
@@ -415,6 +415,6 @@
   </div>
 </footer>
 
-<script src="${pageContext.request.contextPath}/resources/js/home.js"></script>
+<script src="${pageContext.request.contextPath}/js/home.js"></script>
 
 <%@ include file="../common/footer.jsp" %>

@@ -3,7 +3,7 @@
 <c:set var="pageTitle" value="아메리 AI 상담 — 로운"/>
 <%@ include file="../common/header.jsp" %>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/chat-page.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat-page.css">
 
 <div class="ac-page">
 
@@ -88,6 +88,6 @@
 var ctx      = '${pageContext.request.contextPath}';
 var nickname = '${not empty sessionScope.m_name ? sessionScope.m_name : "손님"}';
 </script>
-<script src="${pageContext.request.contextPath}/resources/js/chat-page.js"></script>
+<script src="${pageContext.request.contextPath}/js/chat-page.js"></script>
 
 <%@ include file="../common/footer.jsp" %>

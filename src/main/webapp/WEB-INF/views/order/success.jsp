@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"  prefix="fmt" %>
 <c:set var="pageTitle" value="결제 완료 — 로운"/>
 <%@ include file="../common/header.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/order.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/order.css">
 
 <div class="od-page">
   <div class="od-card">

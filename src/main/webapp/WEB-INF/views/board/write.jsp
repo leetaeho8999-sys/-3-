@@ -3,7 +3,7 @@
 <c:set var="pageTitle" value="새 글 작성 — 게시판"/>
 <%@ include file="../common/header.jsp" %>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board-form.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/board-form.css">
 
 <div class="bf-page">
 

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="pageTitle" value="소개 — 로운"/>
 <%@ include file="../common/header.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/about.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/about.css">
 
 <!-- ── 히어로 ── -->
 <div class="ab-hero">

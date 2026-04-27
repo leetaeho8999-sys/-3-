@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="pageTitle" value="본인 확인 — 마이페이지"/>
 <%@ include file="../common/header.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/auth.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/mypage-theme.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/auth.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage-theme.css">
 
 <div class="auth-page">
   <div class="auth-wrap">

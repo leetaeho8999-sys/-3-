@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="pageTitle" value="게시판 — 로운"/>
 <%@ include file="../common/header.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/board.css">
 
 <style>
     .bd-title-link {

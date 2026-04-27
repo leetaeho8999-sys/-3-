@@ -6,7 +6,7 @@
   CSS 는 비로그인 상태에서도 옵션 모달의 .order-btn-row 스타일이
   필요하므로 <c:if> 바깥에서 항상 로드.
 ──────────────────────────────────────────────── --%>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/cart-panel.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/cart-panel.css">
 
 <c:if test="${not empty sessionScope.m_id}">
 <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
@@ -53,5 +53,5 @@
     window.userPointBalance = ${userPointBalance != null ? userPointBalance : 0};
 </script>
 <script src="https://js.tosspayments.com/v1/payment"></script>
-<script src="${pageContext.request.contextPath}/resources/js/cart.js"></script>
+<script src="${pageContext.request.contextPath}/js/cart.js"></script>
 </c:if>

@@ -52,7 +52,7 @@
     </div>
   </div>
 </footer>
-<script src="${pageContext.request.contextPath}/resources/js/app.js"></script>
+<script src="${pageContext.request.contextPath}/js/app.js"></script>
 <%@ include file="chatbot.jsp" %>
 </body>
 </html>
