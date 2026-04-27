@@ -20,9 +20,9 @@ logs/
 # DB 백업 파일 (mysqldump) — 민감 데이터 포함 가능
 backup/
 
-# 업로드된 이미지 (서버 로컬 파일)
-src/main/webapp/resources/upload/board/*
-!src/main/webapp/resources/upload/board/.gitkeep
+# 사용자 업로드 파일 (서버 로컬, 외부 볼륨 마운트 대상)
+uploads/board/*
+!uploads/board/.gitkeep
 
 # Docker MySQL 초기화 SQL (덤프 파일은 민감 데이터 포함)
 mysql-init/*.sql
