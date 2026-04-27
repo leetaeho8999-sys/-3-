@@ -96,11 +96,12 @@
                     </c:when>
                     <c:otherwise>
                         <c:forEach var="b" items="${list}">
-                            <tr style="border-bottom: 1px solid #f9f9f9;">
+                            <tr style="border-bottom: 1px solid #f9f9f9; ${b.category == '공지' ? 'background:#fff8e1;' : ''}">
                                 <td style="padding: 1rem; text-align: center;">
                                     <span class="c-badge cat-${b.category}">${b.category}</span>
                                 </td>
                                 <td>
+                                    <c:if test="${b.category == '공지'}">📌 </c:if>
                                     <a href="${pageContext.request.contextPath}/board/detail?b_idx=${b.b_idx}"
                                        class="bd-title-link">${b.title}</a>
                                     <c:if test="${b.comments > 0}">

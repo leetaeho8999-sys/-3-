@@ -27,8 +27,8 @@
         <div class="bf-group">
           <label class="bf-label">카테고리</label>
           <select name="category" class="bf-select">
-            <c:forEach var="cat" items="${['질문','후기','정보','자유','건의']}">
-              <option value="${cat}">${cat}</option>
+            <c:forEach var="cat" items="${['공지','질문','후기','정보','자유','건의']}">
+              <option value="${cat}" ${cat == '질문' ? 'selected' : ''}>${cat}</option>
             </c:forEach>
           </select>
         </div>

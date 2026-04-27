@@ -27,7 +27,9 @@
     <select id="getBoardList" parameterType="map" resultMap="boardMap">
         SELECT * FROM board_t WHERE active = 0
         <if test="category != null"> AND category = #{category} </if>
-        ORDER BY b_idx DESC
+        ORDER BY
+        <if test="category == null">(category = '공지') DESC,</if>
+        b_idx DESC
         LIMIT #{numPerPage} OFFSET #{offset}
     </select>
 
@@ -35,7 +37,9 @@
         SELECT * FROM board_t WHERE active = 0
         AND (title LIKE #{keyword} OR author LIKE #{keyword} OR content LIKE #{keyword})
         <if test="category != null"> AND category = #{category} </if>
-        ORDER BY b_idx DESC
+        ORDER BY
+        <if test="category == null">(category = '공지') DESC,</if>
+        b_idx DESC
         LIMIT #{numPerPage} OFFSET #{offset}
     </select>
 
