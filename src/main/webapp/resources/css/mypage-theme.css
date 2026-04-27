@@ -1,0 +1,186 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   마이페이지 다크 배경 테마 — mypage-theme.css
+   membership/list 히어로 섹션과 동일한 다크 계열 배경.
+   이 파일은 mypage_confirm.jsp + mypage.jsp 전용.
+   auth.css / mypage.css 다음에 로드해 선택적으로 덮어씀.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ─────────────────────────────────────────────────
+   CSS 변수 재정의 — 두 페이지의 루트 컨테이너에 선언.
+   inline style="color:var(--rown-text)" 등도 자동 반영.
+───────────────────────────────────────────────── */
+.auth-page,
+.mp-page {
+  --rown-text:   rgba(250, 247, 242, .85);
+  --rown-muted:  rgba(250, 247, 242, .45);
+  --rown-border: rgba(200, 169, 126, .22);
+  --rown-beige:  rgba(200, 169, 126, .10);
+}
+
+/* ─────────────────────────────────────────────────
+   공통 — 다크 배경 + 카페 이미지 오버레이
+   membership .ms-top 과 동일한 구성:
+     • background: var(--rown-dark)
+     • 배경 이미지 opacity .07 (position: fixed → 스크롤 시 고정)
+───────────────────────────────────────────────── */
+.auth-page,
+.mp-page {
+  background: var(--rown-dark);
+  position: relative;
+}
+
+.auth-page::before,
+.mp-page::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url('../images/cafe-interior.jpg');
+  background-size: cover; background-position: center;
+  opacity: .07;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   본인 확인 페이지 — .auth-page 전용
+───────────────────────────────────────────────── */
+
+/* 콘텐츠 z-index 보장 */
+.auth-page .auth-wrap { position: relative; z-index: 1; }
+
+/* 브랜드 텍스트 */
+.auth-page .auth-brand__logo      { color: var(--rown-cream); }
+.auth-page .auth-brand__logo span { color: var(--rown-gold); }
+.auth-page .auth-brand__sub       { color: rgba(250, 247, 242, .4); }
+
+/* 데코 라인 */
+.auth-page .auth-deco__line { background: rgba(200, 169, 126, .25); }
+
+/* 카드 — 글라스모피즘 (membership 카드와 동일 기법) */
+.auth-page .auth-card {
+  background: rgba(250, 247, 242, .06);
+  border-color: rgba(200, 169, 126, .2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 48px rgba(0, 0, 0, .4);
+}
+.auth-page .auth-card__title { color: var(--rown-cream); }
+.auth-page .auth-card__desc  { color: rgba(250, 247, 242, .5); }
+
+/* 폼 */
+.auth-page .auth-label { color: rgba(250, 247, 242, .55); }
+.auth-page .auth-input {
+  background: rgba(250, 247, 242, .07);
+  border-color: rgba(200, 169, 126, .25);
+  color: var(--rown-cream);
+}
+.auth-page .auth-input:focus {
+  background: rgba(250, 247, 242, .11);
+  border-color: var(--rown-gold);
+  box-shadow: 0 0 0 3px rgba(200, 169, 126, .14);
+}
+.auth-page .auth-input::placeholder { color: rgba(250, 247, 242, .28); }
+
+/* 하단 링크 */
+.auth-page .auth-foot       { color: rgba(250, 247, 242, .38); }
+.auth-page .auth-foot a     { color: var(--rown-gold); }
+.auth-page .auth-foot a:hover { color: var(--rown-cream); }
+
+/* ─────────────────────────────────────────────────
+   마이페이지 메인 — .mp-page 전용
+───────────────────────────────────────────────── */
+
+/* z-index 레이어 */
+.mp-banner,
+.mp-body { position: relative; z-index: 1; }
+
+/* 프로필 배너 */
+.mp-banner {
+  background: transparent;
+  border-bottom-color: rgba(200, 169, 126, .15);
+}
+.mp-banner__name { color: var(--rown-cream); }
+.mp-banner__id   { color: rgba(250, 247, 242, .42); }
+.mp-banner__avatar {
+  background: rgba(200, 169, 126, .12);
+  border-color: rgba(200, 169, 126, .5);
+  color: var(--rown-gold);
+}
+.mp-banner__deco-line { background: rgba(200, 169, 126, .22); }
+.mp-banner__deco-dot  { background: var(--rown-gold); }
+
+/* 탭 사이드바 */
+.mp-page .mp-tabs          { border-right-color: rgba(200, 169, 126, .2); }
+.mp-page .mp-tab-btn       { color: rgba(250, 247, 242, .38); }
+.mp-page .mp-tab-btn:hover { color: var(--rown-cream); }
+.mp-page .mp-tab-btn.active {
+  color: var(--rown-cream);
+  border-right-color: var(--rown-gold);
+}
+
+/* 카드 — 글라스모피즘 */
+.mp-page .mp-card {
+  background: rgba(250, 247, 242, .05);
+  border: 1px solid rgba(200, 169, 126, .15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.mp-page .mp-card__title {
+  color: var(--rown-cream);
+  border-bottom-color: rgba(200, 169, 126, .15);
+}
+.mp-page .mp-card__title-icon { display: inline; }
+
+/* 폼 요소 */
+.mp-page .mp-input {
+  border-bottom-color: rgba(200, 169, 126, .25);
+  color: var(--rown-cream);
+}
+.mp-page .mp-input:focus           { border-bottom-color: var(--rown-gold); }
+.mp-page .mp-input[readonly]       { color: rgba(250, 247, 242, .32); }
+.mp-page .mp-input::placeholder    { color: rgba(250, 247, 242, .25); }
+
+/* 버튼 — outline 은 다크 위에서 밝은 테두리로 */
+.mp-page .mp-btn--outline {
+  color: var(--rown-cream);
+  border-color: rgba(200, 169, 126, .35);
+}
+.mp-page .mp-btn--outline:hover { background: rgba(200, 169, 126, .1); }
+
+/* 정보 행 */
+.mp-page .mp-info-row { border-bottom-color: rgba(200, 169, 126, .12); }
+
+/* 게시글 목록 */
+.mp-page .mp-post-item        { border-bottom-color: rgba(200, 169, 126, .12); }
+.mp-page .mp-post-badge       { background: rgba(200, 169, 126, .15); color: var(--rown-gold); }
+.mp-page .mp-post-title       { color: rgba(250, 247, 242, .78); }
+.mp-page .mp-post-title:hover { color: var(--rown-gold); }
+.mp-page .mp-post-date        { color: rgba(250, 247, 242, .38); }
+.mp-page .mp-post-empty       { color: rgba(250, 247, 242, .32); }
+
+/* 알림 배너 */
+.mp-page .mp-alert--success {
+  background: rgba(22, 163, 74, .15); color: #86efac;
+  border-left-color: #16a34a;
+}
+.mp-page .mp-alert--error {
+  background: rgba(220, 38, 38, .15); color: #fca5a5;
+  border-left-color: #dc2626;
+}
+
+/* 탈퇴 경고 박스 */
+.mp-page .mp-danger-box {
+  background: rgba(220, 38, 38, .08);
+  border-color: rgba(220, 38, 38, .25);
+}
+.mp-page .mp-danger-box__title    { color: #f87171; }
+.mp-page .mp-danger-box__desc,
+.mp-page .mp-danger-box ul li     { color: rgba(250, 247, 242, .48); }
+
+/* 반응형 — 모바일 가로 탭 */
+@media (max-width: 768px) {
+  .mp-page .mp-tabs { border-bottom-color: rgba(200, 169, 126, .2); }
+  .mp-page .mp-tab-btn.active {
+    border-right-color: transparent;
+    border-bottom-color: var(--rown-gold);
+  }
+}

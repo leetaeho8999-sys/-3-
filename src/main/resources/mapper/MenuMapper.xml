@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.menu.mapper.MenuMapper">
+
+    <select id="getMenuList" parameterType="String" resultType="MenuVO">
+        SELECT m_idx,
+               name,
+               description,
+               category,
+               price,
+               ice_extra_price      AS icePrice,
+               size_upcharge_grande AS sizeUpchargeGrande,
+               size_upcharge_venti  AS sizeUpchargeVenti,
+               image_url            AS imageUrl,
+               story,
+               origin,
+               available
+          FROM menu_t
+         WHERE available = 1
+        <if test="_parameter != null"> AND category = #{_parameter} </if>
+         ORDER BY FIELD(category,'ESPRESSO','COFFEE','LATTE','NONCOFFEE','TEA','ADE','SMOOTHIE','FRAPPE','SPECIAL','DESSERT'),
+                  price ASC,
+                  m_idx ASC
+    </select>
+
+    <select id="getMenuDetail" parameterType="String" resultType="MenuVO">
+        SELECT m_idx,
+               name,
+               description,
+               category,
+               price,
+               ice_extra_price      AS icePrice,
+               size_upcharge_grande AS sizeUpchargeGrande,
+               size_upcharge_venti  AS sizeUpchargeVenti,
+               image_url            AS imageUrl,
+               story,
+               origin,
+               available
+          FROM menu_t
+         WHERE m_idx = #{m_idx}
+    </select>
+
+    <select id="findByName" parameterType="String" resultType="MenuVO">
+        SELECT m_idx,
+               name,
+               description,
+               category,
+               price,
+               ice_extra_price      AS icePrice,
+               size_upcharge_grande AS sizeUpchargeGrande,
+               size_upcharge_venti  AS sizeUpchargeVenti,
+               image_url            AS imageUrl,
+               story,
+               origin,
+               available
+          FROM menu_t
+         WHERE name = #{name}
+           AND available = 1
+         LIMIT 1
+    </select>
+
+</mapper>

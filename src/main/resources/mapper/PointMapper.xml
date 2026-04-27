@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.point.mapper.PointMapper">
+
+    <!-- 잔액 조회 (행 없으면 NULL) -->
+    <select id="getPoints" resultType="java.lang.Integer">
+        SELECT points FROM membership_t WHERE user_id = #{mId}
+    </select>
+
+    <!-- 잔액 가산 (음수 amount 는 차감) — GREATEST(0, ...) 클램프로 음수 방지 -->
+    <update id="addPoints">
+        UPDATE membership_t
+           SET points = GREATEST(0, points + #{amount})
+         WHERE user_id = #{mId}
+    </update>
+
+    <!-- 조건부 차감 — 잔액이 amount 이상일 때만 성공 -->
+    <update id="usePoints">
+        UPDATE membership_t
+           SET points = points - #{amount}
+         WHERE user_id = #{mId}
+           AND points &gt;= #{amount}
+    </update>
+
+    <insert id="insertHistory" parameterType="org.study.cafe.point.vo.PointHistoryVO">
+        INSERT INTO point_history_t
+            (m_id, type, amount, balance_after, order_id, description)
+        VALUES
+            (#{mId}, #{type}, #{amount}, #{balanceAfter}, #{orderId}, #{description})
+    </insert>
+
+    <select id="findHistoryByMember" resultType="org.study.cafe.point.vo.PointHistoryVO">
+        SELECT ph_idx        AS phIdx,
+               m_id           AS mId,
+               type,
+               amount,
+               balance_after  AS balanceAfter,
+               order_id       AS orderId,
+               description,
+               reg_date       AS regDate
+          FROM point_history_t
+         WHERE m_id = #{mId}
+         ORDER BY reg_date DESC, ph_idx DESC
+         LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countHistoryByMember" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM point_history_t WHERE m_id = #{mId}
+    </select>
+
+    <select id="findEarnedByOrder" resultType="java.lang.Integer">
+        SELECT points_earned FROM order_t WHERE order_id = #{orderId}
+    </select>
+
+    <select id="findUsedByOrder" resultType="java.lang.Integer">
+        SELECT points_used FROM order_t WHERE order_id = #{orderId}
+    </select>
+
+</mapper>

@@ -1,0 +1,402 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap');
+
+/* ===== 아메리 AI 상담 전체 페이지 ===== */
+.ameri-page {
+    display: flex;
+    height: calc(100vh - 64px);
+    margin-top: 64px;
+    background: #FAF7F2;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* ── 사이드바 ── */
+.ameri-sidebar {
+    width: clamp(200px, 22vw, 300px);
+    flex-shrink: 0;
+    background: #3B2314;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ameri-sidebar-brand {
+    padding: clamp(20px, 2.5vw, 32px) clamp(16px, 2vw, 24px) clamp(14px, 1.8vw, 20px);
+    border-bottom: 1px solid rgba(200, 169, 126, 0.2);
+}
+
+.ameri-sidebar-brand .brand-label {
+    font-size: 0.68rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #C8A97E;
+    margin-bottom: 6px;
+}
+
+.ameri-sidebar-brand .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #FAF7F2;
+    font-weight: 700;
+}
+
+.ameri-sidebar-brand .brand-sub {
+    font-size: 0.72rem;
+    color: rgba(200, 169, 126, 0.7);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* 빠른 주제 */
+.ameri-quick-section {
+    padding: 20px 16px 10px;
+}
+
+.ameri-quick-label {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(200, 169, 126, 0.6);
+    margin-bottom: 10px;
+    padding: 0 8px;
+}
+
+.ameri-quick-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 2px;
+}
+
+.ameri-quick-item:hover {
+    background: rgba(200, 169, 126, 0.12);
+}
+
+.ameri-quick-item .qi-icon {
+    font-size: 1rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ameri-quick-item .qi-text {
+    font-size: 0.8rem;
+    color: rgba(250, 247, 242, 0.75);
+    letter-spacing: 0.3px;
+}
+
+/* 사이드바 하단 */
+.ameri-sidebar-footer {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(200, 169, 126, 0.15);
+}
+
+.ameri-new-chat-btn {
+    width: 100%;
+    padding: 10px 0;
+    background: transparent;
+    border: 1px solid rgba(200, 169, 126, 0.4);
+    color: #C8A97E;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.25s;
+    border-radius: 4px;
+}
+
+.ameri-new-chat-btn:hover {
+    background: rgba(200, 169, 126, 0.15);
+    border-color: #C8A97E;
+}
+
+/* ── 메인 채팅 영역 ── */
+.ameri-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: #FAF7F2;
+}
+
+/* 채팅 헤더 */
+.ameri-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 32px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #EDE5DA;
+    flex-shrink: 0;
+}
+
+.ameri-avatar {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #C8A97E 0%, #7B4F2E 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.ameri-chat-header .ah-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #3B2314;
+    font-weight: 600;
+}
+
+.ameri-chat-header .ah-status {
+    font-size: 0.72rem;
+    color: #8C7B6E;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.ameri-chat-header .ah-badge {
+    margin-left: auto;
+    background: #F0E8DC;
+    color: #7B4F2E;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid #C8A97E;
+}
+
+/* 메시지 영역 */
+.ameri-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: clamp(16px, 2.5vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ameri-messages::-webkit-scrollbar { width: 5px; }
+.ameri-messages::-webkit-scrollbar-thumb { background: #D4C4B0; border-radius: 4px; }
+
+/* 웰컴 카드 */
+.ameri-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(24px, 3.5vw, 40px) clamp(12px, 2vw, 20px);
+    text-align: center;
+    gap: 12px;
+}
+
+.ameri-welcome .wc-icon {
+    font-size: 2.8rem;
+    margin-bottom: 4px;
+}
+
+.ameri-welcome .wc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #3B2314;
+    font-weight: 700;
+}
+
+.ameri-welcome .wc-sub {
+    font-size: 0.88rem;
+    color: #8C7B6E;
+    line-height: 1.7;
+    max-width: 380px;
+}
+
+.ameri-welcome .wc-divider {
+    width: 40px;
+    height: 1px;
+    background: #C8A97E;
+    margin: 4px auto;
+}
+
+/* 빠른 질문 카드 (웰컴) */
+.ameri-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.ameri-chip {
+    padding: 8px 18px;
+    background: #FFFFFF;
+    border: 1px solid #C8A97E;
+    color: #7B4F2E;
+    font-size: 0.8rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+}
+
+.ameri-chip:hover {
+    background: #3B2314;
+    color: #FAF7F2;
+    border-color: #3B2314;
+}
+
+/* 메시지 버블 */
+.ameri-msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.ameri-msg-row.user {
+    flex-direction: row-reverse;
+}
+
+.ameri-msg-row .row-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+}
+
+.ameri-msg-row .row-avatar.bot-av {
+    background: linear-gradient(135deg, #C8A97E 0%, #7B4F2E 100%);
+    color: #FAF7F2;
+    font-size: 0.9rem;
+}
+
+.ameri-msg-row .row-avatar.user-av {
+    background: #3B2314;
+    color: #C8A97E;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+}
+
+.ameri-bubble {
+    max-width: 65%;
+    padding: 12px 18px;
+    font-size: 0.88rem;
+    line-height: 1.75;
+    word-break: break-word;
+    position: relative;
+}
+
+.ameri-bubble.bot {
+    background: #FFFFFF;
+    color: #3D2B1F;
+    border: 1px solid #EDE5DA;
+    border-radius: 16px 16px 16px 4px;
+    box-shadow: 0 2px 8px rgba(59, 35, 20, 0.06);
+}
+
+.ameri-bubble.user {
+    background: #3B2314;
+    color: #FAF7F2;
+    border-radius: 16px 16px 4px 16px;
+}
+
+.ameri-bubble.waiting {
+    background: #F5F0E8;
+    color: #8C7B6E;
+    border: 1px solid #EDE5DA;
+    border-radius: 16px 16px 16px 4px;
+    font-style: italic;
+    border-left: 3px solid #C8A97E;
+    font-size: 0.82rem;
+    padding: 10px 16px;
+}
+
+.ameri-bubble .bubble-sender {
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #C8A97E;
+    margin-bottom: 4px;
+    font-style: normal;
+}
+
+/* ── 입력 영역 ── */
+.ameri-input-wrap {
+    padding: clamp(14px, 1.8vw, 20px) clamp(20px, 2.8vw, 32px) clamp(16px, 2vw, 24px);
+    background: #FFFFFF;
+    border-top: 1px solid #EDE5DA;
+    flex-shrink: 0;
+}
+
+.ameri-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FAF7F2;
+    border: 1px solid #C8A97E;
+    border-radius: 50px;
+    padding: 6px 8px 6px 22px;
+    transition: box-shadow 0.2s;
+}
+
+.ameri-input-row:focus-within {
+    box-shadow: 0 0 0 3px rgba(200, 169, 126, 0.2);
+    border-color: #7B4F2E;
+}
+
+.ameri-input-row input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.88rem;
+    color: #3D2B1F;
+    outline: none;
+    padding: 6px 0;
+}
+
+.ameri-input-row input::placeholder { color: #B0A090; }
+
+.ameri-send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #3B2314;
+    color: #FAF7F2;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+}
+
+.ameri-send-btn:hover {
+    background: #7B4F2E;
+    transform: scale(1.05);
+}
+
+.ameri-input-hint {
+    font-size: 0.68rem;
+    color: #B0A090;
+    text-align: center;
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 768px) {
+    .ameri-sidebar { display: none; }
+    .ameri-messages { padding: 20px 16px; }
+    .ameri-input-wrap { padding: 14px 16px 18px; }
+    .ameri-chat-header { padding: 14px 16px; }
+}

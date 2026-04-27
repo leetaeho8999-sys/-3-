@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.chat.mapper.ChatMapper">
+
+    <resultMap id="chatMap" type="org.study.cafe.chat.vo.ChatVO">
+        <result column="log_idx"    property="logIdx"/>
+        <result column="session_id" property="sessionId"/>
+        <result column="m_idx"      property="mIdx"/>
+        <result column="reg_date"   property="regDate"/>
+    </resultMap>
+
+    <insert id="insertMessage" parameterType="org.study.cafe.chat.vo.ChatVO">
+        INSERT INTO chat_log_t (session_id, m_idx, sender, message)
+        VALUES (#{sessionId}, #{mIdx}, #{sender}, #{message})
+    </insert>
+
+    <select id="getHistory" parameterType="String" resultMap="chatMap">
+        SELECT * FROM chat_log_t
+        WHERE session_id = #{sessionId}
+        ORDER BY log_idx ASC
+        LIMIT 50
+    </select>
+
+    <delete id="deleteHistory" parameterType="String">
+        DELETE FROM chat_log_t WHERE session_id = #{sessionId}
+    </delete>
+
+    <select id="getHistoryByMember" parameterType="String" resultMap="chatMap">
+        SELECT * FROM chat_log_t
+        WHERE m_idx = #{mIdx}
+        ORDER BY log_idx ASC
+        LIMIT 50
+    </select>
+
+    <delete id="deleteHistoryByMember" parameterType="String">
+        DELETE FROM chat_log_t WHERE m_idx = #{mIdx}
+    </delete>
+
+
+    <!-- AI 챗봇: 전체 키워드-응답 목록 조회 (시스템 프롬프트 컨텍스트 구성용) -->
+    <select id="findAllKeywords" resultType="map">
+        SELECT keyword, response FROM chat_keyword ORDER BY id ASC
+    </select>
+
+    <!-- AI 챗봇: 키워드 기반 힌트 조회 -->
+    <select id="findByKeyword" parameterType="String" resultType="org.study.cafe.chat.vo.ChatVO">
+        SELECT response AS message
+        FROM chat_keyword
+        WHERE #{keyword} LIKE CONCAT('%', keyword, '%')
+        ORDER BY LENGTH(keyword) DESC
+        LIMIT 1
+    </select>
+
+    <!-- AI 챗봇: 대화 기록 저장 -->
+    <insert id="saveHistory" parameterType="org.study.cafe.chat.vo.ChatHistoryVO">
+        INSERT INTO chat_history (sender, message)
+        VALUES (#{sender}, #{message})
+    </insert>
+
+    <!-- AI 챗봇: 최근 대화 기록 조회 -->
+    <select id="getAiHistory" resultType="org.study.cafe.chat.vo.ChatHistoryVO">
+        SELECT id, sender, message, created_at AS createdAt
+        FROM (
+            SELECT id, sender, message, created_at
+            FROM chat_history
+            ORDER BY id DESC
+            LIMIT 200
+        ) recent
+        ORDER BY id ASC
+    </select>
+
+    <!-- Groq 컨텍스트용: 비로그인=sessionId 기준, 로그인=mIdx 기준 최근 N개 -->
+    <select id="getContextHistory" parameterType="map" resultMap="chatMap">
+        SELECT session_id, m_idx, sender, message, reg_date FROM (
+            SELECT session_id, m_idx, sender, message, reg_date, log_idx
+            FROM chat_log_t
+            WHERE
+            <choose>
+                <when test="mIdx != null">m_idx = #{mIdx}</when>
+                <otherwise>session_id = #{sessionId}</otherwise>
+            </choose>
+            ORDER BY log_idx DESC
+            LIMIT #{limit}
+        ) recent ORDER BY log_idx ASC
+    </select>
+
+    <!-- 만족도 평가 저장 -->
+    <insert id="saveRating" parameterType="org.study.cafe.chat.vo.ChatRatingVO">
+        INSERT INTO chat_rating (bot_message, rating)
+        VALUES (#{botMessage}, #{rating})
+    </insert>
+
+</mapper>

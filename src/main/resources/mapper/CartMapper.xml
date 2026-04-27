@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.cart.mapper.CartMapper">
+
+    <select id="findExact" resultType="org.study.cafe.cart.vo.CartVO">
+        SELECT cart_idx    AS cartIdx,
+               m_id        AS mId,
+               menu_name   AS menuName,
+               temperature,
+               size,
+               quantity,
+               unit_price  AS unitPrice,
+               reg_date    AS regDate
+          FROM cart_t
+         WHERE m_id        = #{mId}
+           AND menu_name   = #{menuName}
+           AND temperature = #{temperature}
+           AND size        = #{size}
+         LIMIT 1
+    </select>
+
+    <insert id="insertItem" parameterType="org.study.cafe.cart.vo.CartVO"
+            useGeneratedKeys="true" keyProperty="cartIdx">
+        INSERT INTO cart_t (m_id, menu_name, temperature, size, quantity, unit_price)
+        VALUES (#{mId}, #{menuName}, #{temperature}, #{size}, #{quantity}, #{unitPrice})
+    </insert>
+
+    <update id="addQuantity">
+        UPDATE cart_t
+           SET quantity = quantity + #{delta}
+         WHERE cart_idx = #{cartIdx}
+           AND m_id     = #{mId}
+    </update>
+
+    <select id="findByMemberId" resultType="org.study.cafe.cart.vo.CartVO">
+        SELECT cart_idx    AS cartIdx,
+               m_id        AS mId,
+               menu_name   AS menuName,
+               temperature,
+               size,
+               quantity,
+               unit_price  AS unitPrice,
+               reg_date    AS regDate
+          FROM cart_t
+         WHERE m_id = #{mId}
+         ORDER BY cart_idx ASC
+    </select>
+
+    <update id="updateQuantity">
+        UPDATE cart_t
+           SET quantity = #{quantity}
+         WHERE cart_idx = #{cartIdx}
+           AND m_id     = #{mId}
+    </update>
+
+    <delete id="deleteByIdx">
+        DELETE FROM cart_t
+         WHERE cart_idx = #{cartIdx}
+           AND m_id     = #{mId}
+    </delete>
+
+    <delete id="deleteAllByMemberId">
+        DELETE FROM cart_t WHERE m_id = #{mId}
+    </delete>
+
+    <select id="countByMemberId" resultType="int">
+        SELECT COUNT(*) FROM cart_t WHERE m_id = #{mId}
+    </select>
+
+</mapper>

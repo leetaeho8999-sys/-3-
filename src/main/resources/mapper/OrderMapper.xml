@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.study.cafe.order.mapper.OrderMapper">
+
+    <insert id="insertOrder" parameterType="org.study.cafe.order.vo.OrderVO">
+        INSERT INTO order_t (order_id, m_id, total_amount, status, points_used)
+        VALUES (#{orderId}, #{mId}, #{totalAmount}, 'READY', #{pointsUsed})
+    </insert>
+
+    <insert id="insertOrderItem" parameterType="org.study.cafe.order.vo.OrderItemVO">
+        INSERT INTO order_item_t (order_id, menu_name, temperature, size, quantity, unit_price, subtotal)
+        VALUES (#{orderId}, #{menuName}, #{temperature}, #{size}, #{quantity}, #{unitPrice}, #{subtotal})
+    </insert>
+
+    <update id="updateOrderPaid">
+        UPDATE order_t
+        SET status = 'PAID',
+            payment_key = #{paymentKey},
+            paid_date = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateOrderFailed">
+        UPDATE order_t
+        SET status = 'FAILED'
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="cancelOrder">
+        UPDATE order_t
+           SET status        = 'CANCELLED',
+               cancel_reason = #{cancelReason},
+               cancel_memo   = #{cancelMemo},
+               cancel_date   = NOW(),
+               refund_amount = #{refundAmount},
+               refund_rate   = #{refundRate}
+         WHERE order_id = #{orderId}
+           AND m_id     = #{mId}
+           AND status   = 'PAID'
+    </update>
+
+    <select id="findByOrderId" resultType="org.study.cafe.order.vo.OrderVO">
+        SELECT order_id      AS orderId,
+               m_id          AS mId,
+               total_amount  AS totalAmount,
+               status,
+               payment_key   AS paymentKey,
+               reg_date      AS regDate,
+               paid_date     AS paidDate,
+               cancel_reason AS cancelReason,
+               cancel_memo   AS cancelMemo,
+               cancel_date   AS cancelDate,
+               refund_amount AS refundAmount,
+               refund_rate   AS refundRate,
+               points_used   AS pointsUsed,
+               points_earned AS pointsEarned
+        FROM order_t
+        WHERE order_id = #{orderId}
+    </select>
+
+    <select id="findByMemberId" resultType="org.study.cafe.order.vo.OrderVO">
+        SELECT order_id      AS orderId,
+               m_id          AS mId,
+               total_amount  AS totalAmount,
+               status,
+               payment_key   AS paymentKey,
+               reg_date      AS regDate,
+               paid_date     AS paidDate,
+               cancel_reason AS cancelReason,
+               cancel_memo   AS cancelMemo,
+               cancel_date   AS cancelDate,
+               refund_amount AS refundAmount,
+               refund_rate   AS refundRate,
+               points_used   AS pointsUsed,
+               points_earned AS pointsEarned
+        FROM order_t
+        WHERE m_id = #{mId}
+        ORDER BY reg_date DESC
+    </select>
+
+    <select id="findRecentByMemberId" resultType="org.study.cafe.order.vo.OrderVO">
+        SELECT o.order_id      AS orderId,
+               o.m_id          AS mId,
+               o.total_amount  AS totalAmount,
+               o.status,
+               o.payment_key   AS paymentKey,
+               o.reg_date      AS regDate,
+               o.paid_date     AS paidDate,
+               o.cancel_reason AS cancelReason,
+               o.cancel_memo   AS cancelMemo,
+               o.cancel_date   AS cancelDate,
+               o.refund_amount AS refundAmount,
+               o.refund_rate   AS refundRate,
+               o.points_used   AS pointsUsed,
+               o.points_earned AS pointsEarned,
+               (SELECT menu_name FROM order_item_t
+                WHERE order_id = o.order_id ORDER BY oi_idx LIMIT 1) AS firstMenuName,
+               (SELECT COUNT(*) FROM order_item_t
+                WHERE order_id = o.order_id) AS itemCount
+        FROM order_t o
+        WHERE o.m_id = #{mId}
+        ORDER BY o.reg_date DESC
+        LIMIT ${limit}
+    </select>
+
+    <update id="updatePointsEarned">
+        UPDATE order_t SET points_earned = #{amount} WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updatePointsUsed">
+        UPDATE order_t SET points_used = #{amount} WHERE order_id = #{orderId}
+    </update>
+
+    <select id="findItemsByOrderId" resultType="org.study.cafe.order.vo.OrderItemVO">
+        SELECT oi_idx     AS oiIdx,
+               order_id   AS orderId,
+               menu_name  AS menuName,
+               temperature,
+               size,
+               quantity,
+               unit_price AS unitPrice,
+               subtotal
+        FROM order_item_t
+        WHERE order_id = #{orderId}
+    </select>
+
+</mapper>

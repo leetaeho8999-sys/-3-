@@ -1,0 +1,106 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   오시는 길 페이지 — contact.css
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ── 히어로 ── */
+.ct-hero {
+  position: relative;
+  height: 42vh; min-height: 300px;
+  background: var(--rown-dark);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.ct-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url('../images/cafe-interior.jpg');
+  background-size: cover; background-position: center;
+  opacity: .1;
+}
+.ct-hero__overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(42,26,14,.5), rgba(42,26,14,.75));
+}
+.ct-hero__inner {
+  position: relative; z-index: 2;
+  text-align: center; padding: 0 1.5rem;
+}
+.ct-hero__eyebrow {
+  font-size: .6rem; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--rown-gold); margin-bottom: 1rem;
+}
+.ct-hero__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 300; color: var(--rown-cream);
+  letter-spacing: .04em; margin-bottom: .6rem;
+}
+.ct-hero__sub {
+  font-size: .9rem; color: rgba(250,247,242,.5); letter-spacing: .06em;
+}
+
+/* ── 본문 섹션 ── */
+.ct-section {
+  background: var(--rown-cream);
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem);
+}
+.ct-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.4fr;
+  gap: 4rem; align-items: start;
+}
+@media (max-width: 900px) {
+  .ct-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+}
+
+/* ── 정보 리스트 ── */
+.ct-info { display: flex; flex-direction: column; gap: 1.75rem; }
+
+.ct-item {
+  display: flex; gap: 1.1rem; align-items: flex-start;
+}
+.ct-item__icon {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--rown-beige); border: 1px solid var(--rown-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.ct-item__label {
+  font-family: var(--font-serif);
+  font-size: .8rem; font-weight: 600;
+  color: var(--rown-gold2); letter-spacing: .04em;
+  text-transform: uppercase; margin-bottom: .3rem;
+}
+.ct-item p {
+  font-size: .9rem; color: var(--rown-muted);
+  line-height: 1.7; margin: 0;
+}
+.ct-item__sub {
+  font-size: .82rem; color: var(--rown-gold2);
+}
+.ct-item__staff {
+  font-size: .82rem; color: var(--rown-gold2);
+  display: inline-block; margin-top: .2rem;
+}
+
+/* ── 지도 영역 ── */
+.ct-map {
+  display: flex; flex-direction: column; gap: .75rem;
+}
+.ct-map__iframe {
+  width: 100%; height: clamp(280px, 35vw, 440px);
+  border: 1px solid var(--rown-border);
+  border-radius: 6px;
+  display: block;
+}
+@media (max-width: 600px) {
+  .ct-map__iframe { height: 300px; }
+}
+.ct-map__link {
+  display: inline-flex; align-items: center; gap: .4rem;
+  align-self: flex-end;
+  font-size: .8rem; color: var(--rown-gold2);
+  text-decoration: none; letter-spacing: .03em;
+  transition: color .2s;
+}
+.ct-map__link:hover { color: var(--rown-dark); }

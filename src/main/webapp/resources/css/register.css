@@ -1,0 +1,108 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   회원가입 전용 — register.css
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.register-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--rown-cream);
+  padding: clamp(64px, 7vw, 80px) clamp(1rem, 4vw, 1.5rem) clamp(1.5rem, 3vw, 3rem);
+}
+.register-wrap { width: 100%; max-width: 480px; }
+
+/* 헤더 영역 */
+.register-brand { text-align: center; margin-bottom: 2.5rem; }
+.register-brand__logo {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 3vw, 2.5rem); letter-spacing: .08em;
+  color: var(--rown-dark); margin-bottom: .4rem;
+}
+.register-brand__logo span { color: var(--rown-gold2); }
+.register-brand__sub {
+  font-size: .8rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--rown-muted);
+}
+
+/* 데코 라인 */
+.register-deco {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-bottom: 2rem;
+}
+.register-deco__line { width: 32px; height: 1px; background: var(--rown-border); }
+.register-deco__dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--rown-gold); }
+
+/* 카드 */
+.register-card {
+  background: #fff;
+  border: 1px solid var(--rown-border);
+  border-radius: 6px;
+  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 2.5vw, 2rem);
+  box-shadow: 0 4px 32px rgba(42,26,14,.08);
+}
+.register-card__title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem; font-weight: 400;
+  color: var(--rown-dark); margin-bottom: .3rem;
+}
+.register-card__desc { font-size: .825rem; color: var(--rown-muted); margin-bottom: 1.75rem; }
+
+/* 폼 */
+.register-form-group { margin-bottom: 1.1rem; }
+.register-label {
+  display: block; font-size: .8rem; font-weight: 500;
+  color: var(--rown-text); margin-bottom: .4rem; letter-spacing: .02em;
+}
+.register-required { color: #c0392b; }
+.register-input {
+  width: 100%; padding: .65rem .875rem;
+  border: 1px solid var(--rown-border); border-radius: 4px;
+  font-size: .875rem; font-family: inherit;
+  outline: none; background: var(--rown-cream); color: var(--rown-dark);
+  transition: border-color .2s, background .2s;
+}
+.register-input:focus {
+  border-color: var(--rown-gold2); background: #fff;
+  box-shadow: 0 0 0 3px rgba(200,169,126,.12);
+}
+
+/* 체크박스 */
+.register-checks {
+  border-top: 1px solid var(--rown-border);
+  padding-top: 1.25rem; margin-top: .5rem;
+  display: flex; flex-direction: column; gap: .6rem;
+}
+.register-check {
+  display: flex; align-items: flex-start; gap: .5rem;
+  font-size: .825rem; color: var(--rown-muted); cursor: pointer;
+}
+.register-check input[type="checkbox"] { margin-top: .15rem; flex-shrink: 0; accent-color: var(--rown-gold2); }
+.register-check a { color: var(--rown-gold2); font-weight: 500; transition: color .2s; }
+.register-check a:hover { color: var(--rown-dark); }
+
+/* 버튼 */
+.register-submit {
+  width: 100%; padding: .75rem;
+  background: var(--rown-dark); color: var(--rown-gold);
+  border: none; border-radius: 4px;
+  font-size: .875rem; font-weight: 500; font-family: inherit;
+  letter-spacing: .04em; cursor: pointer;
+  margin-top: 1.5rem;
+  transition: background .2s, transform .15s;
+}
+.register-submit:hover { background: var(--rown-mid); transform: translateY(-1px); }
+
+/* 알림 */
+.register-alert {
+  padding: .65rem .875rem; border-radius: 4px;
+  font-size: .825rem; margin-bottom: 1rem;
+}
+.register-alert--error   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.register-alert--success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+/* 하단 링크 */
+.register-foot {
+  text-align: center; margin-top: 1.5rem;
+  font-size: .825rem; color: var(--rown-muted);
+}
+.register-foot a { color: var(--rown-gold2); font-weight: 500; transition: color .2s; }
+.register-foot a:hover { color: var(--rown-dark); }

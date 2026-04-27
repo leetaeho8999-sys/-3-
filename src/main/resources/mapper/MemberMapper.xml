@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.study.cafe.member.mapper.MemberMapper">
+
+    <insert id="join">
+        INSERT INTO member (m_id, m_pw, m_name, m_phone, m_email)
+        VALUES (#{m_id}, #{m_pw}, #{m_name}, #{m_phone}, #{m_email})
+    </insert>
+
+    <select id="login" resultType="org.study.cafe.member.vo.MemberVO">
+        SELECT * FROM member
+        WHERE m_id = #{m_id}
+    </select>
+
+    <select id="findMemberId" resultType="string">
+        SELECT m_id
+        FROM member
+        WHERE m_name = #{m_name} AND m_phone = #{m_phone}
+    </select>
+
+    <select id="findMemberPw" resultType="string">
+        SELECT m_pw
+        FROM member
+        WHERE m_id = #{m_id} AND m_phone = #{m_phone}
+    </select>
+
+    <update id="updatePw">
+        UPDATE member
+        SET m_pw = #{m_pw}
+        WHERE m_id = #{m_id}
+    </update>
+
+    <select id="idCheck" resultType="int">
+        SELECT COUNT(*)
+        FROM member
+        WHERE m_id = #{m_id}
+    </select>
+
+    <select id="getMember" resultType="org.study.cafe.member.vo.MemberVO">
+        SELECT * FROM member WHERE m_id = #{m_id}
+    </select>
+
+    <update id="updateMember" parameterType="org.study.cafe.member.vo.MemberVO">
+        UPDATE member
+        SET m_name = #{m_name}, m_phone = #{m_phone}, m_email = #{m_email}
+        WHERE m_id = #{m_id}
+    </update>
+
+    <delete id="deleteMember">
+        DELETE FROM member WHERE m_id = #{m_id}
+    </delete>
+
+</mapper>

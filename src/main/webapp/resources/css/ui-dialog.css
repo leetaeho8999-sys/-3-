@@ -1,0 +1,172 @@
+/* =====================================================
+   ui-dialog.css — 공통 토스트 + 알림/확인 모달
+   함수: window.showToast / showAlert / showConfirm
+   ===================================================== */
+
+/* ── 토스트 컨테이너 (우측 하단 스택, 모바일은 하단 중앙) ── */
+.ui-toast-container {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    z-index: 9999;
+    pointer-events: none;
+    max-width: calc(100vw - 48px);
+}
+
+.ui-toast {
+    pointer-events: auto;
+    min-width: 220px;
+    max-width: 360px;
+    padding: .85rem 1.1rem;
+    border-radius: 10px;
+    color: #fff;
+    font-size: .9rem;
+    font-weight: 500;
+    line-height: 1.45;
+    box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    transform: translateX(400px);
+    opacity: 0;
+    transition: transform .3s ease, opacity .3s ease;
+    word-break: break-word;
+}
+.ui-toast.show       { transform: translateX(0); opacity: 1; }
+.ui-toast.hide       { transform: translateX(400px); opacity: 0; }
+
+.ui-toast--success { background: #3a7d44; }
+.ui-toast--info    { background: #4a2c2a; }
+.ui-toast--error   { background: #b23a2e; }
+
+.ui-toast__icon { margin-right: 6px; font-weight: 700; }
+
+/* ── 모달 오버레이 ───────────────────────── */
+.ui-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    animation: uiDialogFadeIn .2s ease forwards;
+    padding: 16px;
+}
+.ui-dialog-overlay.hide {
+    animation: uiDialogFadeOut .15s ease forwards;
+}
+@keyframes uiDialogFadeIn  { to { opacity: 1; } }
+@keyframes uiDialogFadeOut { to { opacity: 0; } }
+
+/* ── 모달 박스 ──────────────────────────── */
+.ui-dialog {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.3);
+    min-width: 320px;
+    max-width: 440px;
+    width: 100%;
+    overflow: hidden;
+    transform: scale(.9);
+    opacity: 0;
+    animation: uiDialogPop .25s ease forwards;
+}
+.ui-dialog-overlay.hide .ui-dialog {
+    animation: uiDialogPopOut .15s ease forwards;
+}
+@keyframes uiDialogPop    { to { transform: scale(1); opacity: 1; } }
+@keyframes uiDialogPopOut { to { transform: scale(.95); opacity: 0; } }
+
+.ui-dialog__header {
+    padding: 1.1rem 1.4rem .6rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #f3efe8;
+}
+.ui-dialog__icon {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+.ui-dialog__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #4a2c2a;
+}
+
+.ui-dialog__body {
+    padding: 1rem 1.4rem 1.25rem;
+    font-size: .95rem;
+    color: #333;
+    line-height: 1.55;
+    white-space: pre-line;
+    word-break: break-word;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.ui-dialog__body--html { white-space: normal; }
+
+.ui-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: .8rem 1.2rem 1.2rem;
+    background: #fafafa;
+}
+
+.ui-btn {
+    min-width: 88px;
+    padding: .6rem 1.1rem;
+    border: none;
+    border-radius: 7px;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .15s, opacity .15s;
+    font-family: inherit;
+}
+.ui-btn--primary {
+    background: #4a2c2a;
+    color: #fff;
+}
+.ui-btn--primary:hover { background: #3a1f1d; }
+
+.ui-btn--secondary {
+    background: #f0ece5;
+    color: #4a2c2a;
+}
+.ui-btn--secondary:hover { background: #e6ddcd; }
+
+.ui-btn--danger {
+    background: #b23a2e;
+    color: #fff;
+}
+.ui-btn--danger:hover { background: #92281f; }
+
+/* ── 타입별 아이콘 색상 톤 ─────────────── */
+.ui-dialog--info    .ui-dialog__icon { color: #4a2c2a; }
+.ui-dialog--success .ui-dialog__icon { color: #3a7d44; }
+.ui-dialog--warning .ui-dialog__icon { color: #d18616; }
+.ui-dialog--error   .ui-dialog__icon { color: #b23a2e; }
+
+/* ── 반응형 ───────────────────────────── */
+@media (max-width: 600px) {
+    .ui-toast-container {
+        right: 12px;
+        left: 12px;
+        bottom: 16px;
+        align-items: center;
+        max-width: calc(100vw - 24px);
+    }
+    .ui-toast {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+    }
+    .ui-dialog { max-width: 90vw; }
+    .ui-btn { flex: 1; }
+}
