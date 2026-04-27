@@ -17,22 +17,22 @@
         border-radius: 15px; box-shadow: 0 10px 25px rgba(111, 78, 55, 0.15);
         width: 440px; text-align: center; border-top: 8px solid #8B5A2B;
     }
-    h2 { color: #5D4037; margin-bottom: 20px; font-weight: 800; }
-    .input-group { display: flex; gap: 8px; margin: 8px 0; }
-    input {
+    .register-box h2 { color: #5D4037; margin-bottom: 20px; font-weight: 800; }
+    .register-box .input-group { display: flex; gap: 8px; margin: 8px 0; }
+    .register-box input {
         width: 100%; padding: 12px;
         border: 1px solid #D7CCC8; border-radius: 8px;
         background-color: #FAFAFA; transition: all 0.3s ease;
         box-sizing: border-box; font-size: 14px;
     }
-    input:focus { border-color: #8B5A2B; outline: none; box-shadow: 0 0 8px rgba(139, 90, 43, 0.3); }
-    input[readonly] { background-color: #EFEBE9; color: #8D6E63; cursor: not-allowed; }
-    button {
+    .register-box input:focus { border-color: #8B5A2B; outline: none; box-shadow: 0 0 8px rgba(139, 90, 43, 0.3); }
+    .register-box input[readonly] { background-color: #EFEBE9; color: #8D6E63; cursor: not-allowed; }
+    .register-box button {
         padding: 12px; background-color: #8B5A2B; color: white;
         border: none; border-radius: 8px; cursor: pointer;
         font-size: 14px; font-weight: bold; transition: background-color 0.3s ease;
     }
-    button:hover { background-color: #6F4E37; }
+    .register-box button:hover { background-color: #6F4E37; }
     .sub-btn { width: 140px; background-color: #A1887F; }
     .join-btn { width: 100%; margin-top: 20px; font-size: 17px; }
     .cancel-btn { width: 100%; background-color: #A0522D; margin-top: 10px; }
@@ -80,7 +80,17 @@
         </div>
         <input type="hidden" id="isPhoneVerified" value="false">
 
-        <input type="email" name="m_email" placeholder="이메일 주소" required>
+        <div class="input-group">
+            <input type="email" id="joinEmail" name="m_email" placeholder="이메일 주소" required>
+            <button type="button" class="sub-btn" onclick="sendEmailAuth()">인증요청</button>
+        </div>
+        <div id="emailAuthBox" style="display:none; background-color:#FFF3E0; padding:15px; border-radius:8px; margin-top:5px;">
+            <div class="input-group">
+                <input type="text" id="emailAuthInput" placeholder="메일로 받은 4자리 입력" maxlength="4">
+                <button type="button" class="sub-btn" style="background-color: #6D4C41;" onclick="verifyEmail()">확인</button>
+            </div>
+        </div>
+        <input type="hidden" id="isEmailVerified" value="false">
 
         <button type="submit" class="join-btn">가입 신청하기</button>
         <button type="button" class="cancel-btn" onclick="location.href='${pageContext.request.contextPath}/member/login'">취소</button>
@@ -96,6 +106,7 @@
 <script>
     var ctx = '${pageContext.request.contextPath}';
     var generatedCode = "";
+    var generatedEmailCode = "";
 
     function checkId() {
         var id = document.getElementById('joinId').value;
@@ -145,6 +156,26 @@
         } else showAlert("인증번호를 다시 확인해주세요.", '인증 실패', 'error');
     }
 
+    function sendEmailAuth() {
+        var email = document.getElementById('joinEmail').value;
+        if (!email) { showToast("이메일을 입력해주세요.", 'info'); return; }
+        generatedEmailCode = Math.floor(1000 + Math.random() * 9000).toString();
+        showAlert("인증번호: " + generatedEmailCode, '인증번호 발송', 'info');
+        document.getElementById('emailAuthBox').style.display = 'block';
+        document.getElementById('joinEmail').readOnly = true;
+    }
+
+    function verifyEmail() {
+        var inputCode = document.getElementById('emailAuthInput').value;
+        if (inputCode === generatedEmailCode && generatedEmailCode !== "") {
+            showToast("이메일 인증 성공.", 'success');
+            document.getElementById('isEmailVerified').value = "true";
+            document.getElementById('emailAuthBox').style.display = 'none';
+        } else {
+            showAlert("인증번호가 올바르지 않습니다.", '인증 실패', 'error');
+        }
+    }
+
     function finalCheck() {
         if (document.getElementById('isIdChecked').value !== "true") {
             showToast("아이디 중복확인을 해주세요.", 'info'); return false;
@@ -154,6 +185,9 @@
         }
         if (document.getElementById('isPhoneVerified').value !== "true") {
             showToast("전화번호 인증을 해주세요.", 'info'); return false;
+        }
+        if (document.getElementById('isEmailVerified').value !== "true") {
+            showToast("이메일 인증을 해주세요.", 'info'); return false;
         }
         return true;
     }
