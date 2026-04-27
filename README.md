@@ -305,6 +305,7 @@ mvn spring-boot:run
 | 2026-04-24 | `menu_t`, `order_item_t` | `sql/alter_menu_size_upcharge.sql` — 사이즈 추가금 컬럼(`size_upcharge_grande`, `size_upcharge_venti`) 추가, `order_item_t.size` 컬럼 추가. 스타벅스 기준 Grande +500 / Venti +1,000, ESPRESSO/DESSERT 는 0 |
 | 2026-04-24 | `order_t` | `sql/alter_order_cancel.sql` — 취소/환불 컬럼 5개 추가 (`cancel_reason`, `cancel_memo`, `cancel_date`, `refund_amount`, `refund_rate`). 시간 기반 3단계 환불 정책 지원 |
 | 2026-04-24 | `cart_t` (신규) + `init_schema.sql` 통합 | 장바구니 테이블 신설 (`cart_idx`/`m_id`/`menu_name`/`temperature`/`size`/`quantity`/`unit_price`/`reg_date` + FK→member) + `init_schema.sql` 을 "최종 완성본" 으로 업그레이드 — 기존 alter 3종 내용(menu_t size 추가금 2컬럼, order_t cancel 5컬럼, order_item_t size 1컬럼)을 본문에 통합. 신규 환경은 `init_schema.sql` 한 번만 실행하면 완성. **기존 alter_*.sql / migrate_all_*.sql / update_menu_images_*.sql 은 이력 보존 목적으로 유지 (재실행 불필요)** |
+| 2026-04-27 | `menu_t` | image_url 경로 단축 (`/resources/images/` → `/images/`) — 정적 자원 classpath 이전(`webapp/resources` → `resources/static`) 동반 |
 
 ---
 
